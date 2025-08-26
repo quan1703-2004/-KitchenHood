@@ -314,9 +314,7 @@
                         <p class="text-muted mb-3">
                             Cam kết bảo hành chính hãng 5 năm với dịch vụ hậu mãi tốt nhất
                         </p>
-                        <a href="{{ route('about') }}" class="btn btn-outline-warning">
-                            <i class="fas fa-info-circle me-2"></i>Tìm Hiểu
-                        </a>
+            
                     </div>
                 </div>
             </div>

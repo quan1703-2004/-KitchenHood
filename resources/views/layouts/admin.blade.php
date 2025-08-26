@@ -648,6 +648,10 @@
                 <i class="fas fa-box"></i>
                 <span>Quản lý sản phẩm</span>
             </a>
+            <a class="nav-link {{ request()->routeIs('admin.news.*') ? 'active' : '' }}" href="{{ route('admin.news.index') }}">
+                <i class="fas fa-newspaper"></i>
+                <span>Quản lý tin tức</span>
+            </a>
             
             <div class="nav-divider"></div>
             

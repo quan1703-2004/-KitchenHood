@@ -795,6 +795,9 @@
                                     <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">
                                         <i class="fas fa-box me-2"></i>Quản lý sản phẩm
                                     </a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.news.index') }}">
+                                        <i class="fas fa-newspaper me-2"></i>Quản lý tin tức
+                                    </a></li>
                                 @endif
                                 
                                 <li><hr class="dropdown-divider"></li>

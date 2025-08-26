@@ -50,14 +50,16 @@ Route::get('/', function () {
     // Lấy sản phẩm mới nhất để hiển thị trên trang chủ
     $latestProducts = \App\Models\Product::with('category')->latest()->take(6)->get();
     $categories = \App\Models\Category::withCount('products')->take(4)->get();
+    
+    // Lấy tin tức nổi bật cho trang chủ
+    $featuredNews = \App\Models\News::published()->featured()->take(3)->get();
 
-    return view('customer.welcome', compact('latestProducts', 'categories'));
+    return view('customer.welcome', compact('latestProducts', 'categories', 'featuredNews'));
 })->name('home');
 
-// Trang Tin tức
-Route::get('/news', function () {
-    return view('customer.news.index');
-})->name('news.index');
+// Routes cho tin tức
+Route::get('/news', [App\Http\Controllers\NewsController::class, 'index'])->name('news.index');
+Route::get('/news/{slug}', [App\Http\Controllers\NewsController::class, 'show'])->name('news.show');
 
 // Trang Liên hệ
 Route::get('/contact', function () {
@@ -161,4 +163,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    
+    // Quản lý tin tức
+    Route::get('/news', [App\Http\Controllers\AdminNewsController::class, 'index'])->name('news.index');
+    Route::get('/news/create', [App\Http\Controllers\AdminNewsController::class, 'create'])->name('news.create');
+    Route::post('/news', [App\Http\Controllers\AdminNewsController::class, 'store'])->name('news.store');
+    Route::get('/news/{news}/edit', [App\Http\Controllers\AdminNewsController::class, 'edit'])->name('news.edit');
+    Route::put('/news/{news}', [App\Http\Controllers\AdminNewsController::class, 'update'])->name('news.update');
+    Route::delete('/news/{news}', [App\Http\Controllers\AdminNewsController::class, 'destroy'])->name('news.destroy');
 });

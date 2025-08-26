@@ -253,101 +253,41 @@
         </div>
 
         <div class="row g-4">
-            <!-- Tin tức 1 -->
+            @forelse($featuredNews as $article)
             <div class="col-lg-4 col-md-6">
                 <div class="card news-card h-100">
                     <div class="position-relative">
-                        <img src="https://via.placeholder.com/400x250/2c5aa0/ffffff?text=Xu+Hướng+2025" 
+                        <img src="{{ $article->image_url }}" 
                              class="card-img-top" 
-                             alt="Xu hướng máy hút mùi 2025"
+                             alt="{{ $article->title }}"
                              style="height: 250px; object-fit: cover;">
                         <div class="position-absolute top-0 start-0 m-3">
-                            <span class="badge bg-danger">MỚI</span>
+                            <span class="badge bg-danger">NỔI BẬT</span>
                         </div>
                         <div class="position-absolute bottom-0 end-0 m-3">
                             <small class="text-white bg-dark px-2 py-1 rounded">
-                                <i class="fas fa-calendar me-1"></i>15/01/2025
+                                <i class="fas fa-calendar me-1"></i>{{ $article->formatted_date }}
                             </small>
                         </div>
                     </div>
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold mb-3">Xu Hướng Máy Hút Mùi 2025</h5>
+                        <h5 class="card-title fw-bold mb-3">{{ $article->title }}</h5>
                         <p class="card-text text-muted mb-3">
-                            Khám phá những xu hướng mới nhất trong thiết kế và công nghệ máy hút mùi 
-                            cho căn bếp hiện đại năm 2025...
+                            {{ Str::limit($article->excerpt, 100) }}
                         </p>
                         <div class="mt-auto">
-                            <a href="#" class="btn btn-outline-primary">
+                            <a href="{{ route('news.show', $article->slug) }}" class="btn btn-outline-primary">
                                 <i class="fas fa-arrow-right me-2"></i>Đọc thêm
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Tin tức 2 -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card news-card h-100">
-                    <div class="position-relative">
-                        <img src="https://via.placeholder.com/400x250/28a745/ffffff?text=Hướng+Dẫn+Sử+Dụng" 
-                             class="card-img-top" 
-                             alt="Hướng dẫn sử dụng máy hút mùi"
-                             style="height: 250px; object-fit: cover;">
-                        <div class="position-absolute top-0 start-0 m-3">
-                            <span class="badge bg-success">HƯỚNG DẪN</span>
-                        </div>
-                        <div class="position-absolute bottom-0 end-0 m-3">
-                            <small class="text-white bg-dark px-2 py-1 rounded">
-                                <i class="fas fa-calendar me-1"></i>12/01/2025
-                            </small>
-                        </div>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold mb-3">Cách Bảo Trì Máy Hút Mùi</h5>
-                        <p class="card-text text-muted mb-3">
-                            Hướng dẫn chi tiết cách vệ sinh và bảo trì máy hút mùi để đảm bảo 
-                            hiệu suất tối ưu và tuổi thọ lâu dài...
-                        </p>
-                        <div class="mt-auto">
-                            <a href="#" class="btn btn-outline-primary">
-                                <i class="fas fa-arrow-right me-2"></i>Đọc thêm
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            @empty
+            <div class="col-12 text-center">
+                <p class="text-muted">Chưa có tin tức nổi bật nào.</p>
             </div>
-
-            <!-- Tin tức 3 -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card news-card h-100">
-                    <div class="position-relative">
-                        <img src="https://via.placeholder.com/400x250/ffc107/000000?text=Khuyến+Mãi+Đặc+Biệt" 
-                             class="card-img-top" 
-                             alt="Khuyến mãi đặc biệt"
-                             style="height: 250px; object-fit: cover;">
-                        <div class="position-absolute top-0 start-0 m-3">
-                            <span class="badge bg-warning text-dark">KHUYẾN MÃI</span>
-                        </div>
-                        <div class="position-absolute bottom-0 end-0 m-3">
-                            <small class="text-white bg-dark px-2 py-1 rounded">
-                                <i class="fas fa-calendar me-1"></i>10/01/2025
-                            </small>
-                        </div>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold mb-3">Khuyến Mãi Tết Nguyên Đán</h5>
-                        <p class="card-text text-muted mb-3">
-                            Chương trình khuyến mãi đặc biệt nhân dịp Tết Nguyên Đán với nhiều 
-                            ưu đãi hấp dẫn cho khách hàng...
-                        </p>
-                        <div class="mt-auto">
-                            <a href="#" class="btn btn-outline-primary">
-                                <i class="fas fa-arrow-right me-2"></i>Đọc thêm
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforelse
         </div>
 
         <div class="text-center mt-5">
