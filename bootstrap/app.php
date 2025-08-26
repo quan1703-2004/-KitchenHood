@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Đăng ký AdminMiddleware
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'check.cart' => \App\Http\Middleware\CheckCart::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

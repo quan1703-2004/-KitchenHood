@@ -5,6 +5,45 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+
+// Gửi link xác thực
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Link xác thực người dùng nhấp vào email
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    // Tìm user theo ID
+    $user = \App\Models\User::find($id);
+    
+    if (!$user) {
+        return redirect('/login')->with('error', 'User không tồn tại!');
+    }
+    
+    // Kiểm tra hash email
+    if (!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+        return redirect('/login')->with('error', 'Link xác thực không hợp lệ!');
+    }
+    
+    // Kiểm tra xem email đã được xác thực chưa
+    if ($user->hasVerifiedEmail()) {
+        return redirect('/login')->with('info', 'Email đã được xác thực rồi!');
+    }
+    
+    // Xác thực email
+    $user->email_verified_at = now();
+    $user->save();
+    
+    return redirect('/login')->with('success', 'Email đã được xác thực thành công! Bây giờ bạn có thể đăng nhập.');
+})->middleware(['signed'])->name('verification.verify');
+
+// Resend link
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Link xác thực đã gửi lại!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // Routes công khai - không cần đăng nhập
 Route::get('/', function () {
@@ -15,10 +54,10 @@ Route::get('/', function () {
     return view('customer.welcome', compact('latestProducts', 'categories'));
 })->name('home');
 
-// Trang Về chúng tôi
-Route::get('/about', function () {
-    return view('customer.about');
-})->name('about');
+// Trang Tin tức
+Route::get('/news', function () {
+    return view('customer.news.index');
+})->name('news.index');
 
 // Trang Liên hệ
 Route::get('/contact', function () {
@@ -32,9 +71,76 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Route tạm thời để kiểm tra user (sẽ xóa sau)
+Route::get('/check-user/{email}', function($email) {
+    $user = \App\Models\User::where('email', $email)->first();
+    if($user) {
+        return response()->json([
+            'found' => true,
+            'name' => $user->name,
+            'email_verified' => $user->email_verified_at ? true : false,
+            'email_verified_at' => $user->email_verified_at,
+            'role' => $user->role
+        ]);
+    }
+    return response()->json(['found' => false]);
+});
+
+// Route tạm thời để gửi lại email xác thực (sẽ xóa sau)
+Route::get('/resend-verification/{email}', function($email) {
+    $user = \App\Models\User::where('email', $email)->first();
+    if($user) {
+        if($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email đã được xác thực rồi!']);
+        }
+        
+        $user->sendEmailVerificationNotification();
+        return response()->json(['message' => 'Email xác thực đã được gửi lại!']);
+    }
+    return response()->json(['error' => 'User không tồn tại']);
+});
+
+// Route tạm thời để xác thực email thủ công (sẽ xóa sau)
+Route::get('/manual-verify/{email}', function($email) {
+    $user = \App\Models\User::where('email', $email)->first();
+    if($user) {
+        if($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email đã được xác thực rồi!']);
+        }
+        
+        // Xác thực email thủ công
+        $user->email_verified_at = now();
+        $user->save();
+        
+        return response()->json([
+            'message' => 'Email đã được xác thực thủ công thành công!',
+            'user' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at
+            ]
+        ]);
+    }
+    return response()->json(['error' => 'User không tồn tại']);
+});
+
 // Routes cho customer (công khai - không cần đăng nhập)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+// Routes cho giỏ hàng (yêu cầu đăng nhập)
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{product}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::put('/cart/update/{product}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{product}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+});
+
+// Routes cho thanh toán
+Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index')->middleware('check.cart');
+Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store')->middleware('check.cart');
+Route::get('/checkout/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
 
 // Routes cho admin (cần đăng nhập và quyền admin)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

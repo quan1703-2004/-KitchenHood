@@ -138,9 +138,12 @@
                     <!-- Nút hành động -->
                     <div class="d-grid gap-2">
                         @if($product->quantity > 0 && $product->is_active)
-                            <button class="btn btn-success btn-lg">
-                                <i class="fas fa-shopping-cart me-2"></i>Thêm Vào Giỏ Hàng
-                            </button>
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-grid add-to-cart-form">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-shopping-cart me-2"></i>Thêm Vào Giỏ Hàng
+                                </button>
+                            </form>
                         @else
                             <button class="btn btn-secondary btn-lg" disabled>
                                 <i class="fas fa-ban me-2"></i>Không Khả Dụng
@@ -152,10 +155,77 @@
                             <i class="fas fa-tags me-2"></i>Xem Sản Phẩm Cùng Danh Mục
                         </a>
                         @endif
+                        
+                        <!-- Nút xem giỏ hàng -->
+                        <a href="{{ route('cart.index') }}" class="btn btn-outline-info">
+                            <i class="fas fa-shopping-bag me-2"></i>Xem Giỏ Hàng
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Xử lý thêm vào giỏ hàng với SweetAlert2
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const productName = '{{ $product->name }}';
+            
+            // Hiển thị loading
+            Swal.fire({
+                title: 'Đang thêm vào giỏ hàng...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Gửi request
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cập nhật số lượng giỏ hàng
+                    const cartCount = document.getElementById('cart-count');
+                    if (cartCount) {
+                        cartCount.textContent = data.cartCount;
+                    }
+                    
+                    // Hiển thị thông báo thành công
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: `Đã thêm "${productName}" vào giỏ hàng`,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                } else {
+                    throw new Error(data.message || 'Có lỗi xảy ra');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: error.message || 'Không thể thêm sản phẩm vào giỏ hàng',
+                    confirmButtonText: 'Thử lại'
+                });
+            });
+        });
+    });
+});
+</script> 

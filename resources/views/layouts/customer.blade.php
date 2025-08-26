@@ -3,27 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>KitchenHood Pro - Máy Hút Mùi Chất Lượng Cao</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Fallback cho Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" crossorigin="anonymous">
+    <!-- CDN dự phòng -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
     <style>
         :root {
-            --primary-color: #2c5aa0;
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --primary-light: #5dade2;
             --secondary-color: #f8f9fa;
             --accent-color: #ffc107;
-            --text-dark: #2d3748;
-            --text-light: #718096;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --white: #ffffff;
+            --light-blue: #ecf0f1;
+            --border-color: #e9ecef;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
+            background-color: #f2f4f7;
+            color: var(--text-dark);
         }
         
         .navbar {
-            background: white !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--white) !important;
+            box-shadow: 0 2px 20px rgba(52, 152, 219, 0.1);
             padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .navbar-brand {
@@ -35,50 +50,62 @@
         .nav-link {
             font-weight: 500;
             color: var(--text-dark) !important;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
             padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            margin: 0 0.25rem;
         }
         
         .nav-link:hover {
             color: var(--primary-color) !important;
+            background-color: var(--light-blue);
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
         }
         
         .btn-login {
-            background: linear-gradient(45deg, var(--primary-color), #1e40af);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             border: none;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
+            color: var(--white);
+            padding: 10px 24px;
+            border-radius: 25px;
             font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         }
         
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(44, 90, 160, 0.3);
-            color: white;
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+            color: var(--white);
         }
         
         .dropdown-menu {
             border: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            min-width: 200px;
+            box-shadow: 0 15px 35px rgba(52, 152, 219, 0.15);
+            border-radius: 15px;
+            min-width: 220px;
+            border: 1px solid var(--border-color);
         }
         
         .dropdown-item {
-            padding: 10px 20px;
-            transition: background-color 0.3s ease;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 2px 8px;
         }
         
         .dropdown-item:hover {
-            background-color: var(--secondary-color);
+            background-color: var(--light-blue);
             color: var(--primary-color);
+            transform: translateX(5px);
         }
         
         .dropdown-item.active {
-            background-color: var(--primary-color);
-            color: white;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
         }
         
         .cart-badge {
@@ -89,10 +116,11 @@
             color: #000;
             font-size: 0.7rem;
             font-weight: 700;
-            padding: 2px 6px;
+            padding: 3px 7px;
             border-radius: 50%;
-            min-width: 18px;
+            min-width: 20px;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
         }
         
         .breadcrumb {
@@ -121,7 +149,7 @@
         
         .form-control:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
         }
         
         .btn-outline-primary:hover {
@@ -131,33 +159,36 @@
         
         .pagination .page-link {
             color: var(--primary-color);
-            border-color: #dee2e6;
+            border-color: var(--border-color);
         }
         
         .pagination .page-link:hover {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
-            color: white;
+            color: var(--white);
         }
         
         .pagination .page-item.active .page-link {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             border-color: var(--primary-color);
         }
         
         .alert {
-            border-radius: 10px;
+            border-radius: 15px;
             border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
         
         .alert-success {
-            background-color: #d4edda;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
             color: #155724;
+            border-left: 4px solid #28a745;
         }
         
         .alert-danger {
-            background-color: #f8d7da;
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
             color: #721c24;
+            border-left: 4px solid #dc3545;
         }
         
         .invalid-feedback {
@@ -175,7 +206,7 @@
         }
         
         .newsletter-section {
-            background: linear-gradient(135deg, var(--primary-color), #1e40af);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
         }
         
         .newsletter-section .form-control {
@@ -191,13 +222,16 @@
         .product-card {
             transition: all 0.3s ease;
             border: none;
-            border-radius: 15px;
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.1);
+            border: 1px solid var(--border-color);
         }
         
         .product-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 40px rgba(52, 152, 219, 0.2);
+            border-color: var(--primary-light);
         }
         
         .product-image {
@@ -211,78 +245,383 @@
         }
         
         .price-tag {
-            background: linear-gradient(45deg, #ffc107, #ffca28);
+            background: linear-gradient(135deg, var(--accent-color), #ffca28);
             color: #000;
             font-weight: 700;
             font-size: 1.1rem;
+            border-radius: 20px;
+            padding: 8px 16px;
         }
         
         .btn-add-cart {
-            background: linear-gradient(45deg, #2c5aa0, #1e40af);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             border: none;
             padding: 12px 24px;
             font-weight: 600;
             border-radius: 25px;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         }
         
         .btn-add-cart:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(44, 90, 160, 0.3);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
         }
         
         .rating-stars {
-            color: #ffc107;
+            color: var(--accent-color);
+        }
+        
+        /* Fallback cho Font Awesome icons */
+        .fas, .far, .fab {
+            display: inline-block !important;
+            font-style: normal !important;
+            font-variant: normal !important;
+            text-rendering: auto !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+        }
+        
+        /* Fallback text cho các icon quan trọng */
+        .icon-fallback {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: inherit;
+        }
+        
+        /* Đảm bảo icon hiển thị đúng */
+        .navbar .fas,
+        .navbar .far,
+        .navbar .fab {
+            font-size: 1em;
+            line-height: 1;
+            vertical-align: middle;
         }
         
         .category-filter {
-            background: white;
-            border-radius: 15px;
+            background: var(--white);
+            border-radius: 20px;
             padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.1);
+            border: 1px solid var(--border-color);
         }
         
         .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 70vh;
+            position: relative;
+            overflow: hidden;
+            background: var(--white);
+        }
+        
+        .hero-slide {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        /* Text styling cho banner để dễ đọc */
+        .hero-slide .text-dark {
+            color: #ffffff !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-weight: 700;
+        }
+        
+        .hero-slide .text-muted {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+            font-weight: 500;
+        }
+        
+        .hero-slide .text-primary {
+            color: #ffffff !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-weight: 800;
+        }
+        
+        .hero-slide .badge {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            font-weight: 600;
+        }
+        
+        .hero-slide .btn {
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-slide .btn-outline-primary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #ffffff;
+            color: #2c3e50;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-slide .btn-outline-primary:hover {
+            background: #ffffff;
+            border-color: #ffffff;
+            color: #2c3e50;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .hero-slide .btn-primary {
+            background: rgba(52, 152, 219, 0.9);
+            border: 2px solid #ffffff;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-slide .btn-primary:hover {
+            background: rgba(52, 152, 219, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Overlay tối để tăng độ tương phản */
+        .hero-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.6) 100%);
+            z-index: 1;
+        }
+        
+        .hero-slide .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Responsive text sizing */
+        @media (max-width: 768px) {
+            .hero-slide .display-3 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-slide .lead {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-slide .display-3 {
+                font-size: 2rem;
+            }
+            
+            .hero-slide .lead {
+                font-size: 1rem;
+            }
+        }
+        
+        .carousel {
+            height: 70vh;
+        }
+        
+        .carousel-item {
+            height: 70vh;
+        }
+        
+        .carousel-item .hero-slide {
+            height: 100%;
+        }
+        
+        .carousel-indicators {
+            bottom: 30px;
+            z-index: 15;
+        }
+        
+        .carousel-indicators button {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: rgba(52, 152, 219, 0.3);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+            margin: 0 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .carousel-indicators button.active {
+            background-color: var(--primary-color);
+        }
+        
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 60px;
+            height: 60px;
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .carousel-control-prev:hover,
+        .carousel-control-next:hover {
+            background: rgba(52, 152, 219, 0.4);
+            border-color: var(--primary-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .hero-image img {
+            transition: transform 0.3s ease;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .carousel-item.active .hero-image img {
+            transform: scale(1.05);
+        }
+        
+        /* Animation cho carousel content */
+        .carousel-item .text-white {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .carousel-item .hero-image {
+            animation: fadeInRight 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Responsive cho carousel */
+        @media (max-width: 768px) {
+            .hero-section,
+            .carousel,
+            .carousel-item,
+            .hero-slide {
+                min-height: 60vh;
+                height: 60vh;
+            }
+            
+            .carousel-control-prev,
+            .carousel-control-next {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .carousel-indicators {
+                bottom: 20px;
+            }
+            
+            .carousel-indicators button {
+                width: 12px;
+                height: 12px;
+                margin: 0 6px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-section,
+            .carousel,
+            .carousel-item,
+            .hero-slide {
+                min-height: 50vh;
+                height: 50vh;
+            }
+            
+            .carousel-control-prev,
+            .carousel-control-next {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .carousel-control-prev-icon,
+            .carousel-control-next-icon {
+                width: 18px;
+                height: 18px;
+            }
         }
         
         .feature-card {
             text-align: center;
-            padding: 2rem;
+            padding: 2.5rem;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.1);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(52, 152, 219, 0.2);
+            border-color: var(--primary-light);
         }
         
         .feature-icon {
-            background: linear-gradient(135deg, var(--primary-color), #1e40af);
-            color: white;
-            width: 80px;
-            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
         }
         
         .stats-card {
             text-align: center;
-            padding: 2rem;
+            padding: 2.5rem;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.1);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(52, 152, 219, 0.2);
         }
         
         .stats-card h3 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            color: var(--primary-color);
         }
         
         .stats-card p {
             color: var(--text-light);
             margin-bottom: 0;
+            font-weight: 500;
         }
         
         .section-title {
             color: var(--text-dark);
             margin-bottom: 1rem;
+            font-weight: 700;
         }
         
         .product-title {
@@ -297,18 +636,19 @@
         }
         
         .btn-custom {
-            background: linear-gradient(45deg, var(--accent-color), #e0a800);
+            background: linear-gradient(135deg, var(--accent-color), #e0a800);
             border: none;
             color: #000;
             font-weight: 600;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border-radius: 25px;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
         }
         
         .btn-custom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(255, 193, 7, 0.3);
+            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4);
             color: #000;
         }
         
@@ -336,28 +676,30 @@
         }
         
         .admin-badge {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-            color: white;
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: var(--white);
             font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 3px 10px;
+            border-radius: 15px;
             margin-left: 5px;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
         }
         
         footer {
-            background: #1a1a1a;
-            color: white;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: var(--white);
             margin-top: auto;
         }
         
         .footer-link {
-            color: #ccc;
+            color: #bdc3c7;
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         .footer-link:hover {
             color: var(--accent-color);
+            transform: translateX(5px);
         }
     </style>
 </head>
@@ -376,23 +718,23 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">
+                        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="/">
                             <i class="fas fa-home me-1"></i>Trang chủ
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('products.index') }}">
+                        <a class="nav-link {{ request()->is('products*') ? 'active' : '' }}" href="{{ route('products.index') }}">
                             <i class="fas fa-box me-1"></i>Sản phẩm
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('about') }}">
-                            <i class="fas fa-info-circle me-1"></i>Về chúng tôi
+                        <a class="nav-link {{ request()->is('news*') ? 'active' : '' }}" href="{{ route('news.index') }}">
+                            <i class="fas fa-newspaper me-1"></i>Tin tức
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('contact') }}">
+                        <a class="nav-link {{ request()->is('contact*') ? 'active' : '' }}" href="{{ route('contact') }}">
                             <i class="fas fa-phone me-1"></i>Liên hệ
                         </a>
                     </li>
@@ -405,9 +747,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link position-relative" href="#">
+                        <a class="nav-link position-relative" href="{{ route('cart.index') }}">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-badge">0</span>
+                            <span class="cart-badge" id="cart-count">{{ $cartCount ?? 0 }}</span>
                         </a>
                     </li>
                     
@@ -557,6 +899,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -581,6 +924,49 @@
                     link.classList.add('active');
                 }
             });
+            
+            // Carousel functionality
+            const heroCarousel = document.getElementById('heroCarousel');
+            if (heroCarousel) {
+                // Auto-play carousel
+                const carousel = new bootstrap.Carousel(heroCarousel, {
+                    interval: 5000,
+                    wrap: true,
+                    keyboard: true,
+                    pause: 'hover'
+                });
+                
+                // Pause carousel on hover
+                heroCarousel.addEventListener('mouseenter', function() {
+                    carousel.pause();
+                });
+                
+                heroCarousel.addEventListener('mouseleave', function() {
+                    carousel.cycle();
+                });
+                
+                // Add smooth transitions
+                heroCarousel.addEventListener('slide.bs.carousel', function(e) {
+                    const activeItem = heroCarousel.querySelector('.carousel-item.active');
+                    const nextItem = heroCarousel.querySelectorAll('.carousel-item')[e.to];
+                    
+                    if (activeItem) {
+                        activeItem.style.transition = 'opacity 0.6s ease-in-out';
+                    }
+                    if (nextItem) {
+                        nextItem.style.transition = 'opacity 0.6s ease-in-out';
+                    }
+                });
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'ArrowLeft') {
+                        carousel.prev();
+                    } else if (e.key === 'ArrowRight') {
+                        carousel.next();
+                    }
+                });
+            }
         });
     </script>
 </body>

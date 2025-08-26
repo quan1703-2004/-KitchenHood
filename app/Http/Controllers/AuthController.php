@@ -25,14 +25,21 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        User::create([
+        // Tạo user mới
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'customer', // Mặc định là customer
         ]);
 
-        Session::flash('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
+        // Gửi email xác thực
+        $user->sendEmailVerificationNotification();
+
+        // Lưu thông tin user vào session để hiển thị thông báo
+        Session::put('registered_user', $user->email);
+        Session::flash('success', 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.');
+        
         return redirect()->route('login');
     }
 
@@ -54,6 +61,16 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            
+            // Kiểm tra xem email đã được xác thực chưa
+            if (!Auth::user()->hasVerifiedEmail()) {
+                Auth::logout();
+                Session::flash('warning', 'Vui lòng xác thực email trước khi đăng nhập. Kiểm tra email của bạn.');
+                return redirect()->route('login');
+            }
+            
+            // Xóa session registered_user nếu có
+            Session::forget('registered_user');
             
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('admin.dashboard');
