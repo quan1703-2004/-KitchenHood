@@ -54,7 +54,7 @@ class AdminController extends Controller
      */
     public function products()
     {
-        $products = Product::with('category')->latest()->get();
+        $products = Product::with('category')->latest()->paginate(10);
         return view('admin.products.index', compact('products'));
     }
 

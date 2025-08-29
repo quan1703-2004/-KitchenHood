@@ -39,95 +39,100 @@
                     <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
                         @csrf
                         
-                        <div class="row">
-                            <!-- Họ và tên -->
-                            <div class="col-md-6 mb-3">
-                                <label for="customer_name" class="form-label fw-bold text-dark">
-                                    Họ và tên <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" 
-                                       class="form-control @error('customer_name') is-invalid @enderror" 
-                                       id="customer_name" 
-                                       name="customer_name" 
-                                       value="{{ old('customer_name') }}" 
-                                       placeholder="Nhập họ và tên đầy đủ"
-                                       required>
-                                @error('customer_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            
-                            <!-- Email -->
-                            <div class="col-md-6 mb-3">
-                                <label for="customer_email" class="form-label fw-bold text-dark">
-                                    Email <span class="text-danger">*</span>
-                                </label>
-                                <input type="email" 
-                                       class="form-control @error('customer_email') is-invalid @enderror" 
-                                       id="customer_email" 
-                                       name="customer_email" 
-                                       value="{{ old('customer_email') }}" 
-                                       placeholder="example@email.com"
-                                       required>
-                                @error('customer_email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <!-- Số điện thoại -->
-                            <div class="col-md-6 mb-3">
-                                <label for="customer_phone" class="form-label fw-bold text-dark">
-                                    Số điện thoại <span class="text-danger">*</span>
-                                </label>
-                                <input type="tel" 
-                                       class="form-control @error('customer_phone') is-invalid @enderror" 
-                                       id="customer_phone" 
-                                       name="customer_phone" 
-                                       value="{{ old('customer_phone') }}" 
-                                       placeholder="0123456789"
-                                       required>
-                                @error('customer_phone')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            
-                            <!-- Phương thức thanh toán -->
-                            <div class="col-md-6 mb-3">
-                                <label for="payment_method" class="form-label fw-bold text-dark">
-                                    Phương thức thanh toán <span class="text-danger">*</span>
-                                </label>
-                                <select class="form-select @error('payment_method') is-invalid @enderror" 
-                                        id="payment_method" 
-                                        name="payment_method" 
-                                        required>
-                                    <option value="">Chọn phương thức thanh toán</option>
-                                    <option value="cod" {{ old('payment_method') == 'cod' ? 'selected' : '' }}>
-                                        Thanh toán khi nhận hàng (COD)
-                                    </option>
-                                    <option value="bank_transfer" {{ old('payment_method') == 'bank_transfer' ? 'selected' : '' }}>
-                                        Chuyển khoản ngân hàng
-                                    </option>
-                                </select>
-                                @error('payment_method')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <!-- Địa chỉ giao hàng -->
-                        <div class="mb-3">
-                            <label for="customer_address" class="form-label fw-bold text-dark">
-                                Địa chỉ giao hàng <span class="text-danger">*</span>
+                        <!-- Chọn địa chỉ giao hàng -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">
+                                Chọn địa chỉ giao hàng <span class="text-danger">*</span>
                             </label>
-                            <textarea class="form-control @error('customer_address') is-invalid @enderror" 
-                                      id="customer_address" 
-                                      name="customer_address" 
-                                      rows="3" 
-                                      placeholder="Nhập địa chỉ giao hàng chi tiết (số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố)"
-                                      required>{{ old('customer_address') }}</textarea>
-                            @error('customer_address')
+                            
+                            @if($addresses->count() > 0)
+                                <div class="address-selection">
+                                    @foreach($addresses as $address)
+                                        <div class="form-check address-option mb-3 p-3 border rounded {{ $address->is_default ? 'border-primary bg-light' : 'border-light' }}">
+                                            <input class="form-check-input" type="radio" 
+                                                   name="address_id" 
+                                                   id="address_{{ $address->id }}" 
+                                                   value="{{ $address->id }}"
+                                                   {{ $address->is_default ? 'checked' : '' }}
+                                                   required>
+                                            <label class="form-check-label w-100" for="address_{{ $address->id }}">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div class="flex-grow-1">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <h6 class="mb-0 fw-bold text-dark">{{ $address->full_name }}</h6>
+                                                            @if($address->is_default)
+                                                                <span class="badge bg-primary ms-2">
+                                                                    <i class="fas fa-star me-1"></i>Mặc định
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        <div class="text-muted mb-1">
+                                                            <i class="fas fa-phone me-2"></i>{{ $address->phone }}
+                                                        </div>
+                                                        <div class="text-muted">
+                                                            <i class="fas fa-map-marker-alt me-2"></i>
+                                                            @if($address->hasCompleteAddress())
+                                                                {{ $address->street_address }}, {{ $address->short_address }}
+                                                            @else
+                                                                {{ $address->street_address }}
+                                                            @endif
+                                                        </div>
+                                                        @if($address->note)
+                                                            <div class="text-muted small mt-1">
+                                                                <i class="fas fa-sticky-note me-2"></i>{{ $address->note }}
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                    
+                                    <div class="text-center mt-3">
+                                        <a href="{{ route('addresses.create') }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-plus me-2"></i>Thêm địa chỉ mới
+                                        </a>
+                                        <a href="{{ route('addresses.index') }}" class="btn btn-outline-secondary btn-sm ms-2">
+                                            <i class="fas fa-cog me-2"></i>Quản lý địa chỉ
+                                        </a>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="alert alert-warning">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-exclamation-triangle me-3"></i>
+                                        <div>
+                                            <h6 class="mb-2">Bạn chưa có địa chỉ giao hàng</h6>
+                                            <p class="mb-0">Vui lòng thêm địa chỉ giao hàng để tiếp tục đặt hàng.</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <a href="{{ route('addresses.create') }}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-2"></i>Thêm địa chỉ mới
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <!-- Phương thức thanh toán -->
+                        <div class="mb-4">
+                            <label for="payment_method" class="form-label fw-bold text-dark">
+                                Phương thức thanh toán <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select @error('payment_method') is-invalid @enderror" 
+                                    id="payment_method" 
+                                    name="payment_method" 
+                                    required>
+                                <option value="">Chọn phương thức thanh toán</option>
+                                <option value="cod" {{ old('payment_method') == 'cod' ? 'selected' : '' }}>
+                                    Thanh toán khi nhận hàng (COD)
+                                </option>
+                                <option value="bank_transfer" {{ old('payment_method') == 'bank_transfer' ? 'selected' : '' }}>
+                                    Chuyển khoản ngân hàng
+                                </option>
+                            </select>
+                            @error('payment_method')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -165,9 +170,10 @@
                         
                         <!-- Nút đặt hàng -->
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg fw-bold" id="submitOrder">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold" id="submitOrder" 
+                                    {{ $addresses->count() == 0 ? 'disabled' : '' }}>
                                 <i class="fas fa-check-circle me-2"></i>
-                                Đặt Hàng Ngay
+                                {{ $addresses->count() == 0 ? 'Vui lòng thêm địa chỉ giao hàng' : 'Đặt Hàng Ngay' }}
                             </button>
                         </div>
                     </form>
@@ -275,6 +281,20 @@
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
 }
 
+.address-option {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.address-option:hover {
+    border-color: #007bff !important;
+    background-color: #f8f9fa;
+}
+
+.address-option input[type="radio"]:checked + label {
+    color: #007bff;
+}
+
 .order-item {
     transition: all 0.3s ease;
 }
@@ -301,10 +321,15 @@
     border: none;
 }
 
-.btn-success:hover {
+.btn-success:hover:not(:disabled) {
     background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-success:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
@@ -323,6 +348,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Xử lý submit form
     form.addEventListener('submit', function(e) {
+        // Kiểm tra xem có địa chỉ nào được chọn không
+        const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+        if (!selectedAddress) {
+            e.preventDefault();
+            alert('Vui lòng chọn địa chỉ giao hàng!');
+            return;
+        }
+        
         // Disable nút submit để tránh double submit
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
@@ -330,39 +363,23 @@ document.addEventListener('DOMContentLoaded', function() {
         // Form sẽ được submit bình thường
     });
     
-    // Validation cho số điện thoại
-    const phoneInput = document.getElementById('customer_phone');
-    phoneInput.addEventListener('input', function() {
-        // Chỉ cho phép nhập số
-        this.value = this.value.replace(/[^0-9]/g, '');
-        
-        // Giới hạn độ dài
-        if (this.value.length > 11) {
-            this.value = this.value.slice(0, 11);
-        }
-    });
-    
-    // Validation cho email
-    const emailInput = document.getElementById('customer_email');
-    emailInput.addEventListener('blur', function() {
-        const email = this.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (email && !emailRegex.test(email)) {
-            this.classList.add('is-invalid');
-            if (!this.nextElementSibling || !this.nextElementSibling.classList.contains('invalid-feedback')) {
-                const feedback = document.createElement('div');
-                feedback.className = 'invalid-feedback';
-                feedback.textContent = 'Email không hợp lệ';
-                this.parentNode.appendChild(feedback);
+    // Xử lý khi chọn địa chỉ
+    const addressOptions = document.querySelectorAll('input[name="address_id"]');
+    addressOptions.forEach(option => {
+        option.addEventListener('change', function() {
+            // Bỏ highlight tất cả địa chỉ
+            document.querySelectorAll('.address-option').forEach(addr => {
+                addr.classList.remove('border-primary', 'bg-light');
+                addr.classList.add('border-light');
+            });
+            
+            // Highlight địa chỉ được chọn
+            if (this.checked) {
+                const addressOption = this.closest('.address-option');
+                addressOption.classList.remove('border-light');
+                addressOption.classList.add('border-primary', 'bg-light');
             }
-        } else {
-            this.classList.remove('is-invalid');
-            const feedback = this.parentNode.querySelector('.invalid-feedback');
-            if (feedback) {
-                feedback.remove();
-            }
-        }
+        });
     });
 });
 </script>

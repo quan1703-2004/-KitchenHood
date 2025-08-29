@@ -89,6 +89,47 @@
         font-weight: bold;
         color: inherit;
     }
+    
+    /* Phân trang: kiểu pill bo tròn, đổ bóng nhẹ, kích thước gọn */
+    nav[aria-label="Product pagination"] .pagination {
+        justify-content: center;
+        gap: 8px; /* khoảng cách nhẹ giữa các nút */
+    }
+    nav[aria-label="Product pagination"] .page-link {
+        padding: 0.4rem 0.8rem; /* gọn gàng */
+        min-width: 36px; /* đảm bảo nút đều nhau */
+        text-align: center;
+        border: 0;
+        border-radius: 999px; /* dạng pill */
+        font-weight: 600;
+        background-color: #ffffff;
+        color: #0d6efd;
+        box-shadow: 0 4px 12px rgba(13,110,253,0.08);
+        transition: all 0.2s ease;
+    }
+    nav[aria-label="Product pagination"] .page-link:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(13,110,253,0.18);
+        color: #0b5ed7;
+    }
+    nav[aria-label="Product pagination"] .page-item.active .page-link {
+        background: linear-gradient(45deg, #0d6efd, #2c7dff);
+        color: #fff;
+        box-shadow: 0 8px 18px rgba(13,110,253,0.25);
+    }
+    nav[aria-label="Product pagination"] .page-item.disabled .page-link {
+        background-color: #f3f6fc;
+        color: #9db5e8;
+        box-shadow: none;
+    }
+
+    /* Ẩn dòng summary "Showing x to y of z results" trong template Tailwind mặc định */
+    .pagination-wrapper > div > div:first-child {
+        display: none !important; /* ẩn cột chứa đoạn summary nếu tồn tại */
+    }
+    .pagination-wrapper {
+        text-align: center; /* fallback căn giữa khi dùng layout khác */
+    }
 </style>
 
 <div class="bg-light py-5">
@@ -239,9 +280,9 @@
         <!-- Pagination -->
         @if($products->hasPages())
         <div class="row mt-5">
-            <div class="col-12">
-                <nav aria-label="Product pagination">
-                    {{ $products->appends(request()->query())->links() }}
+            <div class="col-12 pagination-wrapper">
+                <nav aria-label="Product pagination" class="d-flex justify-content-center">
+                    {{ $products->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
                 </nav>
             </div>
         </div>
@@ -249,25 +290,7 @@
     </div>
 </div>
 
-<!-- Newsletter Section -->
-<div class="bg-primary text-white py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h3 class="fw-bold mb-2">Đăng ký nhận thông tin mới nhất</h3>
-                <p class="mb-0">Nhận thông báo về sản phẩm mới và khuyến mãi đặc biệt</p>
-            </div>
-            <div class="col-lg-4">
-                <div class="input-group">
-                    <input type="email" class="form-control" placeholder="Email của bạn">
-                    <button class="btn btn-warning" type="button">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 @endsection
 
 <script>
@@ -347,5 +370,18 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+    
+    // Ẩn dòng summary "Showing x to y of z results" nếu có (đôi khi do template Tailwind)
+    try {
+        const wrapper = document.querySelector('.pagination-wrapper') || document;
+        wrapper.querySelectorAll('*').forEach(function(node) {
+            const text = (node.textContent || '').trim();
+            if (/^Showing\s+\d+\s+to\s+\d+\s+of\s+\d+\s+results$/i.test(text)) {
+                node.style.display = 'none';
+            }
+        });
+    } catch (e) {
+        // bỏ qua lỗi nếu DOM chưa sẵn
+    }
 });
 </script>

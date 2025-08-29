@@ -14,6 +14,8 @@ class Product extends Model
         'name',
         'description', 
         'image',
+        'image2',
+        'image3',
         'quantity',
         'price',
         'features',
@@ -45,5 +47,13 @@ class Product extends Model
             return asset('storage/' . $this->image);
         }
         return 'https://via.placeholder.com/300x300?text=No+Image';
+    }
+
+    /**
+     * Quan hệ chi tiết sản phẩm (1-1)
+     */
+    public function detail()
+    {
+        return $this->hasOne(ProductDetail::class);
     }
 }

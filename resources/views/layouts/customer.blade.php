@@ -776,8 +776,11 @@
                                 <li><a class="dropdown-item" href="#">
                                     <i class="fas fa-user me-2"></i>Thông tin tài khoản
                                 </a></li>
-                                <li><a class="dropdown-item" href="#">
+                                <li><a class="dropdown-item" href="{{ route('orders.index') }}">
                                     <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ route('addresses.index') }}">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Quản lý địa chỉ
                                 </a></li>
                                 <li><a class="dropdown-item" href="#">
                                     <i class="fas fa-heart me-2"></i>Sản phẩm yêu thích

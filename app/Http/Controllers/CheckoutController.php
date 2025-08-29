@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Address;
 
 class CheckoutController extends Controller
 {
@@ -52,7 +53,11 @@ class CheckoutController extends Controller
 
         $finalTotal = $total + $shippingFee;
 
-        return view('customer.checkout.index', compact('cartItems', 'total', 'shippingFee', 'finalTotal'));
+        // Lấy danh sách địa chỉ của user
+        $addresses = Auth::user()->addresses()->orderBy('is_default', 'desc')->get();
+        $defaultAddress = Auth::user()->getDefaultAddress();
+
+        return view('customer.checkout.index', compact('cartItems', 'total', 'shippingFee', 'finalTotal', 'addresses', 'defaultAddress'));
     }
 
     /**
@@ -61,16 +66,22 @@ class CheckoutController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'customer_address' => 'required|string|max:500',
+            'address_id' => 'required|exists:addresses,id',
             'payment_method' => 'required|in:cod,bank_transfer',
             'notes' => 'nullable|string|max:1000'
         ]);
         
         if (!Auth::check()) {
             return redirect()->route('login');
+        }
+
+        // Kiểm tra quyền sở hữu địa chỉ
+        $address = Address::where('id', $request->address_id)
+                         ->where('user_id', Auth::id())
+                         ->first();
+        
+        if (!$address) {
+            return redirect()->back()->with('error', 'Địa chỉ không hợp lệ!');
         }
 
         $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
@@ -83,13 +94,13 @@ class CheckoutController extends Controller
         }
         
         try {
-            // Tạo đơn hàng mới
+            // Tạo đơn hàng mới sử dụng thông tin từ địa chỉ đã lưu
             $order = Order::create([
                 'order_number' => 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid()),
-                'customer_name' => $request->customer_name,
-                'customer_email' => $request->customer_email,
-                'customer_phone' => $request->customer_phone,
-                'customer_address' => $request->customer_address,
+                'customer_name' => $address->full_name,
+                'customer_email' => Auth::user()->email,
+                'customer_phone' => $address->phone,
+                'customer_address' => $address->full_address,
                 'payment_method' => $request->payment_method,
                 'notes' => $request->notes,
                 'status' => 'pending',

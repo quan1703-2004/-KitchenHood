@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AddressController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
@@ -130,6 +131,11 @@ Route::get('/manual-verify/{email}', function($email) {
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
+// API routes để lấy tỉnh thành, quận huyện, phường xã (công khai)
+Route::get('/api/provinces', [AddressController::class, 'getProvinces'])->name('addresses.provinces');
+Route::get('/api/districts/{provinceId}', [AddressController::class, 'getDistricts'])->name('addresses.districts');
+Route::get('/api/wards/{districtId}', [AddressController::class, 'getWards'])->name('addresses.wards');
+
 // Routes cho giỏ hàng (yêu cầu đăng nhập)
 Route::middleware('auth')->group(function () {
     Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
@@ -137,6 +143,26 @@ Route::middleware('auth')->group(function () {
     Route::put('/cart/update/{product}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{product}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+    
+    // Routes cho quản lý địa chỉ
+    Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
+    Route::get('/addresses/create', [AddressController::class, 'create'])->name('addresses.create');
+    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::get('/addresses/{address}/edit', [AddressController::class, 'edit'])->name('addresses.edit');
+    Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::post('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
+    
+    // API route để lấy danh sách địa chỉ (cho checkout)
+    Route::get('/api/addresses', [AddressController::class, 'getAddresses'])->name('addresses.api');
+    
+    // Routes cho quản lý đơn hàng
+    Route::get('/orders', [App\Http\Controllers\User\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [App\Http\Controllers\User\OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/cancel', [App\Http\Controllers\User\OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/reorder', [App\Http\Controllers\User\OrderController::class, 'reorder'])->name('orders.reorder');
+    Route::get('/orders/{order}/review', [App\Http\Controllers\User\OrderController::class, 'review'])->name('orders.review');
+    Route::post('/orders/{order}/review', [App\Http\Controllers\User\OrderController::class, 'storeReview'])->name('orders.store-review');
 });
 
 // Routes cho thanh toán

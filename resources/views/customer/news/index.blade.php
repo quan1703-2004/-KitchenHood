@@ -41,7 +41,7 @@
     }
 </style>
 
-<div class="bg-light py-5">
+<div class="bg-light py-3">
     <div class="container">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
@@ -51,18 +51,6 @@
             </ol>
         </nav>
         
-        <!-- Header Section -->
-        <div class="row mb-5">
-            <div class="col-12 text-center">
-                <div class="badge bg-info text-white px-3 py-2 rounded-pill mb-3 fw-bold">
-                    <i class="fas fa-newspaper me-1"></i>TIN TỨC
-                </div>
-                <h1 class="display-4 fw-bold text-dark mb-3">Tin Tức & Cập Nhật</h1>
-                <p class="lead text-muted">
-                    Cập nhật những thông tin mới nhất về máy hút mùi, xu hướng nhà bếp và khuyến mãi đặc biệt
-                </p>
-            </div>
-        </div>
 
         <!-- Filter Section -->
         <div class="row mb-5">

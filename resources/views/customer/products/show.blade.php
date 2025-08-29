@@ -6,18 +6,16 @@
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="h2 fw-bold">{{ $product->name }}</h1>
-                        <div>
-                            <a href="{{ route('products.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left me-1"></i>Quay Lại
-                            </a>
-                            @if($product->category)
-                            <a href="{{ route('products.index', ['category' => $product->category->id]) }}" class="btn btn-primary">
-                                <i class="fas fa-tag me-1"></i>Xem Sản Phẩm Cùng Danh Mục
-                            </a>
-                            @endif
-                        </div>
+                    <h1 class="h2 fw-bold mb-3">{{ $product->name }}</h1>
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Quay Lại
+                        </a>
+                        @if($product->category)
+                        <a href="{{ route('products.index', ['category' => $product->category->id]) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-tag me-1"></i>Xem Sản Phẩm Cùng Danh Mục
+                        </a>
+                        @endif
                     </div>
 
                     <!-- Hình ảnh sản phẩm -->

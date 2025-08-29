@@ -80,7 +80,7 @@
     }
 </style>
 
-<div class="bg-light py-5">
+<div class="bg-light py-3">
     <div class="container">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
