@@ -129,8 +129,7 @@
                                                 <tr>
                                                     <th>Sản phẩm</th>
                                                     <th class="text-center">Số lượng</th>
-                                                    <th class="text-end">Đơn giá</th>
-                                                    <th class="text-end">Thành tiền</th>
+                                                   
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -148,8 +147,7 @@
                                                         </div>
                                                     </td>
                                                     <td class="text-center">{{ $item->quantity }}</td>
-                                                    <td class="text-end">{{ number_format($item->unit_price) }} VNĐ</td>
-                                                    <td class="text-end fw-bold">{{ number_format($item->total_price) }} VNĐ</td>
+                                                   
                                                 </tr>
                                                 @endforeach
                                             </tbody>

@@ -106,4 +106,105 @@ class Product extends Model
     {
         return $this->reviews()->with('user')->latest()->first();
     }
+
+    /**
+     * Quan hệ với giao dịch tồn kho
+     */
+    public function inventoryTransactions()
+    {
+        return $this->hasMany(InventoryTransaction::class);
+    }
+
+    /**
+     * Kiểm tra sản phẩm có còn hàng không
+     */
+    public function getIsInStockAttribute()
+    {
+        return $this->quantity > 0;
+    }
+
+    /**
+     * Kiểm tra sản phẩm có sắp hết hàng không (dưới 10 sản phẩm)
+     */
+    public function getIsLowStockAttribute()
+    {
+        return $this->quantity > 0 && $this->quantity <= 10;
+    }
+
+    /**
+     * Lấy trạng thái tồn kho dạng text
+     */
+    public function getStockStatusAttribute()
+    {
+        if ($this->quantity <= 0) {
+            return 'Hết hàng';
+        } elseif ($this->quantity <= 10) {
+            return 'Sắp hết hàng';
+        } else {
+            return 'Còn hàng';
+        }
+    }
+
+    /**
+     * Nhập hàng - tăng số lượng tồn kho
+     */
+    public function addStock($quantity, $notes = null, $userId = null)
+    {
+        $quantityBefore = $this->quantity;
+        $this->quantity += $quantity;
+        $this->save();
+
+        // Ghi lại giao dịch nhập hàng
+        InventoryTransaction::create([
+            'product_id' => $this->id,
+            'type' => 'in',
+            'quantity' => $quantity,
+            'quantity_before' => $quantityBefore,
+            'quantity_after' => $this->quantity,
+            'notes' => $notes,
+            'user_id' => $userId
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Xuất hàng - giảm số lượng tồn kho
+     */
+    public function reduceStock($quantity, $notes = null, $orderId = null, $userId = null)
+    {
+        if ($this->quantity < $quantity) {
+            throw new \Exception('Không đủ hàng trong kho');
+        }
+
+        $quantityBefore = $this->quantity;
+        $this->quantity -= $quantity;
+        $this->save();
+
+        // Ghi lại giao dịch xuất hàng
+        InventoryTransaction::create([
+            'product_id' => $this->id,
+            'type' => 'out',
+            'quantity' => $quantity,
+            'quantity_before' => $quantityBefore,
+            'quantity_after' => $this->quantity,
+            'notes' => $notes,
+            'order_id' => $orderId,
+            'user_id' => $userId
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Lấy lịch sử giao dịch tồn kho
+     */
+    public function getInventoryHistory($limit = 10)
+    {
+        return $this->inventoryTransactions()
+            ->with(['user', 'order'])
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
 }

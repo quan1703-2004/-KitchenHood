@@ -662,6 +662,11 @@
                     <i class="fas fa-fw fa-star"></i>
                     <span>Quản lý Đánh giá</span></a>
                 </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Quản lý Tồn kho</span></a>
+                </li>
                 
             <div class="nav-divider"></div>
             <a class="nav-link" href="/">

@@ -32,9 +32,43 @@ class OrderController extends Controller
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
         ]);
 
-        $order->status = $request->status;
+        $oldStatus = $order->status;
+        $newStatus = $request->status;
+
+        // Nếu chuyển từ pending sang processing và thanh toán thành công
+        if ($oldStatus === 'pending' && $newStatus === 'processing' && $order->payment_status === 'paid') {
+            // Trừ tồn kho cho tất cả sản phẩm trong đơn hàng
+            foreach ($order->items as $item) {
+                try {
+                    $item->product->reduceStock(
+                        $item->quantity,
+                        "Xuất hàng cho đơn hàng #{$order->order_number}",
+                        $order->id,
+                        auth()->id()
+                    );
+                } catch (\Exception $e) {
+                    // Nếu không đủ hàng, rollback trạng thái đơn hàng
+                    return redirect()->back()->with('error', "Không đủ hàng cho sản phẩm: {$item->product->name}. Chỉ còn {$item->product->quantity} sản phẩm.");
+                }
+            }
+        }
+
+        // Nếu hủy đơn hàng và đã trừ tồn kho trước đó
+        if ($newStatus === 'cancelled' && in_array($oldStatus, ['processing', 'shipped', 'delivered'])) {
+            // Hoàn lại tồn kho cho tất cả sản phẩm trong đơn hàng
+            foreach ($order->items as $item) {
+                $item->product->addStock(
+                    $item->quantity,
+                    "Hoàn lại hàng do hủy đơn hàng #{$order->order_number}",
+                    auth()->id()
+                );
+            }
+        }
+
+        $order->status = $newStatus;
         $order->save();
 
-        return redirect()->route('admin.orders.show', $order)->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
+        $statusMessage = $newStatus === 'cancelled' ? 'Đã hủy đơn hàng' : 'Cập nhật trạng thái đơn hàng';
+        return redirect()->route('admin.orders.show', $order)->with('success', $statusMessage . ' thành công!');
     }
 }

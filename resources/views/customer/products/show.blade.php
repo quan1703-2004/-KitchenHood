@@ -183,10 +183,15 @@
                     <!-- Số lượng -->
                     <div class="mb-4">
                         <h6 class="fw-bold">Tình Trạng Kho</h6>
-                        @if($product->quantity > 0)
+                        @if($product->quantity > 10)
                             <span class="badge bg-success fs-6">
                                 <i class="fas fa-check me-1"></i>
                                 Còn {{ $product->quantity }} sản phẩm
+                            </span>
+                        @elseif($product->quantity > 0)
+                            <span class="badge bg-warning fs-6">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                Chỉ còn {{ $product->quantity }} sản phẩm
                             </span>
                         @else
                             <span class="badge bg-danger fs-6">
@@ -221,9 +226,13 @@
                                     <i class="fas fa-shopping-cart me-2"></i>Thêm Vào Giỏ Hàng
                                 </button>
                             </form>
+                        @elseif($product->quantity <= 0)
+                            <button class="btn btn-danger btn-lg" disabled>
+                                <i class="fas fa-ban me-2"></i>Hết Hàng
+                            </button>
                         @else
                             <button class="btn btn-secondary btn-lg" disabled>
-                                <i class="fas fa-ban me-2"></i>Không Khả Dụng
+                                <i class="fas fa-pause me-2"></i>Không Khả Dụng
                             </button>
                         @endif
                         
