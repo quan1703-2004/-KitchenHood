@@ -7,6 +7,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h1 class="h2 fw-bold mb-3">{{ $product->name }}</h1>
+                    
                     <div class="d-flex flex-wrap gap-2 mb-4">
                         <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i>Quay Lại
@@ -72,6 +73,84 @@
                                     <span class="ms-2">{{ $product->updated_at->format('d/m/Y H:i') }}</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                       <!-- Rating tổng quan -->
+                    <div class="mb-4">
+                        <x-product-rating :product="$product" />
+                    </div>
+
+                    <!-- Đánh giá sản phẩm -->
+                    <hr class="my-5">
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="mb-4">Đánh giá sản phẩm ({{ $product->reviews->count() }})</h3>
+
+                            @forelse ($product->reviews as $review)
+                                <div class="media mb-4">
+                                    <div class="media-body">
+                                        <h5 class="mt-0">{{ $review->user->name }}</h5>
+                                        <div class="text-warning mb-2">
+                                            <x-rating-stars :rating="$review->rating" :showHalfStar="false" />
+                                            <span class="badge bg-primary ms-2">{{ $review->rating }}/5</span>
+                                        </div>
+                                        <p>{{ $review->comment }}</p>
+                                        <small class="text-muted">Đăng vào {{ $review->created_at->format('d/m/Y') }}</small>
+                                    </div>
+                                </div>
+                            @empty
+                                <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Gửi form đánh Giá -->
+                    <hr class="my-5">
+
+                    <div class="row">
+                        <div class="col-12">
+                            @auth
+                                @php
+                                    // Kiểm tra xem người dùng đã mua sản phẩm chưa
+                                    $hasPurchased = auth()->user()->orders()
+                                        ->where('status', 'delivered')
+                                        ->whereHas('items', function($query) use ($product) {
+                                            $query->where('product_id', $product->id);
+                                        })
+                                        ->exists();
+
+                                    // Kiểm tra xem người dùng đã đánh giá chưa
+                                    $hasReviewed = $product->reviews()->where('user_id', auth()->id())->exists();
+                                @endphp
+
+                                @if ($hasPurchased && !$hasReviewed)
+                                    <h4 class="mb-4">Viết đánh giá của bạn</h4>
+                                    <form action="{{ route('reviews.store', $product->id) }}" method="POST">
+                                        @csrf
+                                        <div class="form-group mb-3">
+                                            <label for="rating">Đánh giá (số sao):</label>
+                                            <select name="rating" id="rating" class="form-control" required>
+                                                <option value="5">5 sao (Tuyệt vời)</option>
+                                                <option value="4">4 sao (Tốt)</option>
+                                                <option value="3">3 sao (Bình thường)</option>
+                                                <option value="2">2 sao (Tệ)</option>
+                                                <option value="1">1 sao (Rất tệ)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="comment">Bình luận:</label>
+                                            <textarea name="comment" id="comment" rows="4" class="form-control" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+                                    </form>
+                                @elseif($hasPurchased && $hasReviewed)
+                                    <p class="alert alert-info">Bạn đã đánh giá sản phẩm này.</p>
+                                @endif
+                            @else
+                                <p>Vui lòng <a href="{{ route('login') }}">đăng nhập</a> để viết đánh giá.</p>
+                            @endauth
                         </div>
                     </div>
                 </div>

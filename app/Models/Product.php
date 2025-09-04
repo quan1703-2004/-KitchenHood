@@ -56,4 +56,54 @@ class Product extends Model
     {
         return $this->hasOne(ProductDetail::class);
     }
+
+    // quan hệ review sản phẩm
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Lấy rating trung bình của sản phẩm từ bảng reviews
+     */
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    /**
+     * Lấy số lượng đánh giá của sản phẩm
+     */
+    public function getReviewsCountAttribute()
+    {
+        return $this->reviews()->count();
+    }
+
+    /**
+     * Lấy số lượng đánh giá theo từng mức sao
+     */
+    public function getRatingCountAttribute()
+    {
+        $ratings = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $ratings[$i] = $this->reviews()->where('rating', $i)->count();
+        }
+        return $ratings;
+    }
+
+    /**
+     * Kiểm tra xem sản phẩm có đánh giá nào không
+     */
+    public function getHasReviewsAttribute()
+    {
+        return $this->reviews()->count() > 0;
+    }
+
+    /**
+     * Lấy đánh giá mới nhất của sản phẩm
+     */
+    public function getLatestReviewAttribute()
+    {
+        return $this->reviews()->with('user')->latest()->first();
+    }
 }

@@ -652,9 +652,18 @@
                 <i class="fas fa-newspaper"></i>
                 <span>Quản lý tin tức</span>
             </a>
-            
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.orders.index') }}">
+                <i class="fas fa-fw fa-shopping-cart"></i>
+                <span>Quản lý Đơn hàng</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.reviews.index') }}">
+                    <i class="fas fa-fw fa-star"></i>
+                    <span>Quản lý Đánh giá</span></a>
+                </li>
+                
             <div class="nav-divider"></div>
-            
             <a class="nav-link" href="/">
                 <i class="fas fa-home"></i>
                 <span>Về trang chủ</span>

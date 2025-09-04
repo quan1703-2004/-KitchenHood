@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\News;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-class AdminNewsController extends Controller
+class NewsController extends Controller
 {
     /**
      * Hiển thị danh sách tin tức

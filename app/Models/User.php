@@ -88,4 +88,10 @@ implements MustVerifyEmail
     {
         return $this->role === 'admin';
     }
+
+    // quan hệ review của user
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

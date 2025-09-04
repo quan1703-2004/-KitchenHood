@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\News;
 use Illuminate\Http\Request;
 
-class AdminController extends Controller
+class DashboardController extends Controller
 {
     /**
      * Hiển thị dashboard admin với thống kê tổng quan
      */
-    public function dashboard()
+    public function index()
     {
         $totalCategories = Category::count();
         $totalProducts = Product::count();

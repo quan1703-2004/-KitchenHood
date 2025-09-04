@@ -94,23 +94,44 @@ class CheckoutController extends Controller
         }
         
         try {
-            // Tạo đơn hàng mới sử dụng thông tin từ địa chỉ đã lưu
-            $order = Order::create([
-                'order_number' => 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid()),
-                'customer_name' => $address->full_name,
-                'customer_email' => Auth::user()->email,
-                'customer_phone' => $address->phone,
-                'customer_address' => $address->full_address,
-                'payment_method' => $request->payment_method,
-                'notes' => $request->notes,
-                'status' => 'pending',
-                'total_amount' => 0,
-                'shipping_fee' => 0,
-                'final_amount' => 0
-            ]);
-            
+            // Tính toán tổng tiền trước khi tạo đơn hàng
             $total = 0;
+            foreach ($items as $ci) {
+                $product = $ci->product;
+                if ($product) {
+                    $total += $product->price * $ci->quantity;
+                }
+            }
+            
+            // Tính phí vận chuyển
             $shippingFee = 0;
+            if ($total < 5000000) {
+                $shippingFee = 50000;
+            }
+            
+            $finalAmount = $total + $shippingFee;
+            
+            // Tạo đơn hàng mới với tổng tiền đã tính
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'order_number' => 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid()),
+                'subtotal' => $total,
+                'shipping_fee' => $shippingFee,
+                'total_amount' => $finalAmount,
+                'payment_method' => $request->payment_method,
+                'payment_status' => 'pending',
+                'shipping_name' => $address->full_name,
+                'shipping_phone' => $address->phone,
+                'shipping_address' => $address->full_address,
+                'shipping_province_id' => $address->province_id,
+                'shipping_province_name' => $address->province_name,
+                'shipping_district_id' => $address->district_id,
+                'shipping_district_name' => $address->district_name,
+                'shipping_ward_id' => $address->ward_id,
+                'shipping_ward_name' => $address->ward_name,
+                'notes' => $request->notes,
+                'status' => 'pending'
+            ]);
             
             // Tạo các mục đơn hàng
             foreach ($items as $ci) {
@@ -124,23 +145,8 @@ class CheckoutController extends Controller
                         'quantity' => $ci->quantity,
                         'subtotal' => $product->price * $ci->quantity
                     ]);
-                    $total += $product->price * $ci->quantity;
                 }
             }
-            
-            // Tính phí vận chuyển
-            if ($total < 5000000) {
-                $shippingFee = 50000;
-            }
-            
-            $finalAmount = $total + $shippingFee;
-            
-            // Cập nhật tổng tiền đơn hàng
-            $order->update([
-                'total_amount' => $total,
-                'shipping_fee' => $shippingFee,
-                'final_amount' => $finalAmount
-            ]);
             
             // Xóa giỏ hàng DB
             CartItem::where('cart_id', $cart->id)->delete();
@@ -149,6 +155,7 @@ class CheckoutController extends Controller
                            ->with('success', 'Đặt hàng thành công!');
                            
         } catch (\Exception $e) {
+            \Log::error('Checkout error: ' . $e->getMessage());
             return redirect()->back()
                            ->with('error', 'Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại!')
                            ->withInput();
@@ -164,3 +171,4 @@ class CheckoutController extends Controller
         return view('customer.checkout.success', compact('order'));
     }
 }
+

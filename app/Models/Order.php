@@ -92,6 +92,11 @@ class Order extends Model
         return $methods[$this->payment_method] ?? 'Không xác định';
     }
 
+    // quan hệ với OrderItem
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
     /**
      * Lấy trạng thái thanh toán dạng text
      */

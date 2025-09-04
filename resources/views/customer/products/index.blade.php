@@ -145,30 +145,6 @@
         @endif
         
         <!-- Header Section -->
-        <div class="row mb-5">
-            <div class="col-12 text-center">
-                <div class="badge bg-primary text-white px-3 py-2 rounded-pill mb-3 fw-bold">
-                    <i class="fas fa-wind me-1" title="Sản phẩm"></i>SẢN PHẨM
-                </div>
-                <h1 class="display-4 fw-bold text-dark mb-3">
-                    @if(request('category'))
-                        {{ $categories->firstWhere('id', request('category'))->name ?? 'Máy Hút Mùi' }}
-                    @else
-                        Máy Hút Mùi Chất Lượng Cao
-                    @endif
-                </h1>
-                <p class="lead text-muted">
-                    @if(request('category'))
-                        Khám phá sản phẩm trong danh mục {{ $categories->firstWhere('id', request('category'))->name ?? '' }}
-                        <span class="badge bg-primary ms-2">{{ $products->total() }} sản phẩm</span>
-                    @else
-                        Khám phá bộ sưu tập máy hút mùi hiện đại với công nghệ tiên tiến
-                        <span class="badge bg-primary ms-2">{{ $products->total() }} sản phẩm</span>
-                    @endif
-                </p>
-            </div>
-        </div>
-
         <!-- Filter Section -->
         <div class="row mb-5">
             <div class="col-12">
@@ -177,8 +153,12 @@
                         <div class="col-md-6">
                             <h5 class="fw-bold mb-3 mb-md-0">
                                 <i class="fas fa-filter me-2 text-primary" title="Lọc"></i>Lọc Sản Phẩm
+                                <span class="badge bg-primary ms-2">{{ $products->total() }} sản phẩm</span>
                             </h5>
                         </div>
+                    
+
+
                         <div class="col-md-6">
                             <div class="d-flex gap-2 flex-wrap justify-content-md-end">
                                 <div class="dropdown">
@@ -231,13 +211,18 @@
                         <h5 class="card-title fw-bold mb-2">{{ $product->name }}</h5>
                         <p class="card-text text-muted mb-3">{{ Str::limit($product->description, 80) }}</p>
                         
-                        <div class="rating-stars mb-3">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                            <span class="text-muted ms-2">(4.5)</span>
+                            <div class="rating-stars mb-3">
+                            @if($product->has_reviews)
+                                <div class="d-flex align-items-center">
+                                    <x-rating-stars :rating="$product->average_rating" :showCount="true" />
+                                    <small class="text-muted ms-2">({{ $product->reviews_count }} đánh giá)</small>
+                                </div>
+                            @else
+                                <div class="d-flex align-items-center">
+                                    <x-rating-stars :rating="0" :showHalfStar="false" />
+                                    <span class="text-muted ms-2">(Chưa có đánh giá)</span>
+                                </div>
+                            @endif
                         </div>
                         
                         <div class="mt-auto">

@@ -1,62 +1,235 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏪 KitchenHood Pro - E-commerce Website
+
+[![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.1+-blue.svg)](https://php.net)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-blue.svg)](https://getbootstrap.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen" alt="Status">
+  <img src="https://img.shields.io/badge/Version-1.0.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/Last%20Update-September%202025-orange" alt="Last Update">
 </p>
 
-## About Laravel
+## 📋 Mô tả dự án
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**KitchenHood Pro** là một website thương mại điện tử chuyên về máy hút mùi và thiết bị nhà bếp cao cấp. Dự án được xây dựng bằng Laravel 10 với giao diện hiện đại, responsive và đầy đủ tính năng quản lý.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### ✨ Tính năng chính
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 🛍️ **Quản lý sản phẩm**: Thêm, sửa, xóa sản phẩm với hình ảnh và thông tin chi tiết
+- 🛒 **Giỏ hàng thông minh**: Quản lý giỏ hàng với tính năng thêm, sửa, xóa sản phẩm
+- 💳 **Hệ thống thanh toán**: Hỗ trợ nhiều phương thức thanh toán
+- 📦 **Quản lý đơn hàng**: Theo dõi trạng thái đơn hàng từ đặt hàng đến giao hàng
+- ⭐ **Hệ thống đánh giá**: Rating động từ khách hàng với thống kê chi tiết
+- 👥 **Quản lý người dùng**: Đăng ký, đăng nhập, xác thực email
+- 📰 **Tin tức & Blog**: Hệ thống tin tức với phân loại và tìm kiếm
+- 🎨 **Giao diện admin**: Dashboard quản lý với thống kê trực quan
+- 📱 **Responsive Design**: Tương thích với mọi thiết bị
 
-## Learning Laravel
+## 🛠️ Yêu cầu hệ thống
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **PHP**: >= 8.1
+- **Composer**: >= 2.0
+- **Node.js**: >= 16.0
+- **NPM**: >= 8.0
+- **MySQL**: >= 8.0 hoặc MariaDB >= 10.5
+- **Web Server**: Apache/Nginx
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🚀 Hướng dẫn cài đặt
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Bước 1: Clone dự án
 
-## Laravel Sponsors
+```bash
+# Clone repository về máy local
+git https://github.com/tambl2004/laravel.git
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Bước 2: Cài đặt dependencies
 
-### Premium Partners
+```bash
+# Cài đặt PHP dependencies
+composer install
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Cài đặt Node.js dependencies
+npm install
+```
 
-## Contributing
+### Bước 3: Cấu hình môi trường
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+# Copy file môi trường
+cp .env.example .env
 
-## Code of Conduct
+# Tạo application key
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Bước 4: Cấu hình database
 
-## Security Vulnerabilities
+1. **Tạo database mới** trong MySQL/MariaDB
+2. **Cập nhật thông tin database** trong file `.env`:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kecommerce2024.sql
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## License
+### Bước 5: Kết nối csdl
+Lấy file sql rồi import vào xampp
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# laravel
+
+
+### Bước 6: Tạo storage link
+
+```bash
+# Tạo symbolic link cho storage
+php artisan storage:link
+```
+
+### Bước 7: Build assets
+
+```bash
+# Build CSS và JS cho production
+npm run build
+
+# Hoặc chạy development server
+npm run dev
+```
+
+### Bước 8: Khởi chạy server
+
+```bash
+# Chạy development server
+php artisan serve
+```
+
+Truy cập website tại: **http://localhost:8000**
+
+## 👤 Tài khoản mặc định
+
+### Admin Account
+- **Email**: admin@admin.com
+- **Password**: 12345678
+
+
+## 📁 Cấu trúc dự án
+
+```
+kitchenhood-pro/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Admin/           # Controllers quản lý admin
+│   │   └── User/            # Controllers cho user
+│   ├── Models/              # Eloquent models
+│   └── Helpers/             # Helper classes
+├── database/
+│   ├── migrations/          # Database migrations
+│   └── seeders/            # Database seeders
+├── resources/
+│   ├── views/
+│   │   ├── admin/          # Views cho admin panel
+│   │   ├── customer/       # Views cho customer
+│   │   └── components/     # Blade components
+│   ├── css/               # CSS files
+│   └── js/                # JavaScript files
+├── routes/
+│   └── web.php            # Web routes
+└── public/               # Public assets
+```
+
+## 🔧 Các lệnh hữu ích
+
+```bash
+# Clear cache
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+php artisan route:clear
+
+# Tạo dữ liệu mẫu
+php artisan db:seed
+
+# Test rating system
+php artisan test:rating
+
+# Tạo storage link
+php artisan storage:link
+
+# Chạy migrations
+php artisan migrate:fresh --seed
+```
+
+## 🎨 Tính năng nổi bật
+
+### ⭐ Hệ thống Rating động
+- Rating được tính toán tự động từ đánh giá thực tế của khách hàng
+- Hiển thị thống kê chi tiết với progress bar
+- Phần trăm khuyến nghị dựa trên đánh giá 4-5 sao
+
+### 🛒 Giỏ hàng thông minh
+- Thêm/sửa/xóa sản phẩm trong giỏ hàng
+- Tính toán tổng tiền tự động
+- Lưu trữ giỏ hàng theo session
+
+### 📦 Quản lý đơn hàng
+- Theo dõi trạng thái đơn hàng
+- Quản lý địa chỉ giao hàng
+- Lịch sử đơn hàng chi tiết
+
+### 🎨 Giao diện hiện đại
+- Bootstrap 5 với thiết kế responsive
+- Font Awesome icons
+- Gradient và animation đẹp mắt
+
+## 🐛 Troubleshooting
+
+### Lỗi thường gặp
+
+1. **Lỗi "Class not found"**
+   ```bash
+   composer dump-autoload
+   ```
+
+2. **Lỗi permission storage**
+   ```bash
+   chmod -R 775 storage/
+   chmod -R 775 bootstrap/cache/
+   ```
+
+3. **Lỗi database connection**
+   - Kiểm tra thông tin database trong `.env`
+   - Đảm bảo MySQL/MariaDB đang chạy
+
+4. **Lỗi npm install**
+   ```bash
+   npm cache clean --force
+   npm install
+   ```
+
+## 🤝 Đóng góp
+
+1. Fork dự án
+2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Tạo Pull Request
+
+## 📄 License
+
+Dự án này được phân phối dưới giấy phép MIT. Xem file `LICENSE` để biết thêm chi tiết.
+
+## 📞 Liên hệ
+
+- **Email**: support@kitchenhood.com
+- **Website**: https://kitchenhood.com
+- **GitHub**: https://github.com/your-username/kitchenhood-pro
+
+---
+
+<p align="center">
+  <strong>Made with ❤️ by KitchenHood Team</strong>
+</p>

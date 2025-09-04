@@ -8,6 +8,13 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AddressController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 
 // Gửi link xác thực
 Route::get('/email/verify', function () {
@@ -49,7 +56,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 // Routes công khai - không cần đăng nhập
 Route::get('/', function () {
     // Lấy sản phẩm mới nhất để hiển thị trên trang chủ
-    $latestProducts = \App\Models\Product::with('category')->latest()->take(6)->get();
+    $latestProducts = \App\Models\Product::with(['category', 'reviews'])->latest()->take(6)->get();
     $categories = \App\Models\Category::withCount('products')->take(4)->get();
     
     // Lấy tin tức nổi bật cho trang chủ
@@ -61,6 +68,9 @@ Route::get('/', function () {
 // Routes cho tin tức
 Route::get('/news', [App\Http\Controllers\NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{slug}', [App\Http\Controllers\NewsController::class, 'show'])->name('news.show');
+
+// Routes cho đánh giá
+Route::middleware('auth')->post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
 // Trang Liên hệ
 Route::get('/contact', function () {
@@ -172,29 +182,38 @@ Route::get('/checkout/success/{order}', [App\Http\Controllers\CheckoutController
 
 // Routes cho admin (cần đăng nhập và quyền admin)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
     // Quản lý danh mục - sử dụng method adminIndex cho index
-    Route::get('/categories', [CategoryController::class, 'adminIndex'])->name('categories.index');
-    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
-    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
-    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
     
     // Quản lý sản phẩm - sử dụng method adminIndex cho index
-    Route::get('/products', [ProductController::class, 'adminIndex'])->name('products.index');
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
-    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
     
     // Quản lý tin tức
-    Route::get('/news', [App\Http\Controllers\AdminNewsController::class, 'index'])->name('news.index');
-    Route::get('/news/create', [App\Http\Controllers\AdminNewsController::class, 'create'])->name('news.create');
-    Route::post('/news', [App\Http\Controllers\AdminNewsController::class, 'store'])->name('news.store');
-    Route::get('/news/{news}/edit', [App\Http\Controllers\AdminNewsController::class, 'edit'])->name('news.edit');
-    Route::put('/news/{news}', [App\Http\Controllers\AdminNewsController::class, 'update'])->name('news.update');
-    Route::delete('/news/{news}', [App\Http\Controllers\AdminNewsController::class, 'destroy'])->name('news.destroy');
+    Route::get('/news', [AdminNewsController::class, 'index'])->name('news.index');
+    Route::get('/news/create', [AdminNewsController::class, 'create'])->name('news.create');
+    Route::post('/news', [AdminNewsController::class, 'store'])->name('news.store');
+    Route::get('/news/{news}/edit', [AdminNewsController::class, 'edit'])->name('news.edit');
+    Route::put('/news/{news}', [AdminNewsController::class, 'update'])->name('news.update');
+    Route::delete('/news/{news}', [AdminNewsController::class, 'destroy'])->name('news.destroy');
+
+    // Quản lý đơn hàng
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+    Route::put('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
+
+    // Quản lý Đánh giá
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 });

@@ -269,7 +269,47 @@
         }
         
         .rating-stars {
-            color: var(--accent-color);
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .rating-stars .fas.fa-star,
+        .rating-stars .fas.fa-star-half-alt {
+            color: #ffc107 !important;
+        }
+        
+        .rating-stars .far.fa-star {
+            color: #6c757d !important;
+        }
+        
+        .product-rating {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .product-rating .progress {
+            border-radius: 10px;
+            background-color: #e9ecef;
+        }
+        
+        .product-rating .progress-bar {
+            border-radius: 10px;
+            background: linear-gradient(90deg, #ffc107 0%, #ffb300 100%);
+        }
+        
+        .product-rating .badge {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .rating-stars .fa-lg {
+            font-size: 1.25rem;
+        }
+        
+        .rating-stars .fa-2x {
+            font-size: 1.5rem;
         }
         
         /* Fallback cho Font Awesome icons */
@@ -894,9 +934,21 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="d-flex justify-content-md-end gap-3">
-                        <img src="https://via.placeholder.com/40x25/0052cc/ffffff?text=VISA" alt="Visa" class="rounded">
-                        <img src="https://via.placeholder.com/40x25/eb001b/ffffff?text=MC" alt="MasterCard" class="rounded">
-                        <img src="https://via.placeholder.com/40x25/003087/ffffff?text=MOMO" alt="MoMo" class="rounded">
+                        <!-- VISA -->
+                        <div class="payment-icon visa-icon d-flex align-items-center justify-content-center rounded" 
+                             style="width: 40px; height: 25px; background: linear-gradient(135deg, #0052cc 0%, #1a75ff 100%);">
+                            <span class="text-white fw-bold" style="font-size: 10px;">VISA</span>
+                        </div>
+                        <!-- MasterCard -->
+                        <div class="payment-icon mastercard-icon d-flex align-items-center justify-content-center rounded" 
+                             style="width: 40px; height: 25px; background: linear-gradient(135deg, #eb001b 0%, #ff6b6b 100%);">
+                            <span class="text-white fw-bold" style="font-size: 10px;">MC</span>
+                        </div>
+                        <!-- MoMo -->
+                        <div class="payment-icon momo-icon d-flex align-items-center justify-content-center rounded" 
+                             style="width: 40px; height: 25px; background: linear-gradient(135deg, #003087 0%, #4a90e2 100%);">
+                            <span class="text-white fw-bold" style="font-size: 10px;">MoMo</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -906,6 +958,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- CSS cho payment icons -->
+    <style>
+        .payment-icon {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .payment-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .visa-icon {
+            background: linear-gradient(135deg, #0052cc 0%, #1a75ff 100%) !important;
+        }
+        
+        .mastercard-icon {
+            background: linear-gradient(135deg, #eb001b 0%, #ff6b6b 100%) !important;
+        }
+        
+        .momo-icon {
+            background: linear-gradient(135deg, #003087 0%, #4a90e2 100%) !important;
+        }
+    </style>
+    
     <script>
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {

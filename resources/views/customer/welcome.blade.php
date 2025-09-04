@@ -190,12 +190,17 @@
                             <p class="card-text text-muted mb-3">{{ Str::limit($product->description, 80) }}</p>
                             
                             <div class="rating-stars mb-3">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                                <span class="text-muted ms-2">(4.5)</span>
+                                @if($product->has_reviews)
+                                    <div class="d-flex align-items-center">
+                                        <x-rating-stars :rating="$product->average_rating" :showCount="true" />
+                                        <small class="text-muted ms-2">({{ $product->reviews_count }} đánh giá)</small>
+                                    </div>
+                                @else
+                                    <div class="d-flex align-items-center">
+                                        <x-rating-stars :rating="0" :showHalfStar="false" />
+                                        <span class="text-muted ms-2">(Chưa có đánh giá)</span>
+                                    </div>
+                                @endif
                             </div>
                             
                             <div class="mt-auto">
