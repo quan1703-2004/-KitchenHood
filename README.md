@@ -1,212 +1,209 @@
-# 🏪 KitchenHood Pro - E-commerce Website
+# 🏪 KitchenHood Pro — E-commerce Website
 
 [![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.1+-blue.svg)](https://php.net)
+[![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://php.net)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-blue.svg)](https://getbootstrap.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen" alt="Status">
-  <img src="https://img.shields.io/badge/Version-1.0.0-blue" alt="Version">
-  <img src="https://img.shields.io/badge/Last%20Update-September%202025-orange" alt="Last Update">
+  <img src="https://img.shields.io/badge/Tr%E1%BA%A1ng%20th%C3%A1i-Production%20Ready-brightgreen" alt="Status">
+  <img src="https://img.shields.io/badge/Phi%C3%AAn%20b%E1%BA%A3n-1.0.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/C%E1%BA%ADp%20nh%E1%BA%ADt-09/2025-orange" alt="Last Update">
+  <br/>
+  <strong>Website bán hàng KitchenHood Pro</strong>
+  <br/>
+  Đơn giản – Hiện đại – Dễ triển khai
+  
 </p>
 
-## 🛠️ Yêu cầu hệ thống
+## Nội dung
+
+- [Tổng quan](#tổng-quan)
+- [Tính năng nổi bật](#tính-năng-nổi-bật)
+- [Yêu cầu hệ thống](#yêu-cầu-hệ-thống)
+- [Cài đặt nhanh](#cài-đặt-nhanh)
+- [Tài khoản mặc định](#tài-khoản-mặc-định)
+- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
+- [Các lệnh hữu ích](#các-lệnh-hữu-ích)
+- [Khắc phục sự cố](#khắc-phục-sự-cố)
+
+## Tổng quan
+
+KitchenHood Pro là dự án thương mại điện tử xây dựng với Laravel 10, giao diện hiện đại (Bootstrap 5), tối ưu cho triển khai nhanh trong môi trường phát triển nội bộ.
+
+## Tính năng nổi bật
+
+- ⭐ **Rating động**: Tính điểm tự động từ đánh giá thực tế, kèm progress bar và % khuyến nghị (4–5 sao)
+- 🛒 **Giỏ hàng thông minh**: Thêm/sửa/xóa, tính tổng tiền tự động, lưu theo session
+- 📦 **Đơn hàng**: Theo dõi trạng thái, địa chỉ giao hàng, lịch sử chi tiết
+- 🎨 **Giao diện**: Responsive với Bootstrap 5, icon Font Awesome, hiệu ứng mượt
+
+## Yêu cầu hệ thống
 
 - **PHP**: >= 8.1
 - **Composer**: >= 2.0
-- **Node.js**: >= 16.0
-- **NPM**: >= 8.0
+- **Node.js**: >= 16.0 và **NPM**: >= 8.0
 - **MySQL**: >= 8.0 hoặc MariaDB >= 10.5
-- **Web Server**: Apache/Nginx
+- **Web Server**: Apache hoặc Nginx
 
-## 🚀 Hướng dẫn cài đặt
+## Cài đặt nhanh
 
-### Bước 1: Clone dự án
+> Lưu ý: Các lệnh dưới đây dành cho môi trường phát triển local. Trên Windows, nên chạy Terminal ở chế độ Administrator khi cần.
 
-```bash
-# Clone repository về máy local
-git https://github.com/tambl2004/laravel.git
-
-### Bước 2: Cài đặt dependencies
+### 1) Clone dự án
 
 ```bash
-# Cài đặt PHP dependencies (vendor)
-composer update
-
-
-# Lưu ý: nếu cài bị lỗi thì dùng cách sau:
-1. Mở file cấu hình : 
-notepad C:\xampp\php\php.ini
-2. Tìm và bỏ dấu ; trước các dòng sau nếu có:
-   extension=gd
-   extension=zip
-   extension=mbstring
-3. Sau đó lưu lại rồi chạy:
-composer clear-cache
-composer update
-
-
-#Cài đặt tailwind 
-npm install -D @tailwindcss/vite
-
-# Cài đặt Node.js dependencies
-npm install
+git clone https://github.com/tambl2004/laravel.git
+cd laravel
 ```
 
-### Bước 3: Cấu hình môi trường
+### 2) Cài đặt dependencies
 
 ```bash
-# Copy file môi trường
+# PHP dependencies
+composer update
+
+# Node dependencies
+npm install
+
+# Cài Tailwind plugin cho Vite (nếu sử dụng)
+npm install -D @tailwindcss/vite
+```
+
+Nếu gặp lỗi khi chạy composer trên Windows (thiếu extension), thử:
+
+```bash
+# Mở file php.ini và bật các extension cần thiết
+# Ví dụ với XAMPP (tuỳ máy): C:\xampp\php\php.ini
+# Bỏ dấu ; trước các dòng:
+#   extension=gd
+#   extension=zip
+#   extension=mbstring
+
+composer clear-cache
+composer update
+```
+
+### 3) Cấu hình môi trường
+
+```bash
 cp .env.example .env
-
-# Xóa cache cấu hình cũ (rất quan trọng)
 php artisan config:clear
-
-# Sinh khóa và ghi vào .env
 php artisan key:generate
-
-# (Tuỳ chọn) Cache lại cấu hình cho sạch
+# Tuỳ chọn: cache lại cấu hình sau khi đã chỉnh .env
 php artisan config:cache
+```
 
-### Bước 4: Cấu hình database
+### 4) Cấu hình database (.env)
 
-2. **Cập nhật thông tin database** trong file `.env`:
+```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=ecommerce2024
 DB_USERNAME=root
 DB_PASSWORD=
-SESSION_DRIVER=file 
+SESSION_DRIVER=file
+```
 
-### Bước 5: Kết nối csdl
-Tạo bảng database mới trong xampp rồi import file sql vào, nhớ phải trùng tên ecommerce2024
+### 5) Khởi tạo cơ sở dữ liệu
 
-### Bước 6: Tạo storage link
+- Tạo database mới tên `ecommerce2024`
+- Import file SQL mẫu (nếu dự án cung cấp) vào database này
+
+Hoặc sử dụng migration/seed (nếu hỗ trợ):
 
 ```bash
-# Tạo symbolic link cho storage
+php artisan migrate:fresh --seed
+```
+
+### 6) Liên kết storage
+
+```bash
 php artisan storage:link
 ```
 
-### Bước 7: Build assets
+### 7) Build assets
 
 ```bash
-# Build CSS và JS cho production
+# Production build
 npm run build
 
-# Hoặc chạy development server
+# Hoặc chạy chế độ phát triển
 npm run dev
 ```
 
-### Bước 8: Khởi chạy server
+### 8) Chạy server
 
 ```bash
-# Chạy development server
 php artisan serve
 ```
 
-Truy cập website tại: **http://localhost:8000**
+Truy cập: `http://localhost:8000`
 
-## 👤 Tài khoản mặc định
+## Tài khoản mặc định
 
-### Admin Account
-- **Email**: admin@admin.com
-- **Password**: 12345678
+- **Admin**: Email `admin@admin.com` — Mật khẩu `12345678`
+- **User**: Mật khẩu mặc định `12345678`
 
-Tài khoản người dùng pass cũng là 12345678
+## Cấu trúc thư mục
 
-## 📁 Cấu trúc dự án
-
-```
+```text
 kitchenhood-pro/
 ├── app/
 │   ├── Http/Controllers/
-│   │   ├── Admin/           # Controllers quản lý admin
-│   │   └── User/            # Controllers cho user
+│   │   ├── Admin/           # Controller cho quản trị
+│   │   └── User/            # Controller cho người dùng
 │   ├── Models/              # Eloquent models
 │   └── Helpers/             # Helper classes
 ├── database/
-│   ├── migrations/          # Database migrations
-│   └── seeders/            # Database seeders
+│   ├── migrations/          # Migration
+│   └── seeders/             # Seeders
 ├── resources/
 │   ├── views/
-│   │   ├── admin/          # Views cho admin panel
-│   │   ├── customer/       # Views cho customer
-│   │   └── components/     # Blade components
-│   ├── css/               # CSS files
-│   └── js/                # JavaScript files
+│   │   ├── admin/           # View Admin Panel
+│   │   ├── customer/        # View Customer
+│   │   └── components/      # Blade components
+│   ├── css/                 # CSS
+│   └── js/                  # JavaScript
 ├── routes/
-│   └── web.php            # Web routes
-└── public/               # Public assets
+│   └── web.php              # Web routes
+└── public/                  # Tài nguyên public
 ```
 
-## 🔧 Các lệnh hữu ích
+## Các lệnh hữu ích
 
 ```bash
-# Clear cache
+# Xoá cache
 php artisan cache:clear
 php artisan config:clear
 php artisan view:clear
 php artisan route:clear
 
-# Tạo dữ liệu mẫu
+# Tạo dữ liệu mẫu (nếu có seeder)
 php artisan db:seed
 
-# Test rating system
+# Kiểm thử hệ thống rating (nếu có command)
 php artisan test:rating
 
-# Tạo storage link
+# Tạo lại storage link
 php artisan storage:link
 
-# Chạy migrations
+# Reset DB và seed lại
 php artisan migrate:fresh --seed
 ```
 
-## 🎨 Tính năng nổi bật
+## Khắc phục sự cố
 
-### ⭐ Hệ thống Rating động
-- Rating được tính toán tự động từ đánh giá thực tế của khách hàng
-- Hiển thị thống kê chi tiết với progress bar
-- Phần trăm khuyến nghị dựa trên đánh giá 4-5 sao
-
-### 🛒 Giỏ hàng thông minh
-- Thêm/sửa/xóa sản phẩm trong giỏ hàng
-- Tính toán tổng tiền tự động
-- Lưu trữ giỏ hàng theo session
-
-### 📦 Quản lý đơn hàng
-- Theo dõi trạng thái đơn hàng
-- Quản lý địa chỉ giao hàng
-- Lịch sử đơn hàng chi tiết
-
-### 🎨 Giao diện hiện đại
-- Bootstrap 5 với thiết kế responsive
-- Font Awesome icons
-- Gradient và animation đẹp mắt
-
-## 🐛 Troubleshooting
-
-### Lỗi thường gặp
-
-1. **Lỗi "Class not found"**
-   ```bash
-   composer dump-autoload
-   ```
-
-2. **Lỗi permission storage**
-   ```bash
-   chmod -R 775 storage/
-   chmod -R 775 bootstrap/cache/
-   ```
-
-3. **Lỗi database connection**
-   - Kiểm tra thông tin database trong `.env`
-   - Đảm bảo MySQL/MariaDB đang chạy
-
-4. **Lỗi npm install**
-   ```bash
-   npm cache clean --force
-   npm install
-   ```
+- **"Class not found"**: chạy `composer dump-autoload`
+- **Permission storage** (Linux/Mac):
+  ```bash
+  chmod -R 775 storage/
+  chmod -R 775 bootstrap/cache/
+  ```
+- **Không kết nối được DB**: kiểm tra `.env`, đảm bảo MySQL/MariaDB đang chạy
+- **Lỗi npm install**:
+  ```bash
+  npm cache clean --force
+  npm install
+  ```
