@@ -11,22 +11,6 @@
   <img src="https://img.shields.io/badge/Last%20Update-September%202025-orange" alt="Last Update">
 </p>
 
-## 📋 Mô tả dự án
-
-**KitchenHood Pro** là một website thương mại điện tử chuyên về máy hút mùi và thiết bị nhà bếp cao cấp. Dự án được xây dựng bằng Laravel 10 với giao diện hiện đại, responsive và đầy đủ tính năng quản lý.
-
-### ✨ Tính năng chính
-
-- 🛍️ **Quản lý sản phẩm**: Thêm, sửa, xóa sản phẩm với hình ảnh và thông tin chi tiết
-- 🛒 **Giỏ hàng thông minh**: Quản lý giỏ hàng với tính năng thêm, sửa, xóa sản phẩm
-- 💳 **Hệ thống thanh toán**: Hỗ trợ nhiều phương thức thanh toán
-- 📦 **Quản lý đơn hàng**: Theo dõi trạng thái đơn hàng từ đặt hàng đến giao hàng
-- ⭐ **Hệ thống đánh giá**: Rating động từ khách hàng với thống kê chi tiết
-- 👥 **Quản lý người dùng**: Đăng ký, đăng nhập, xác thực email
-- 📰 **Tin tức & Blog**: Hệ thống tin tức với phân loại và tìm kiếm
-- 🎨 **Giao diện admin**: Dashboard quản lý với thống kê trực quan
-- 📱 **Responsive Design**: Tương thích với mọi thiết bị
-
 ## 🛠️ Yêu cầu hệ thống
 
 - **PHP**: >= 8.1
@@ -47,8 +31,24 @@ git https://github.com/tambl2004/laravel.git
 ### Bước 2: Cài đặt dependencies
 
 ```bash
-# Cài đặt PHP dependencies
-composer install
+# Cài đặt PHP dependencies (vendor)
+composer update
+
+
+# Lưu ý: nếu cài bị lỗi thì dùng cách sau:
+1. Mở file cấu hình : 
+notepad C:\xampp\php\php.ini
+2. Tìm và bỏ dấu ; trước các dòng sau nếu có:
+   extension=gd
+   extension=zip
+   extension=mbstring
+3. Sau đó lưu lại rồi chạy:
+composer clear-cache
+composer update
+
+
+#Cài đặt tailwind 
+npm install -D @tailwindcss/vite
 
 # Cài đặt Node.js dependencies
 npm install
@@ -60,28 +60,28 @@ npm install
 # Copy file môi trường
 cp .env.example .env
 
-# Tạo application key
+# Xóa cache cấu hình cũ (rất quan trọng)
+php artisan config:clear
+
+# Sinh khóa và ghi vào .env
 php artisan key:generate
-```
+
+# (Tuỳ chọn) Cache lại cấu hình cho sạch
+php artisan config:cache
 
 ### Bước 4: Cấu hình database
 
-1. **Tạo database mới** trong MySQL/MariaDB
 2. **Cập nhật thông tin database** trong file `.env`:
-
-```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=kecommerce2024.sql
+DB_DATABASE=ecommerce2024
 DB_USERNAME=root
 DB_PASSWORD=
-```
+SESSION_DRIVER=file 
 
 ### Bước 5: Kết nối csdl
-Lấy file sql rồi import vào xampp
-
-
+Tạo bảng database mới trong xampp rồi import file sql vào, nhớ phải trùng tên ecommerce2024
 
 ### Bước 6: Tạo storage link
 
@@ -115,6 +115,7 @@ Truy cập website tại: **http://localhost:8000**
 - **Email**: admin@admin.com
 - **Password**: 12345678
 
+Tài khoản người dùng pass cũng là 12345678
 
 ## 📁 Cấu trúc dự án
 
@@ -209,27 +210,3 @@ php artisan migrate:fresh --seed
    npm cache clean --force
    npm install
    ```
-
-## 🤝 Đóng góp
-
-1. Fork dự án
-2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Tạo Pull Request
-
-## 📄 License
-
-Dự án này được phân phối dưới giấy phép MIT. Xem file `LICENSE` để biết thêm chi tiết.
-
-## 📞 Liên hệ
-
-- **Email**: support@kitchenhood.com
-- **Website**: https://kitchenhood.com
-- **GitHub**: https://github.com/your-username/kitchenhood-pro
-
----
-
-<p align="center">
-  <strong>Made with ❤️ by KitchenHood Team</strong>
-</p>
