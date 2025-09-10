@@ -183,7 +183,7 @@
         
         <!-- Tóm tắt đơn hàng -->
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+            <div class="card shadow-sm border-0" style="top: 20px;">
                 <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0 fw-bold">
                         <i class="fas fa-shopping-bag me-2"></i>

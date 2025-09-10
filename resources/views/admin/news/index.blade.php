@@ -1,18 +1,22 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 fw-bold text-dark mb-2"><i class="fas fa-newspaper me-2 text-primary"></i>Quản Lý Tin Tức</h1>
+                <p class="text-muted mb-0">Tạo, chỉnh sửa và quản lý bài viết</p>
+            </div>
+            <a href="{{ route('admin.news.create') }}" class="btn btn-success btn-lg px-4">
+                <i class="fas fa-plus me-2"></i>Thêm Tin Tức Mới
+            </a>
+        </div>
+    </div>
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">
-                        <i class="fas fa-newspaper me-2"></i>Quản Lý Tin Tức
-                    </h3>
-                    <a href="{{ route('admin.news.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Thêm Tin Tức Mới
-                    </a>
-                </div>
+            <div class="card admin-table">
+                <div class="card-body p-0">
                 
                 <div class="card-body">
                     @if(session('success'))
@@ -23,8 +27,8 @@
                     @endif
 
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
+                        <table class="table">
+                            <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Hình Ảnh</th>
@@ -57,18 +61,18 @@
                                     <td>
                                         <div class="fw-bold">{{ Str::limit($article->title, 50) }}</div>
                                         @if($article->is_featured)
-                                            <span class="badge bg-warning text-dark">Nổi bật</span>
+                                            <span class="badge badge-success">Nổi bật</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="badge bg-info">{{ ucfirst($article->category) }}</span>
+                                        <span class="badge badge-info">{{ ucfirst($article->category) }}</span>
                                     </td>
                                     <td>{{ $article->author }}</td>
                                     <td>
                                         @if($article->is_published)
-                                            <span class="badge bg-success">Đã xuất bản</span>
+                                            <span class="badge badge-success">Đã xuất bản</span>
                                         @else
-                                            <span class="badge bg-secondary">Bản nháp</span>
+                                            <span class="badge badge-secondary">Bản nháp</span>
                                         @endif
                                     </td>
                                     <td>
@@ -78,13 +82,13 @@
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ route('news.show', $article->slug) }}" 
-                                               class="btn btn-sm btn-outline-info" 
+                                               class="btn btn-sm btn-view" 
                                                target="_blank"
                                                title="Xem">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <a href="{{ route('admin.news.edit', $article) }}" 
-                                               class="btn btn-sm btn-outline-warning"
+                                               class="btn btn-sm btn-edit"
                                                title="Sửa">
                                                 <i class="fas fa-edit"></i>
                                             </a>
@@ -95,7 +99,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="btn btn-sm btn-outline-danger"
+                                                        class="btn btn-sm btn-delete"
                                                         title="Xóa">
                                                     <i class="fas fa-trash"></i>
                                                 </button>

@@ -240,5 +240,22 @@
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Hiển thị loader khi submit form đăng nhập/đăng ký
+    document.addEventListener('DOMContentLoaded', function() {
+        const handleFormWithLoader = (formSelector, btnSelector, loaderSelector) => {
+            const form = document.querySelector(formSelector);
+            if (!form) return;
+            const btn = form.querySelector(btnSelector);
+            const loader = form.querySelector(loaderSelector);
+            form.addEventListener('submit', function() {
+                if (btn) btn.setAttribute('disabled', 'disabled');
+                if (loader) loader.classList.remove('d-none');
+            });
+        };
+        handleFormWithLoader('form[action$="/login"]', '#login-submit', '#login-loader');
+        handleFormWithLoader('form[action$="/register"]', '#register-submit', '#register-loader');
+    });
+    </script>
 </body>
 </html>

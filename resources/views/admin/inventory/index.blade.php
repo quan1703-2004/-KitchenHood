@@ -1,14 +1,17 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Quản Lý Tồn Kho</h1>
         <div>
-            <a href="{{ route('admin.inventory.history') }}" class="btn btn-info">
+            <h1 class="h2 fw-bold text-dark mb-2"><i class="fas fa-warehouse me-2 text-primary"></i>Quản Lý Tồn Kho</h1>
+            <p class="text-muted mb-0">Theo dõi tồn kho, sắp hết hàng và lịch sử giao dịch</p>
+        </div>
+        <div>
+            <a href="{{ route('admin.inventory.history') }}" class="btn btn-view btn-sm me-2" style="padding: 0.75rem 1rem;">
                 <i class="fas fa-history me-2"></i>Lịch Sử Giao Dịch
             </a>
-            <a href="{{ route('admin.inventory.export') }}" class="btn btn-success">
+            <a href="{{ route('admin.inventory.export') }}" class="btn btn-success" style="padding: 0.75rem 1rem;">
                 <i class="fas fa-file-excel me-2"></i>Xuất Excel
             </a>
         </div>
@@ -16,83 +19,41 @@
 
     <!-- Thống kê tổng quan -->
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Tổng Sản Phẩm</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total_products'] }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-box fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card h-100">
+                <div class="card-icon"><i class="fas fa-box"></i></div>
+                <div class="card-count">{{ $stats['total_products'] }}</div>
+                <div class="card-title">Tổng Sản Phẩm</div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Còn Hàng</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['in_stock'] }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card h-100">
+                <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);"><i class="fas fa-check-circle"></i></div>
+                <div class="card-count">{{ $stats['in_stock'] }}</div>
+                <div class="card-title">Còn Hàng</div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Sắp Hết Hàng</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['low_stock'] }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card h-100">
+                <div class="card-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="card-count">{{ $stats['low_stock'] }}</div>
+                <div class="card-title">Sắp Hết Hàng</div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Hết Hàng</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['out_of_stock'] }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card h-100">
+                <div class="card-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);"><i class="fas fa-times-circle"></i></div>
+                <div class="card-count">{{ $stats['out_of_stock'] }}</div>
+                <div class="card-title">Hết Hàng</div>
             </div>
         </div>
     </div>
 
     <!-- Bảng sản phẩm -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Danh Sách Sản Phẩm</h6>
-        </div>
-        <div class="card-body">
+    <div class="card admin-table mb-4">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th width="5%">ID</th>
@@ -132,18 +93,18 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="badge bg-info text-wrap">{{ $product->category->name ?? 'N/A' }}</span>
+                                <span class="badge badge-info text-wrap">{{ $product->category->name ?? 'N/A' }}</span>
                             </td>
                             <td class="text-center">
                                 <span class="fw-bold fs-6">{{ $product->quantity }}</span>
                             </td>
                             <td class="text-center">
                                 @if($product->quantity <= 0)
-                                    <span class="badge bg-danger">Hết hàng</span>
+                                    <span class="badge badge-secondary">Hết hàng</span>
                                 @elseif($product->quantity <= 10)
-                                    <span class="badge bg-warning">Sắp hết hàng</span>
+                                    <span class="badge badge-success" style="background: #f59e0b;">Sắp hết hàng</span>
                                 @else
-                                    <span class="badge bg-success">Còn hàng</span>
+                                    <span class="badge badge-success">Còn hàng</span>
                                 @endif
                             </td>
                             <td class="text-end">
@@ -151,15 +112,11 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group-vertical btn-group-sm" role="group">
-                                    <a href="{{ route('admin.inventory.show', $product) }}" 
-                                       class="btn btn-primary btn-sm mb-1" 
-                                       title="Xem chi tiết">
+                                    <a href="{{ route('admin.inventory.show', $product) }}" class="btn btn-view mb-1" title="Xem chi tiết">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     @if($product->quantity <= 10)
-                                        <a href="{{ route('admin.inventory.show', $product) }}" 
-                                           class="btn btn-warning btn-sm" 
-                                           title="Nhập hàng">
+                                        <a href="{{ route('admin.inventory.show', $product) }}" class="btn btn-edit" title="Nhập hàng">
                                             <i class="fas fa-plus"></i>
                                         </a>
                                     @endif

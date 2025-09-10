@@ -40,6 +40,21 @@
             padding: 1rem 0;
             border-bottom: 1px solid var(--border-color);
         }
+        /* Navbar sticky thông minh: ẩn khi cuộn xuống, hiện khi cuộn lên */
+        .navbar.smart-sticky {
+            position: sticky; /* giữ ở top khi cuộn */
+            top: 0;
+            z-index: 1030; /* cao hơn nội dung khác */
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+            will-change: transform;
+        }
+        .navbar.smart-sticky.navbar-hidden {
+            transform: translateY(-100%); /* ẩn đi khi cuộn xuống */
+        }
+        .navbar.smart-sticky.navbar-scrolled {
+            box-shadow: 0 6px 20px rgba(44, 62, 80, 0.08);
+            background-color: var(--white) !important;
+        }
         
         .navbar-brand {
             font-weight: 700;
@@ -745,7 +760,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light smart-sticky">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-wind me-2"></i>KitchenHood Pro
@@ -984,6 +999,25 @@
         }
     </style>
     
+    <style>
+        /* Global page loader */
+        #global-page-loader{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:transparent;z-index:1050}
+        #global-page-loader .wrapper{display:flex;justify-content:center;align-items:center;height:60px}
+        #global-page-loader .ball{--size:16px;width:var(--size);height:var(--size);border-radius:11px;margin:0 10px;animation:2s bounce ease infinite}
+        #global-page-loader .blue{background-color:#4285f5}
+        #global-page-loader .red{background-color:#ea4436;animation-delay:.25s}
+        #global-page-loader .yellow{background-color:#fbbd06;animation-delay:.5s}
+        #global-page-loader .green{background-color:#34a952;animation-delay:.75s}
+        @keyframes bounce{50%{transform:translateY(25px)}}
+    </style>
+    <div id="global-page-loader" aria-hidden="true">
+        <div class="wrapper">
+            <div class="blue ball"></div>
+            <div class="red ball"></div>
+            <div class="yellow ball"></div>
+            <div class="green ball"></div>
+        </div>
+    </div>
     <script>
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1002,6 +1036,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             const currentLocation = location.pathname;
             const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            const navbar = document.querySelector('nav.navbar.smart-sticky');
+            let lastScrollY = window.scrollY;
+            let ticking = false;
+            const delta = 8; // ngưỡng thay đổi nhỏ bỏ qua để tránh nhấp nháy
+            const showAtTopThreshold = 80; // sau khi vượt mốc này mới cho phép ẩn khi kéo xuống
             
             navLinks.forEach(link => {
                 if (link.getAttribute('href') === currentLocation) {
@@ -1009,6 +1048,38 @@
                 }
             });
             
+            // Logic ẩn/hiện navbar theo hướng cuộn
+            const handleScroll = () => {
+                const currentY = window.scrollY;
+                // thêm style khi đã cuộn xuống khỏi top một chút
+                if (currentY > 5) {
+                    navbar?.classList.add('navbar-scrolled');
+                } else {
+                    navbar?.classList.remove('navbar-scrolled');
+                }
+                // nếu chênh lệch nhỏ thì bỏ qua (tránh toggle liên tục)
+                if (Math.abs(currentY - lastScrollY) < delta) {
+                    ticking = false;
+                    return;
+                }
+                // cuộn xuống và đã vượt qua ngưỡng -> ẩn
+                if (currentY > lastScrollY && currentY > showAtTopThreshold) {
+                    navbar?.classList.add('navbar-hidden');
+                } else {
+                    // cuộn lên -> hiện
+                    navbar?.classList.remove('navbar-hidden');
+                }
+                lastScrollY = currentY;
+                ticking = false;
+            };
+
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(handleScroll);
+                    ticking = true;
+                }
+            }, { passive: true });
+
             // Carousel functionality
             const heroCarousel = document.getElementById('heroCarousel');
             if (heroCarousel) {
@@ -1051,6 +1122,25 @@
                     }
                 });
             }
+            // Global loader for navigation clicks
+            const pageLoader = document.getElementById('global-page-loader');
+            const requestShow = () => { if(pageLoader) pageLoader.style.display = 'flex'; };
+            const hideWhenReady = () => { if(pageLoader) pageLoader.style.display = 'none'; };
+
+            // Show loader trên bất kỳ click điều hướng hợp lệ
+            document.body.addEventListener('click', function(e){
+                const a = e.target.closest('a');
+                if(!a) return;
+                // Bỏ qua mở tab mới / có modifier key
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                const href = a.getAttribute('href');
+                if(!href || href.startsWith('#') || a.hasAttribute('target')) return;
+                if(href.startsWith('javascript:')) return;
+                requestShow();
+            }, {capture:true});
+
+            // Ẩn khi trang mới hiển thị
+            window.addEventListener('pageshow', hideWhenReady);
         });
     </script>
 </body>

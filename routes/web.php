@@ -12,9 +12,11 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Models\Faq;
 
 // Gửi link xác thực
 Route::get('/email/verify', function () {
@@ -62,7 +64,10 @@ Route::get('/', function () {
     // Lấy tin tức nổi bật cho trang chủ
     $featuredNews = \App\Models\News::published()->featured()->take(3)->get();
 
-    return view('customer.welcome', compact('latestProducts', 'categories', 'featuredNews'));
+    // Lấy FAQ hiển thị ngoài trang chủ, sắp xếp theo sort_order
+    $faqs = Faq::where('is_visible', true)->orderBy('sort_order')->get();
+
+    return view('customer.welcome', compact('latestProducts', 'categories', 'featuredNews', 'faqs'));
 })->name('home');
 
 // Routes cho tin tức
@@ -224,4 +229,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/inventory/export-history', [App\Http\Controllers\Admin\InventoryController::class, 'exportHistory'])->name('inventory.export-history');
     Route::get('/inventory/{product}', [App\Http\Controllers\Admin\InventoryController::class, 'show'])->name('inventory.show');
     Route::post('/inventory/{product}/add-stock', [App\Http\Controllers\Admin\InventoryController::class, 'addStock'])->name('inventory.add-stock');
+
+    // Quản lý FAQ
+    Route::resource('/faqs', AdminFaqController::class)->names('faqs');
 });

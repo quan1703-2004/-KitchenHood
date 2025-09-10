@@ -37,27 +37,25 @@
             font-size: 14px;
         }
         
-        /* Admin Sidebar */
+        /* Admin Sidebar - modernized */
         .admin-sidebar {
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            background: #ffffff;
             min-height: 100vh;
             padding: 0;
             position: fixed;
             left: 0;
             top: 0;
-            width: 280px;
+            width: 260px;
             z-index: 1000;
             border-right: 1px solid var(--border-color);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-sm);
         }
         
         .admin-sidebar .sidebar-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-            padding: 2rem 1.5rem;
-            text-align: center;
-            color: white;
+            padding: 1.25rem 1.25rem 0.75rem 1.25rem;
+            text-align: left;
+            color: var(--text-dark);
             position: relative;
-            overflow: hidden;
         }
         
         .admin-sidebar .sidebar-header::before {
@@ -77,11 +75,9 @@
         }
         
         .admin-sidebar .sidebar-header h4 {
-            font-weight: 700;
-            font-size: 1.25rem;
-            margin: 0;
-            position: relative;
-            z-index: 1;
+            font-weight: 800;
+            font-size: 1.15rem;
+            margin: 0 0 0.25rem 0;
         }
         
         .admin-sidebar .sidebar-header .subtitle {
@@ -92,58 +88,71 @@
             z-index: 1;
         }
         
-        .admin-sidebar .nav {
-            padding: 1.5rem 0;
-        }
+        .admin-sidebar .nav { padding: 0.75rem 0 1.25rem 0; }
         
         .admin-sidebar .nav-link {
             color: var(--text-dark) !important;
-            padding: 1rem 1.5rem;
+            padding: 0.65rem 0.9rem;
+            margin: 0.2rem 0.75rem;
             border: none;
             text-decoration: none;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
             position: relative;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            border-radius: 10px;
         }
         
         .admin-sidebar .nav-link:hover {
-            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
-            color: white !important;
-            transform: translateX(8px);
-            box-shadow: var(--shadow-md);
+            background: #f1f5f9;
+            color: var(--text-dark) !important;
+            transform: translateX(4px);
         }
         
         .admin-sidebar .nav-link.active {
-            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
-            color: white !important;
-            box-shadow: var(--shadow-md);
+            background: #eef2ff;
+            color: var(--primary-color) !important;
+            box-shadow: none;
         }
         
         .admin-sidebar .nav-link.active::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: white;
-            border-radius: 0 2px 2px 0;
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--primary-color);
+            border-radius: 50%;
         }
         
         .admin-sidebar .nav-link i {
-            font-size: 1.1rem;
-            width: 20px;
-            text-align: center;
+            font-size: 1rem;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
         }
         
         .admin-sidebar .nav-divider {
             margin: 1rem 1.5rem;
             border-top: 1px solid var(--border-color);
             opacity: 0.5;
+        }
+
+        /* Sidebar search */
+        .sidebar-search { padding: 0 1.25rem 0.5rem 1.25rem; }
+        .sidebar-search .form-control {
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            height: 38px;
+            font-size: 0.9rem;
         }
         
         /* Admin Content */
@@ -601,6 +610,68 @@
             }
         }
         
+        /* ====== Global Admin Enhancements (đồng bộ phong cách như trang FAQ) ====== */
+        .admin-content .card {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .admin-content .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Bảng mặc định */
+        .admin-content .table {
+            margin-bottom: 0;
+        }
+
+        .admin-content .table thead th,
+        .admin-content thead.table-dark th {
+            background: #f8fafc !important;
+            color: var(--text-dark) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .admin-content .table tbody td {
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .admin-content .table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Nút hành động nhỏ đồng bộ */
+        .admin-content .btn.btn-sm {
+            border-radius: 8px;
+            padding: 0.4rem 0.65rem;
+            font-weight: 600;
+        }
+
+        .btn-warning { background: #fbbf24; color: #92400e; border: none; }
+        .btn-warning:hover { background: #f59e0b; color: #92400e; transform: translateY(-1px); }
+        .btn-danger { background: #ef4444; border: none; }
+        .btn-danger:hover { background: #dc2626; transform: translateY(-1px); }
+        .btn-success { color: #0f5132; }
+
+        /* Badge mở rộng để dùng chung */
+        .badge-info { background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%); color: #fff; }
+        .badge-secondary { background: #e2e8f0; color: #334155; }
+
+        /* Tiêu đề trang và khu vực header */
+        .admin-content h1, .admin-content .h1, .admin-content .content-title {
+            color: var(--text-dark);
+            font-weight: 800;
+        }
+
+        /* Khoảng cách container cũ */
+        .admin-content .container, .admin-content .container-fluid { padding-left: 0; padding-right: 0; }
+
         /* Overlay for mobile sidebar */
         .sidebar-overlay {
             display: none;
@@ -631,7 +702,7 @@
         </button>
         
         <div class="sidebar-header">
-            <h4><i class="fas fa-shield-alt me-2"></i>ADMIN PANEL</h4>
+            <h4><i class="fas fa-shield-alt me-2"></i>Admin Panel</h4>
             <div class="subtitle">KitchenHood Pro</div>
         </div>
         
@@ -651,6 +722,10 @@
             <a class="nav-link {{ request()->routeIs('admin.news.*') ? 'active' : '' }}" href="{{ route('admin.news.index') }}">
                 <i class="fas fa-newspaper"></i>
                 <span>Quản lý tin tức</span>
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}" href="{{ route('admin.faqs.index') }}">
+                <i class="fas fa-question-circle"></i>
+                <span>Quản lý FAQ</span>
             </a>
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.orders.index') }}">
