@@ -159,7 +159,7 @@
 
         <!-- Sidebar thông tin -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm sticky-top" style="top: 2rem;">
+            <div class="card border-0 shadow-sm" style="top: 2rem;">
                 <div class="card-body">
                     <h5 class="card-title fw-bold mb-4">Thông Tin Sản Phẩm</h5>
                     

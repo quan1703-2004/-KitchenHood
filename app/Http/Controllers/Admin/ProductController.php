@@ -8,9 +8,22 @@ use App\Models\Category;
 use App\Models\ProductDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    /**
+     * Tạo tên file ảnh ngắn gọn và duy nhất
+     * - Định dạng: prd_{YmdHis}_{rand6}.{ext}
+     * - Dùng cho tất cả ảnh sản phẩm để tránh tên quá dài
+     */
+    private function makeShortImageName(string $extension): string
+    {
+        // tạo chuỗi ngắn tránh trùng lặp (timestamp + random)
+        $timestamp = now()->format('YmdHis');
+        $random = Str::lower(Str::random(6));
+        return "prd_{$timestamp}_{$random}.{$extension}";
+    }
     // Hiển thị danh sách sản phẩm (cho admin)
     public function index()
     {
@@ -44,22 +57,29 @@ class ProductController extends Controller
 
         $data = $request->all();
         
-        // Xử lý upload hình ảnh chính
+        // Xử lý upload hình ảnh chính (đặt tên file ngắn)
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $data['image'] = $imagePath;
+            $ext = $request->file('image')->getClientOriginalExtension();
+            $filename = $this->makeShortImageName($ext);
+            // lưu vào disk public/products với tên ngắn
+            $path = $request->file('image')->storeAs('products', $filename, 'public');
+            $data['image'] = $path;
         }
         
-        // Xử lý upload hình ảnh phụ 1
+        // Xử lý upload hình ảnh phụ 1 (đặt tên file ngắn)
         if ($request->hasFile('image2')) {
-            $image2Path = $request->file('image2')->store('products', 'public');
-            $data['image2'] = $image2Path;
+            $ext = $request->file('image2')->getClientOriginalExtension();
+            $filename = $this->makeShortImageName($ext);
+            $path = $request->file('image2')->storeAs('products', $filename, 'public');
+            $data['image2'] = $path;
         }
         
-        // Xử lý upload hình ảnh phụ 2
+        // Xử lý upload hình ảnh phụ 2 (đặt tên file ngắn)
         if ($request->hasFile('image3')) {
-            $image3Path = $request->file('image3')->store('products', 'public');
-            $data['image3'] = $image3Path;
+            $ext = $request->file('image3')->getClientOriginalExtension();
+            $filename = $this->makeShortImageName($ext);
+            $path = $request->file('image3')->storeAs('products', $filename, 'public');
+            $data['image3'] = $path;
         }
         
         // Đặt giá trị mặc định cho quantity nếu không có
@@ -114,37 +134,43 @@ class ProductController extends Controller
 
         $data = $request->all();
         
-        // Xử lý upload hình ảnh chính mới
+        // Xử lý upload hình ảnh chính mới (đặt tên file ngắn)
         if ($request->hasFile('image')) {
             // Xóa hình ảnh cũ nếu có
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
-            
-            $imagePath = $request->file('image')->store('products', 'public');
-            $data['image'] = $imagePath;
+
+            $ext = $request->file('image')->getClientOriginalExtension();
+            $filename = $this->makeShortImageName($ext);
+            $path = $request->file('image')->storeAs('products', $filename, 'public');
+            $data['image'] = $path;
         }
         
-        // Xử lý upload hình ảnh phụ 1 mới
+        // Xử lý upload hình ảnh phụ 1 mới (đặt tên file ngắn)
         if ($request->hasFile('image2')) {
             // Xóa hình ảnh cũ nếu có
             if ($product->image2) {
                 Storage::disk('public')->delete($product->image2);
             }
-            
-            $image2Path = $request->file('image2')->store('products', 'public');
-            $data['image2'] = $image2Path;
+
+            $ext = $request->file('image2')->getClientOriginalExtension();
+            $filename = $this->makeShortImageName($ext);
+            $path = $request->file('image2')->storeAs('products', $filename, 'public');
+            $data['image2'] = $path;
         }
         
-        // Xử lý upload hình ảnh phụ 2 mới
+        // Xử lý upload hình ảnh phụ 2 mới (đặt tên file ngắn)
         if ($request->hasFile('image3')) {
             // Xóa hình ảnh cũ nếu có
             if ($product->image3) {
                 Storage::disk('public')->delete($product->image3);
             }
-            
-            $image3Path = $request->file('image3')->store('products', 'public');
-            $data['image3'] = $image3Path;
+
+            $ext = $request->file('image3')->getClientOriginalExtension();
+            $filename = $this->makeShortImageName($ext);
+            $path = $request->file('image3')->storeAs('products', $filename, 'public');
+            $data['image3'] = $path;
         }
         
         // Đặt giá trị mặc định cho quantity nếu không có

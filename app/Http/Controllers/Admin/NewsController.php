@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\Storage;
 class NewsController extends Controller
 {
     /**
+     * Tạo tên file ảnh ngắn gọn và duy nhất cho news
+     */
+    private function makeShortImageName(string $extension): string
+    {
+        $timestamp = now()->format('YmdHis');
+        $random = Str::lower(Str::random(6));
+        return "news_{$timestamp}_{$random}.{$extension}";
+    }
+    /**
      * Hiển thị danh sách tin tức
      */
     public function index()
@@ -45,10 +54,12 @@ class NewsController extends Controller
 
         $data = $request->all();
         
-        // Xử lý upload hình ảnh
+        // Xử lý upload hình ảnh (đặt tên file ngắn)
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('news', 'public');
-            $data['image'] = $imagePath;
+            $ext = $request->file('image')->getClientOriginalExtension();
+            $filename = $this->makeShortImageName($ext);
+            $path = $request->file('image')->storeAs('news', $filename, 'public');
+            $data['image'] = $path;
         }
 
         // Tạo slug từ title
@@ -86,15 +97,17 @@ class NewsController extends Controller
 
         $data = $request->all();
         
-        // Xử lý upload hình ảnh mới
+        // Xử lý upload hình ảnh mới (đặt tên file ngắn)
         if ($request->hasFile('image')) {
             // Xóa hình ảnh cũ nếu có
             if ($news->image) {
                 Storage::disk('public')->delete($news->image);
             }
-            
-            $imagePath = $request->file('image')->store('news', 'public');
-            $data['image'] = $imagePath;
+
+            $ext = $request->file('image')->getClientOriginalExtension();
+            $filename = $this->makeShortImageName($ext);
+            $path = $request->file('image')->storeAs('news', $filename, 'public');
+            $data['image'] = $path;
         }
 
         // Cập nhật slug nếu title thay đổi

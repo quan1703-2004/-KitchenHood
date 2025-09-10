@@ -1,2 +1,11 @@
+# Mặc định bỏ qua mọi file trong public storage
 *
 !.gitignore
+
+# Cho phép commit các thư mục ảnh sản phẩm và tin tức
+!products/
+!news/
+
+# Cho phép nội dung bên trong 2 thư mục trên
+products/**
+news/**
