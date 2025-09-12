@@ -185,6 +185,13 @@ Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'
 Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store')->middleware('check.cart');
 Route::get('/checkout/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
 
+// Payment routes
+Route::get('/payment/qr-code/{order}', [App\Http\Controllers\PaymentController::class, 'qrCode'])->name('payment.qr-code');
+Route::get('/payment/momo/{order}', [App\Http\Controllers\PaymentController::class, 'momo'])->name('payment.momo');
+Route::post('/payment/confirm-qr/{order}', [App\Http\Controllers\PaymentController::class, 'confirmQrCode'])->name('payment.confirm-qr');
+Route::post('/payment/confirm-momo/{order}', [App\Http\Controllers\PaymentController::class, 'confirmMomo'])->name('payment.confirm-momo');
+Route::post('/payment/cancel/{order}', [App\Http\Controllers\PaymentController::class, 'cancel'])->name('payment.cancel');
+
 // Routes cho admin (cần đăng nhập và quyền admin)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -249,4 +256,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/reports/products', [App\Http\Controllers\Admin\ReportController::class, 'products'])->name('reports.products');
     Route::get('/reports/customers', [App\Http\Controllers\Admin\ReportController::class, 'customers'])->name('reports.customers');
     Route::post('/reports/export', [App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
+    
+    // Quản lý phương thức thanh toán
+    Route::resource('/payment-methods', App\Http\Controllers\Admin\PaymentMethodController::class)->names('payment-methods');
 });

@@ -67,7 +67,7 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'address_id' => 'required|exists:addresses,id',
-            'payment_method' => 'required|in:cod,bank_transfer',
+            'payment_method' => 'required|in:cod,bank_transfer,momo',
             'notes' => 'nullable|string|max:1000'
         ]);
         
@@ -151,8 +151,15 @@ class CheckoutController extends Controller
             // Xóa giỏ hàng DB
             CartItem::where('cart_id', $cart->id)->delete();
             
-            return redirect()->route('checkout.success', $order->id)
-                           ->with('success', 'Đặt hàng thành công!');
+            // Xử lý chuyển hướng theo phương thức thanh toán
+            if ($request->payment_method === 'cod') {
+                return redirect()->route('checkout.success', $order->id)
+                               ->with('success', 'Đặt hàng thành công!');
+            } elseif ($request->payment_method === 'bank_transfer') {
+                return redirect()->route('payment.qr-code', $order->id);
+            } elseif ($request->payment_method === 'momo') {
+                return redirect()->route('payment.momo', $order->id);
+            }
                            
         } catch (\Exception $e) {
             \Log::error('Checkout error: ' . $e->getMessage());

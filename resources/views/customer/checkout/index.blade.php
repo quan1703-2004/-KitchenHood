@@ -129,7 +129,10 @@
                                     Thanh toán khi nhận hàng (COD)
                                 </option>
                                 <option value="bank_transfer" {{ old('payment_method') == 'bank_transfer' ? 'selected' : '' }}>
-                                    Chuyển khoản ngân hàng
+                                    Chuyển khoản ngân hàng (QR Code)
+                                </option>
+                                <option value="momo" {{ old('payment_method') == 'momo' ? 'selected' : '' }}>
+                                    Thanh toán qua Momo
                                 </option>
                             </select>
                             @error('payment_method')

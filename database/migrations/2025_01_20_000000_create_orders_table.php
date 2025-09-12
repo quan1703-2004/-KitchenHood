@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('customer_email'); // Email khách hàng
             $table->string('customer_phone'); // Số điện thoại
             $table->text('customer_address'); // Địa chỉ giao hàng
-            $table->enum('payment_method', ['cod', 'bank_transfer']); // Phương thức thanh toán
+            $table->enum('payment_method', ['cod', 'bank_transfer', 'momo']); // Phương thức thanh toán
             $table->text('notes')->nullable(); // Ghi chú
             $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending'); // Trạng thái đơn hàng
             $table->bigInteger('total_amount'); // Tổng tiền sản phẩm
