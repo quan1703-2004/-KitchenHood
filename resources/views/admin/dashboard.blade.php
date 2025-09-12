@@ -13,8 +13,11 @@
     <a href="{{ route('admin.products.create') }}" class="btn btn-success me-2">
         <i class="fas fa-plus me-2"></i>Thêm Sản Phẩm
     </a>
-    <a href="{{ route('admin.news.create') }}" class="btn btn-info">
+    <a href="{{ route('admin.news.create') }}" class="btn btn-info me-2">
         <i class="fas fa-plus me-2"></i>Thêm Tin Tức
+    </a>
+    <a href="{{ route('admin.reports.dashboard') }}" class="btn btn-success">
+        <i class="fas fa-chart-line me-2"></i>Báo cáo & Thống kê
     </a>
 </div>
 

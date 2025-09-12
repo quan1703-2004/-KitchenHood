@@ -58,17 +58,7 @@
             position: relative;
         }
         
-        .admin-sidebar .sidebar-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
-        }
-        
+
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(180deg); }
@@ -157,7 +147,7 @@
         
         /* Admin Content */
         .admin-content {
-            margin-left: 280px;
+            margin-left: 250px;
             padding: 2rem;
             min-height: 100vh;
             background: #f8fafc;
@@ -727,21 +717,27 @@
                 <i class="fas fa-question-circle"></i>
                 <span>Quản lý FAQ</span>
             </a>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.orders.index') }}">
-                <i class="fas fa-fw fa-shopping-cart"></i>
-                <span>Quản lý Đơn hàng</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.reviews.index') }}">
-                    <i class="fas fa-fw fa-star"></i>
-                    <span>Quản lý Đánh giá</span></a>
-                </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}">
-                    <i class="fas fa-warehouse"></i>
-                    <span>Quản lý Tồn kho</span></a>
-                </li>
+            <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Quản lý Đơn hàng</span>
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}" href="{{ route('admin.reviews.index') }}">
+                <i class="fas fa-star"></i>
+                <span>Quản lý Đánh giá</span>
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}">
+                <i class="fas fa-warehouse"></i>
+                <span>Quản lý Tồn kho</span>
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                <i class="fas fa-users"></i>
+                <span>Quản lý Người dùng</span>
+            </a>
+            
+            <a class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" href="{{ route('admin.reports.dashboard') }}">
+                <i class="fas fa-chart-line"></i>
+                <span>Báo cáo & Thống kê</span>
+            </a>
                 
             <div class="nav-divider"></div>
             <a class="nav-link" href="/">

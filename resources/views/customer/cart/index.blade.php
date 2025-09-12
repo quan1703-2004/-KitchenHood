@@ -2,215 +2,31 @@
 
 @section('content')
 <style>
-    .cart-container {
-        background: linear-gradient(135deg, var(--secondary-color) 0%, #eef5fb 100%);
-        min-height: 100vh;
-        padding: 2rem 0;
-    }
-    
-    .cart-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-        color: var(--white);
-        border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        text-align: center;
-    }
-    
-    .cart-item {
-        background: var(--white);
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 8px 24px rgba(52,152,219,0.08);
-        border: 1px solid var(--border-color);
-        transition: all 0.3s ease;
-    }
-    
-    .cart-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    }
-    
-    .product-image {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 2px solid var(--border-color);
-    }
-    
-    .quantity-controls {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .quantity-btn {
-        width: 35px;
-        height: 35px;
-        border: 2px solid var(--primary-color);
-        background: var(--white);
-        color: var(--primary-color);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .quantity-btn:hover {
-        background: var(--primary-color);
-        color: var(--white);
-        transform: scale(1.1);
-    }
-    
-    .quantity-input {
-        width: 60px;
-        text-align: center;
-        border: 2px solid var(--border-color);
-        border-radius: 8px;
-        padding: 0.5rem;
-        font-weight: bold;
-        color: var(--primary-color);
-    }
-    
-    .update-btn {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-        border: none;
-        color: var(--white);
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .update-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(52, 152, 219, 0.35);
-    }
-    
-    .remove-btn {
-        background: linear-gradient(45deg, #dc3545, #c82333);
-        border: none;
-        color: var(--white);
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .remove-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
-    }
-    
-    .clear-cart-btn {
-        background: linear-gradient(45deg, #6c757d, #495057);
-        border: none;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .clear-cart-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
-    }
-    
-    .continue-shopping-btn {
-        background: linear-gradient(45deg, #17a2b8, #138496);
-        border: none;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .continue-shopping-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
-    }
-    
-    .order-summary {
-        background: var(--white);
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 12px 36px rgba(52,152,219,0.12);
-        border: 1px solid var(--border-color);
-        position: sticky;
-        top: 2rem;
-    }
-    
-    .summary-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 0;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .summary-item:last-child {
-        border-bottom: none;
-        font-weight: bold;
-        font-size: 1.2rem;
-        color: var(--primary-color);
-    }
-    
-    .checkout-btn {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-        border: none;
-        color: var(--white);
-        padding: 1rem 2rem;
-        border-radius: 15px;
-        font-weight: 700;
-        font-size: 1.1rem;
-        width: 100%;
-        transition: all 0.3s ease;
-        margin-top: 1rem;
-    }
-    
-    .checkout-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(44, 90, 160, 0.4);
-    }
-    
-    .price-display {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: var(--primary-color);
-    }
-    
-    .subtotal-display {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #28a745;
-    }
-    
-    .total-display {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #2c5aa0;
-    }
-    
-    .empty-cart {
-        text-align: center;
-        padding: 4rem 2rem;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    }
-    
-    .empty-cart i {
-        font-size: 4rem;
-        color: #6c757d;
-        margin-bottom: 1rem;
-    }
+    .cart-container{background:linear-gradient(135deg,#f5f9ff 0%,#edf4ff 100%);min-height:100vh;padding:2rem 0}
+    .cart-header{background:linear-gradient(135deg,var(--primary-color) 0%,var(--primary-dark) 100%);color:#fff;border-radius:18px;padding:1.75rem 2rem;margin-bottom:2rem;text-align:center}
+    .cart-item{background:#fff;border:1px solid var(--border-color);border-radius:14px;padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:var(--shadow-sm);transition:transform .2s ease, box-shadow .2s ease;display:grid;grid-template-columns:120px 1fr 170px 160px 48px;gap:16px;align-items:center}
+    .cart-item:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+    .product-image{width:120px;height:120px;object-fit:cover;border-radius:12px;border:1px solid var(--border-color)}
+    .product-title{font-weight:700;color:#0f172a;margin-bottom:.25rem}
+    .product-meta{color:#64748b;margin-bottom:.25rem}
+    .price-display{font-weight:700;color:var(--primary-color)}
+    .quantity-controls{display:flex;align-items:center;gap:.5rem}
+    .quantity-btn{width:36px;height:36px;border:2px solid var(--primary-color);background:#fff;color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;transition:all .2s}
+    .quantity-btn:hover{background:var(--primary-color);color:#fff}
+    .quantity-input{width:64px;text-align:center;border:2px solid var(--border-color);border-radius:10px;padding:.5rem;font-weight:700;color:var(--primary-color)}
+    .subtotal-display{font-size:1.1rem;font-weight:700;color:#16a34a}
+    .update-btn{background:linear-gradient(135deg,var(--primary-color),var(--primary-dark));border:none;color:#fff;padding:.55rem .9rem;border-radius:10px;font-weight:700}
+    .remove-btn{background:#ef4444;border:none;color:#fff;padding:.55rem .75rem;border-radius:10px}
+    .order-summary{background:#fff;border:1px solid var(--border-color);border-radius:16px;padding:1.5rem;box-shadow:var(--shadow-sm);position:sticky;top:2rem}
+    .summary-item{display:flex;justify-content:space-between;align-items:center;padding:.85rem 0;border-bottom:1px solid #e9ecef}
+    .summary-item:last-child{border-bottom:none}
+    .total-display{font-size:1.45rem;font-weight:800;color:#1e3a8a}
+    .checkout-btn{background:linear-gradient(135deg,var(--primary-color),var(--primary-dark));border:none;color:#fff;padding:1rem;border-radius:12px;font-weight:800;width:100%;margin-top:1rem}
+    .clear-cart-btn{background:#475569;border:none;color:#fff;padding:.8rem 1.2rem;border-radius:10px;font-weight:700}
+    .continue-shopping-btn{background:#0ea5e9;border:none;color:#fff;padding:.8rem 1.2rem;border-radius:10px;font-weight:700}
+    .empty-cart{text-align:center;padding:4rem 2rem;background:#fff;border-radius:16px;box-shadow:var(--shadow-sm)}
+    .empty-cart i{font-size:4rem;color:#6c757d;margin-bottom:1rem}
+    @media (max-width: 992px){.cart-item{grid-template-columns:100px 1fr;grid-template-rows:auto auto auto;gap:12px}.cart-item .qty-col{grid-row:2}.cart-item .subtotal-col{grid-row:2}.cart-item .remove-col{grid-row:3;justify-self:end}}
 </style>
 
 <div class="cart-container">
@@ -235,47 +51,31 @@
 
                 @foreach($cartItems as $item)
                 <div class="cart-item" data-product-id="{{ $item['product']->id }}" data-price="{{ $item['product']->price }}">
-                    <div class="row align-items-center">
-                        <div class="col-md-2">
-                            @if($item['product']->image)
-                                <img src="{{ asset('storage/' . $item['product']->image) }}" alt="{{ $item['product']->name }}" class="product-image">
-                            @else
-                                <img src="https://via.placeholder.com/120x120/cccccc/666666?text=Không+có+ảnh" alt="{{ $item['product']->name }}" class="product-image">
-                            @endif
+                    <div class="img-col">
+                        @if($item['product']->image)
+                            <img src="{{ asset('storage/' . $item['product']->image) }}" alt="{{ $item['product']->name }}" class="product-image">
+                        @else
+                            <img src="https://via.placeholder.com/120x120/cccccc/666666?text=Không+có+ảnh" alt="{{ $item['product']->name }}" class="product-image">
+                        @endif
+                    </div>
+                    <div class="info-col">
+                        <div class="product-title">{{ $item['product']->name }}</div>
+                        <div class="product-meta">{{ $item['product']->category->name ?? 'Không phân loại' }}</div>
+                        <span class="price-display">{{ number_format($item['product']->price) }} VNĐ</span>
+                    </div>
+                    <div class="qty-col">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn quantity-decrease" type="button"><i class="fas fa-minus"></i></button>
+                            <input type="number" class="quantity-input" value="{{ $item['quantity'] }}" min="1" max="99">
+                            <button class="quantity-btn quantity-increase" type="button"><i class="fas fa-plus"></i></button>
                         </div>
-                        
-                        <div class="col-md-4">
-                            <h5 class="fw-bold text-dark mb-2">{{ $item['product']->name }}</h5>
-                            <p class="text-muted mb-1">{{ $item['product']->category->name ?? 'Không phân loại' }}</p>
-                            <span class="price-display">{{ number_format($item['product']->price) }} VNĐ</span>
-                        </div>
-                        
-                        <div class="col-md-3">
-                            <div class="quantity-controls">
-                                <button class="quantity-btn quantity-decrease" type="button">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" class="quantity-input" value="{{ $item['quantity'] }}" min="1" max="99">
-                                <button class="quantity-btn quantity-increase" type="button">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-2 text-center">
-                            <div class="subtotal-display mb-2" data-subtotal="{{ $item['subtotal'] }}">
-                                {{ number_format($item['subtotal']) }} VNĐ
-                            </div>
-                            <button class="update-btn btn-sm update-quantity" type="button">
-                                <i class="fas fa-sync-alt me-1"></i>Cập nhật
-                            </button>
-                        </div>
-                        
-                        <div class="col-md-1 text-end">
-                            <button class="remove-btn btn-sm remove-item" type="button" data-product-id="{{ $item['product']->id }}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                    </div>
+                    <div class="subtotal-col text-center">
+                        <div class="subtotal-display mb-2" data-subtotal="{{ $item['subtotal'] }}">{{ number_format($item['subtotal']) }} VNĐ</div>
+                        <button class="update-btn btn-sm update-quantity" type="button"><i class="fas fa-sync-alt me-1"></i>Cập nhật</button>
+                    </div>
+                    <div class="remove-col text-end">
+                        <button class="remove-btn btn-sm remove-item" type="button" data-product-id="{{ $item['product']->id }}"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
                 @endforeach

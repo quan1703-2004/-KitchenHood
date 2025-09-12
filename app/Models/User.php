@@ -23,7 +23,7 @@ implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'role', // Thêm cột role
+        'role',
     ];
 
     /**
@@ -87,6 +87,14 @@ implements MustVerifyEmail
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * Accessor để tương thích với code cũ
+     */
+    public function getIsAdminAttribute(): bool
+    {
+        return $this->isAdmin();
     }
 
     // quan hệ review của user
