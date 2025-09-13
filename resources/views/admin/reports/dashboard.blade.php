@@ -1,5 +1,8 @@
 @extends('layouts.admin')
 
+@section('title', 'Báo cáo & Thống kê - KitchenHood Pro')
+@section('meta_description', 'Dashboard báo cáo và thống kê chi tiết về doanh thu, đơn hàng, khách hàng và sản phẩm của hệ thống KitchenHood Pro')
+
 @section('content')
 <!-- Header Section -->
 <div class="reports-header">
@@ -13,11 +16,14 @@
         </div>
         <div class="header-actions">
             <div class="date-range-picker">
-                <input type="date" id="start-date" class="form-control" value="{{ now()->startOfMonth()->format('Y-m-d') }}">
+                <input type="date" id="start-date" class="form-control" value="{{ $startDate }}">
                 <span class="mx-2">đến</span>
-                <input type="date" id="end-date" class="form-control" value="{{ now()->format('Y-m-d') }}">
+                <input type="date" id="end-date" class="form-control" value="{{ $endDate }}">
                 <button class="btn btn-primary ms-2" onclick="updateDateRange()">
-                    <i class="fas fa-sync me-1"></i>
+                    <i class="fas fa-sync me-1"></i>Cập nhật
+                </button>
+                <button class="btn btn-success ms-2" onclick="refreshCharts()">
+                    <i class="fas fa-refresh me-1"></i>Làm mới
                 </button>
             </div>
         </div>
@@ -87,40 +93,99 @@
 <div class="reports-grid">
     <!-- Left Column -->
     <div class="reports-left">
-        <!-- Revenue Chart -->
+        <!-- Doanh thu theo danh mục -->
         <div class="chart-card">
             <div class="chart-header">
                 <h3 class="chart-title">
-                    <i class="fas fa-chart-area me-2"></i>
-                    Doanh thu theo tháng
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Doanh thu theo danh mục
                 </h3>
                 <div class="chart-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenue')">
+                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('categoryRevenue')">
                         <i class="fas fa-download me-1"></i>Xuất
                     </button>
                 </div>
             </div>
             <div class="chart-content">
-                <canvas id="revenueChart" height="300"></canvas>
+                <canvas id="categoryRevenueChart" height="300"></canvas>
             </div>
         </div>
 
-        <!-- Orders Status Chart -->
+        <!-- Doanh thu theo ngày -->
         <div class="chart-card">
             <div class="chart-header">
                 <h3 class="chart-title">
-                    <i class="fas fa-chart-pie me-2"></i>
-                    Đơn hàng theo trạng thái
+                    <i class="fas fa-chart-line me-2"></i>
+                    Doanh thu theo ngày (30 ngày gần nhất)
                 </h3>
+                <div class="chart-actions">
+                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenueByDate')">
+                        <i class="fas fa-download me-1"></i>Xuất
+                    </button>
+                </div>
             </div>
             <div class="chart-content">
-                <canvas id="ordersStatusChart" height="250"></canvas>
+                <canvas id="revenueByDateChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Doanh thu theo tháng -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Doanh thu theo tháng (6 tháng gần nhất)
+                </h3>
+                <div class="chart-actions">
+                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenueByMonth')">
+                        <i class="fas fa-download me-1"></i>Xuất
+                    </button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="revenueByMonthChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Doanh thu theo năm -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Doanh thu theo năm (3 năm gần nhất)
+                </h3>
+                <div class="chart-actions">
+                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenueByYear')">
+                        <i class="fas fa-download me-1"></i>Xuất
+                    </button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="revenueByYearChart" height="300"></canvas>
             </div>
         </div>
     </div>
 
     <!-- Right Column -->
     <div class="reports-right">
+        <!-- Doanh thu theo phương thức thanh toán -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Doanh thu theo phương thức thanh toán
+                </h3>
+                <div class="chart-actions">
+                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenueByPaymentMethod')">
+                        <i class="fas fa-download me-1"></i>Xuất
+                    </button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="revenueByPaymentMethodChart" height="300"></canvas>
+            </div>
+        </div>
+
         <!-- Top Products -->
         <div class="table-card">
             <div class="table-header">
@@ -251,8 +316,9 @@
     </div>
 </div>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Chart.js - Preload và async load -->
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script">
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 
 <style>
 /* ===== REPORTS STYLES ===== */
@@ -409,7 +475,7 @@
 }
 
 .stat-number {
-    font-size: 1.8rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: var(--text-dark);
     margin-bottom: 0.25rem;
@@ -443,15 +509,24 @@
     color: var(--text-muted);
 }
 
+/* Main Container */
+.main-content {
+    max-width: 100%;
+    overflow-x: hidden;
+    padding: 0 1rem;
+}
+
 /* Reports Grid */
 .reports-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
     margin-bottom: 2rem;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
-/* Chart Cards */
+/* Chart Cards Responsive */
 .chart-card {
     background: white;
     border-radius: 16px;
@@ -459,6 +534,27 @@
     border: 1px solid var(--border-color);
     overflow: hidden;
     margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    max-width: 100%;
+    width: 100%;
+}
+
+.chart-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.chart-content {
+    padding: 2rem;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.chart-content canvas {
+    max-height: 300px !important;
+    max-width: 100% !important;
+    width: 100% !important;
 }
 
 .chart-header {
@@ -483,8 +579,9 @@
     color: var(--primary-color);
 }
 
-.chart-content {
-    padding: 2rem;
+.chart-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
 /* Table Cards */
@@ -768,10 +865,14 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .reports-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+    
+    .chart-content canvas {
+        height: 350px !important;
     }
 }
 
@@ -784,26 +885,23 @@
         font-size: 1.5rem;
     }
     
-    .date-range-picker {
-        flex-direction: column;
-        width: 100%;
-        margin-top: 1rem;
+    .chart-content canvas {
+        height: 300px !important;
     }
     
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
     .stats-grid {
         grid-template-columns: 1fr;
     }
     
-    .stat-card {
-        padding: 1.5rem;
-    }
-    
-    .chart-content {
-        padding: 1rem;
-    }
-    
-    .actions-grid {
-        grid-template-columns: 1fr;
+    .chart-content canvas {
+        height: 250px !important;
     }
 }
 
@@ -815,6 +913,22 @@
     .stat-card {
         flex-direction: column;
         text-align: center;
+    }
+    
+    .chart-content {
+        padding: 0.5rem;
+    }
+    
+    .chart-content canvas {
+        max-height: 180px !important;
+    }
+    
+    .chart-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .chart-title {
+        font-size: 1rem;
     }
     
     .product-item {
@@ -836,81 +950,309 @@
 </style>
 
 <script>
-// Revenue Chart
-const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-const revenueChart = new Chart(revenueCtx, {
-    type: 'line',
-    data: {
-        labels: {!! json_encode($revenueByMonth->pluck('month')) !!},
-        datasets: [{
-            label: 'Doanh thu (₫)',
-            data: {!! json_encode($revenueByMonth->pluck('revenue')) !!},
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
+// Dữ liệu từ PHP được chuyển sang JavaScript
+const categoryRevenueData = {!! json_encode($categoryRevenue) !!};
+const revenueByDateData = {!! json_encode($revenueByDate) !!};
+const revenueByMonthData = {!! json_encode($revenueByMonth) !!};
+const revenueByYearData = {!! json_encode($revenueByYear) !!};
+const revenueByPaymentMethodData = {!! json_encode($revenueByPaymentMethod) !!};
+
+
+console.log('Category Revenue Data:', categoryRevenueData);
+console.log('Revenue by Payment Method Data:', revenueByPaymentMethodData);
+console.log('Revenue by Date Data:', revenueByDateData);
+
+// 1. Biểu đồ cột cho doanh thu theo danh mục (categoryRevenueChart)
+function initCategoryRevenueChart() {
+    const categoryRevenueCtx = document.getElementById('categoryRevenueChart').getContext('2d');
+    return new Chart(categoryRevenueCtx, {
+        type: 'bar',
+        data: {
+            labels: categoryRevenueData.map(item => item.category_name),
+            datasets: [{
+                label: 'Doanh thu (₫)',
+                data: categoryRevenueData.map(item => item.revenue),
+                backgroundColor: [
+                    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+                    '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
+                ],
+                borderColor: [
+                    '#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed',
+                    '#0891b2', '#65a30d', '#ea580c', '#db2777', '#4f46e5'
+                ],
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
         },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return new Intl.NumberFormat('vi-VN').format(value) + '₫';
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.parsed.y) + '₫';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('vi-VN').format(value) + '₫';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
                     }
                 }
             }
         }
-    }
-});
+    });
+}
 
-// Orders Status Chart
-const ordersStatusCtx = document.getElementById('ordersStatusChart').getContext('2d');
-const ordersStatusChart = new Chart(ordersStatusCtx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Chờ xử lý', 'Đang xử lý', 'Đang giao hàng', 'Đã giao hàng', 'Đã hủy'],
-        datasets: [{
-            data: [
-                {{ $stats['pending_orders'] }},
-                {{ $stats['processing_orders'] }},
-                0,
-                {{ $stats['delivered_orders'] }},
-                0
-            ],
-            backgroundColor: [
-                '#f59e0b',
-                '#0ea5e9',
-                '#2563eb',
-                '#10b981',
-                '#ef4444'
-            ],
-            borderWidth: 0
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 20,
-                    usePointStyle: true
+// 2. Biểu đồ đường cho doanh thu theo ngày (revenueByDateChart)
+function initRevenueByDateChart() {
+    const revenueByDateCtx = document.getElementById('revenueByDateChart').getContext('2d');
+    return new Chart(revenueByDateCtx, {
+        type: 'line',
+        data: {
+            labels: revenueByDateData.map(item => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            }),
+            datasets: [{
+                label: 'Doanh thu (₫)',
+                data: revenueByDateData.map(item => item.revenue),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.parsed.y) + '₫';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('vi-VN').format(value) + '₫';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
                 }
             }
         }
-    }
-});
+    });
+}
+
+// 3. Biểu đồ cột cho doanh thu theo tháng (revenueByMonthChart)
+function initRevenueByMonthChart() {
+    const revenueByMonthCtx = document.getElementById('revenueByMonthChart').getContext('2d');
+    return new Chart(revenueByMonthCtx, {
+        type: 'bar',
+        data: {
+            labels: revenueByMonthData.map(item => {
+                const [year, month] = item.month.split('-');
+                return `${month}/${year}`;
+            }),
+            datasets: [{
+                label: 'Doanh thu (₫)',
+                data: revenueByMonthData.map(item => item.revenue),
+                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                borderColor: '#3b82f6',
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.parsed.y) + '₫';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('vi-VN').format(value) + '₫';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+// 4. Biểu đồ cột cho doanh thu theo năm (revenueByYearChart)
+function initRevenueByYearChart() {
+    const revenueByYearCtx = document.getElementById('revenueByYearChart').getContext('2d');
+    return new Chart(revenueByYearCtx, {
+        type: 'bar',
+        data: {
+            labels: revenueByYearData.map(item => item.year.toString()),
+            datasets: [{
+                label: 'Doanh thu (₫)',
+                data: revenueByYearData.map(item => item.revenue),
+                backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.parsed.y) + '₫';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('vi-VN').format(value) + '₫';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+// 5. Biểu đồ tròn cho doanh thu theo phương thức thanh toán (revenueByPaymentMethodChart)
+function initRevenueByPaymentMethodChart() {
+    const revenueByPaymentMethodCtx = document.getElementById('revenueByPaymentMethodChart').getContext('2d');
+    return new Chart(revenueByPaymentMethodCtx, {
+        type: 'pie',
+        data: {
+            labels: revenueByPaymentMethodData.map(item => {
+                // Chuyển đổi tên phương thức thanh toán sang tiếng Việt
+                const paymentMethods = {
+                    'cod': 'Thanh toán khi nhận hàng',
+                    'bank_transfer': 'Chuyển khoản ngân hàng',
+                    'momo': 'Ví MoMo',
+                    'qr_code': 'QR Code',
+                    'vnpay': 'VNPay',
+                    'credit_card': 'Thẻ tín dụng'
+                };
+                return paymentMethods[item.payment_method] || item.payment_method;
+            }),
+            datasets: [{
+                data: revenueByPaymentMethodData.map(item => item.revenue),
+                backgroundColor: [
+                    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+                    '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
+                ],
+                borderColor: '#ffffff',
+                borderWidth: 3,
+                hoverBorderWidth: 4,
+                hoverBorderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = new Intl.NumberFormat('vi-VN').format(context.parsed) + '₫';
+                            const percentage = ((context.parsed / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
 
 // Functions
 function updateDateRange() {
@@ -926,11 +1268,58 @@ function updateDateRange() {
 function exportChart(type) {
     // Export chart functionality
     console.log('Exporting chart:', type);
+    // Có thể thêm logic xuất biểu đồ thành hình ảnh hoặc PDF
 }
 
 function exportAllReports() {
     // Export all reports functionality
     console.log('Exporting all reports');
+    // Có thể thêm logic xuất tất cả báo cáo
 }
+
+function refreshCharts() {
+    // Làm mới trang để cập nhật dữ liệu
+    window.location.reload();
+}
+
+// Kiểm tra và hiển thị thông báo nếu không có dữ liệu
+document.addEventListener('DOMContentLoaded', function() {
+    // Lazy load charts khi Chart.js đã sẵn sàng
+    function initCharts() {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initCharts, 100);
+            return;
+        }
+        
+        // Khởi tạo tất cả biểu đồ
+        initCategoryRevenueChart();
+        initRevenueByDateChart();
+        initRevenueByMonthChart();
+        initRevenueByYearChart();
+        initRevenueByPaymentMethodChart();
+    }
+    
+    // Kiểm tra dữ liệu biểu đồ
+    if (categoryRevenueData.length === 0) {
+        console.warn('Không có dữ liệu doanh thu theo danh mục');
+    }
+    
+    if (revenueByPaymentMethodData.length === 0) {
+        console.warn('Không có dữ liệu doanh thu theo phương thức thanh toán');
+    }
+    
+    if (revenueByDateData.length === 0) {
+        console.warn('Không có dữ liệu doanh thu theo ngày');
+    }
+    
+    // Hiển thị thông báo nếu cần
+    const hasData = categoryRevenueData.length > 0 || revenueByPaymentMethodData.length > 0 || revenueByDateData.length > 0;
+    if (!hasData) {
+        console.log('Không có dữ liệu để hiển thị biểu đồ. Có thể đơn hàng chưa được giao hoặc chưa có đơn hàng nào.');
+    }
+    
+    // Khởi tạo biểu đồ
+    initCharts();
+});
 </script>
 @endsection

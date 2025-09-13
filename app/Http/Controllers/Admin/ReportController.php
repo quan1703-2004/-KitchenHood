@@ -17,8 +17,12 @@ class ReportController extends Controller
     /**
      * Dashboard tổng quan
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
+        // Lấy tham số thời gian từ request
+        $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
+
         // Thống kê tổng quan
         $stats = [
             'total_users' => User::count(),
@@ -37,6 +41,41 @@ class ReportController extends Controller
             ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(total_amount) as revenue')
             ->groupBy('month')
             ->orderBy('month')
+            ->get();
+
+        // Doanh thu theo năm (3 năm gần nhất)
+        $revenueByYear = Order::where('status', 'delivered')
+            ->where('created_at', '>=', Carbon::now()->subYears(3))
+            ->selectRaw('YEAR(created_at) as year, SUM(total_amount) as revenue')
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
+
+        // Doanh thu theo ngày (30 ngày gần nhất)
+        $revenueByDate = Order::where('status', 'delivered')
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as revenue')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Doanh thu theo danh mục (bao gồm tất cả đơn hàng đã thanh toán)
+        $categoryRevenue = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.payment_status', 'paid') // Chỉ lấy đơn hàng đã thanh toán
+            ->whereBetween('orders.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']) // Bao gồm cả giờ
+            ->selectRaw('categories.name as category_name, SUM(order_items.subtotal) as revenue')
+            ->groupBy('categories.id', 'categories.name')
+            ->orderBy('revenue', 'desc')
+            ->get();
+
+        // Doanh thu theo phương thức thanh toán (bao gồm tất cả đơn hàng đã thanh toán)
+        $revenueByPaymentMethod = Order::where('payment_status', 'paid') // Chỉ lấy đơn hàng đã thanh toán
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']) // Bao gồm cả giờ
+            ->selectRaw('payment_method, SUM(total_amount) as revenue, COUNT(*) as order_count')
+            ->groupBy('payment_method')
             ->get();
 
         // Đơn hàng theo trạng thái
@@ -62,13 +101,29 @@ class ReportController extends Controller
         // Khách hàng mới (30 ngày gần nhất)
         $newCustomers = User::where('created_at', '>=', Carbon::now()->subDays(30))->count();
 
+        // Debug: Log dữ liệu để kiểm tra
+        \Log::info('ReportController Debug', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'categoryRevenue_count' => $categoryRevenue->count(),
+            'revenueByPaymentMethod_count' => $revenueByPaymentMethod->count(),
+            'categoryRevenue_data' => $categoryRevenue->toArray(),
+            'revenueByPaymentMethod_data' => $revenueByPaymentMethod->toArray(),
+        ]);
+
         return view('admin.reports.dashboard', compact(
             'stats',
             'revenueByMonth',
+            'revenueByYear',
+            'revenueByDate',
+            'categoryRevenue',
+            'revenueByPaymentMethod',
             'ordersByStatus',
             'topProducts',
             'recentOrders',
-            'newCustomers'
+            'newCustomers',
+            'startDate',
+            'endDate'
         ));
     }
 
@@ -80,36 +135,54 @@ class ReportController extends Controller
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
-        // Doanh thu theo ngày
-        $dailyRevenue = Order::where('status', 'delivered')
-            ->whereBetween('created_at', [$startDate, $endDate])
+        // Sửa logic bộ lọc ngày - bao gồm cả giờ để đảm bảo tính chính xác
+        $startDateTime = $startDate . ' 00:00:00';
+        $endDateTime = $endDate . ' 23:59:59';
+
+        // Doanh thu theo ngày (chỉ lấy đơn hàng đã thanh toán)
+        $dailyRevenue = Order::where('payment_status', 'paid')
+            ->whereBetween('created_at', [$startDateTime, $endDateTime])
             ->selectRaw('DATE(created_at) as date, SUM(total_amount) as revenue, COUNT(*) as orders')
             ->groupBy('date')
             ->orderBy('date')
             ->get();
 
-        // Doanh thu theo tháng
-        $monthlyRevenue = Order::where('status', 'delivered')
-            ->whereBetween('created_at', [$startDate, $endDate])
+        // Doanh thu theo tháng (chỉ lấy đơn hàng đã thanh toán)
+        $monthlyRevenue = Order::where('payment_status', 'paid')
+            ->whereBetween('created_at', [$startDateTime, $endDateTime])
             ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(total_amount) as revenue, COUNT(*) as orders')
             ->groupBy('month')
             ->orderBy('month')
             ->get();
 
-        // Doanh thu theo phương thức thanh toán
-        $revenueByPayment = Order::where('status', 'delivered')
-            ->whereBetween('created_at', [$startDate, $endDate])
+        // Doanh thu theo phương thức thanh toán (chỉ lấy đơn hàng đã thanh toán)
+        $revenueByPayment = Order::where('payment_status', 'paid')
+            ->whereBetween('created_at', [$startDateTime, $endDateTime])
             ->selectRaw('payment_method, SUM(total_amount) as revenue, COUNT(*) as orders')
             ->groupBy('payment_method')
             ->get();
 
-        // Tổng doanh thu
-        $totalRevenue = Order::where('status', 'delivered')
-            ->whereBetween('created_at', [$startDate, $endDate])
+        // Tổng doanh thu (chỉ lấy đơn hàng đã thanh toán)
+        $totalRevenue = Order::where('payment_status', 'paid')
+            ->whereBetween('created_at', [$startDateTime, $endDateTime])
             ->sum('total_amount');
 
-        // Tổng đơn hàng
-        $totalOrders = Order::whereBetween('created_at', [$startDate, $endDate])->count();
+        // Tổng đơn hàng (tất cả đơn hàng trong khoảng thời gian)
+        $totalOrders = Order::whereBetween('created_at', [$startDateTime, $endDateTime])->count();
+
+        // Debug: Log dữ liệu để kiểm tra
+        \Log::info('Revenue Report Debug', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'startDateTime' => $startDateTime,
+            'endDateTime' => $endDateTime,
+            'dailyRevenue_count' => $dailyRevenue->count(),
+            'revenueByPayment_count' => $revenueByPayment->count(),
+            'totalRevenue' => $totalRevenue,
+            'totalOrders' => $totalOrders,
+            'dailyRevenue_data' => $dailyRevenue->toArray(),
+            'revenueByPayment_data' => $revenueByPayment->toArray(),
+        ]);
 
         return view('admin.reports.revenue', compact(
             'dailyRevenue',

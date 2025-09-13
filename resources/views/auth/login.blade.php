@@ -134,6 +134,6 @@
 
 @section('footer')
 <div class="text-center">
-    Chưa có tài khoản? <a href="{{ route('register') }}">Đăng ký ngay</a>
+    Chưa có tài khoản? <a href="{{ route('register') }}" style="color: #1e40af; font-weight: 600;">Đăng ký ngay</a>
 </div>
 @endsection

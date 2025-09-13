@@ -31,6 +31,7 @@
                            class="form-control" 
                            value="{{ $startDate }}"
                            required>
+                    <small class="text-muted">Bao gồm từ 00:00:00</small>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Đến ngày</label>
@@ -39,6 +40,7 @@
                            class="form-control" 
                            value="{{ $endDate }}"
                            required>
+                    <small class="text-muted">Bao gồm đến 23:59:59</small>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">&nbsp;</label>
@@ -55,6 +57,7 @@
         </form>
     </div>
 </div>
+
 
 <!-- Summary Cards -->
 <div class="summary-cards mb-4">
