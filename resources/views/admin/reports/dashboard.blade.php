@@ -893,8 +893,8 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
     }
-}
-
+    }
+    
 @media (max-width: 480px) {
     .stats-grid {
         grid-template-columns: 1fr;
@@ -1026,33 +1026,33 @@ function initCategoryRevenueChart() {
 function initRevenueByDateChart() {
     const revenueByDateCtx = document.getElementById('revenueByDateChart').getContext('2d');
     return new Chart(revenueByDateCtx, {
-        type: 'line',
-        data: {
+    type: 'line',
+    data: {
             labels: revenueByDateData.map(item => {
                 const date = new Date(item.date);
                 return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
             }),
-            datasets: [{
-                label: 'Doanh thu (₫)',
+        datasets: [{
+            label: 'Doanh thu (₫)',
                 data: revenueByDateData.map(item => item.revenue),
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                borderWidth: 3,
-                fill: true,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 3,
+            fill: true,
                 tension: 0.4,
                 pointBackgroundColor: '#10b981',
                 pointBorderColor: '#ffffff',
                 pointBorderWidth: 2,
                 pointRadius: 6,
                 pointHoverRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
                 },
                 tooltip: {
                     callbacks: {
@@ -1060,15 +1060,15 @@ function initRevenueByDateChart() {
                             return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.parsed.y) + '₫';
                         }
                     }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return new Intl.NumberFormat('vi-VN').format(value) + '₫';
-                        }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return new Intl.NumberFormat('vi-VN').format(value) + '₫';
+                    }
                     },
                     grid: {
                         color: 'rgba(0, 0, 0, 0.1)'
@@ -1077,11 +1077,11 @@ function initRevenueByDateChart() {
                 x: {
                     grid: {
                         display: false
-                    }
                 }
             }
         }
-    });
+    }
+});
 }
 
 // 3. Biểu đồ cột cho doanh thu theo tháng (revenueByMonthChart)
@@ -1089,12 +1089,12 @@ function initRevenueByMonthChart() {
     const revenueByMonthCtx = document.getElementById('revenueByMonthChart').getContext('2d');
     return new Chart(revenueByMonthCtx, {
         type: 'bar',
-        data: {
+    data: {
             labels: revenueByMonthData.map(item => {
                 const [year, month] = item.month.split('-');
                 return `${month}/${year}`;
             }),
-            datasets: [{
+        datasets: [{
                 label: 'Doanh thu (₫)',
                 data: revenueByMonthData.map(item => item.revenue),
                 backgroundColor: 'rgba(59, 130, 246, 0.8)',
@@ -1215,7 +1215,7 @@ function initRevenueByPaymentMethodChart() {
             }),
             datasets: [{
                 data: revenueByPaymentMethodData.map(item => item.revenue),
-                backgroundColor: [
+            backgroundColor: [
                     '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
                     '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
                 ],
@@ -1223,16 +1223,16 @@ function initRevenueByPaymentMethodChart() {
                 borderWidth: 3,
                 hoverBorderWidth: 4,
                 hoverBorderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
                         usePointStyle: true,
                         font: {
                             size: 12
@@ -1247,11 +1247,11 @@ function initRevenueByPaymentMethodChart() {
                             const percentage = ((context.parsed / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
                             return `${label}: ${value} (${percentage}%)`;
                         }
-                    }
                 }
             }
         }
-    });
+    }
+});
 }
 
 // Functions

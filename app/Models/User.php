@@ -24,6 +24,11 @@ implements MustVerifyEmail
         'email',
         'password',
         'role',
+        'avatar',
+        'phone',
+        'birth_date',
+        'gender',
+        'address',
     ];
 
     /**
@@ -46,7 +51,20 @@ implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'birth_date' => 'date',
         ];
+    }
+
+    /**
+     * Get the avatar URL
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+        
+        return asset('images/avatars/default-avatar.png');
     }
 
     /**

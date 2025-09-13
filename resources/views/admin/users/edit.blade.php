@@ -38,9 +38,57 @@
 <!-- Form Section -->
 <div class="user-form-section">
     <div class="form-card">
-        <form action="{{ route('admin.users.update', $user) }}" method="POST" class="user-form">
+        <form action="{{ route('admin.users.update', $user) }}" method="POST" class="user-form" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            
+            <!-- Avatar Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-camera me-2"></i>
+                        Ảnh đại diện
+                    </h3>
+                </div>
+                <div class="section-content">
+                    <div class="avatar-upload-section">
+                        <div class="current-avatar">
+                            <div class="avatar-preview">
+                                @if($user->avatar)
+                                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" id="avatar-preview">
+                                @else
+                                    <div class="avatar-placeholder" id="avatar-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="avatar-info">
+                                <h4 class="avatar-name">{{ $user->name }}</h4>
+                                <p class="avatar-description">Ảnh đại diện sẽ hiển thị trong hệ thống</p>
+                            </div>
+                        </div>
+                        <div class="avatar-upload">
+                            <div class="upload-area" id="upload-area">
+                                <div class="upload-content">
+                                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                    <h5 class="upload-title">Tải lên ảnh mới</h5>
+                                    <p class="upload-description">Kéo thả hoặc click để chọn ảnh</p>
+                                    <small class="upload-hint">JPG, PNG, GIF tối đa 2MB</small>
+                                </div>
+                                <input type="file" 
+                                       id="avatar" 
+                                       name="avatar" 
+                                       class="file-input @error('avatar') is-invalid @enderror" 
+                                       accept="image/*"
+                                       onchange="previewAvatar(this)">
+                            </div>
+                            @error('avatar')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <!-- Basic Information -->
             <div class="form-section">
@@ -78,6 +126,62 @@
                                        placeholder="Nhập địa chỉ email"
                                        required>
                                 @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <input type="tel" 
+                                       id="phone" 
+                                       name="phone" 
+                                       class="form-control @error('phone') is-invalid @enderror" 
+                                       value="{{ old('phone', $user->phone ?? '') }}" 
+                                       placeholder="Nhập số điện thoại">
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="birth_date" class="form-label">Ngày sinh</label>
+                                <input type="date" 
+                                       id="birth_date" 
+                                       name="birth_date" 
+                                       class="form-control @error('birth_date') is-invalid @enderror" 
+                                       value="{{ old('birth_date', $user->birth_date ?? '') }}">
+                                @error('birth_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="gender" class="form-label">Giới tính</label>
+                                <select id="gender" 
+                                        name="gender" 
+                                        class="form-select @error('gender') is-invalid @enderror">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="male" {{ old('gender', $user->gender ?? '') == 'male' ? 'selected' : '' }}>Nam</option>
+                                    <option value="female" {{ old('gender', $user->gender ?? '') == 'female' ? 'selected' : '' }}>Nữ</option>
+                                    <option value="other" {{ old('gender', $user->gender ?? '') == 'other' ? 'selected' : '' }}>Khác</option>
+                                </select>
+                                @error('gender')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="address" class="form-label">Địa chỉ</label>
+                                <textarea id="address" 
+                                          name="address" 
+                                          class="form-control @error('address') is-invalid @enderror" 
+                                          rows="3" 
+                                          placeholder="Nhập địa chỉ">{{ old('address', $user->address ?? '') }}</textarea>
+                                @error('address')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -544,6 +648,179 @@
     text-decoration: none;
 }
 
+/* Avatar Upload Section */
+.avatar-upload-section {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.current-avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    min-width: 200px;
+}
+
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid var(--border-color);
+    position: relative;
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    color: var(--text-muted);
+    font-size: 3rem;
+}
+
+.avatar-info {
+    text-align: center;
+}
+
+.avatar-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+}
+
+.avatar-description {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+.avatar-upload {
+    flex: 1;
+}
+
+.upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: var(--bg-light);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.upload-area.dragover {
+    border-color: var(--success-color);
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+}
+
+.upload-content {
+    pointer-events: none;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.upload-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.upload-description {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.upload-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Form Select */
+.form-select {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+.form-select.is-invalid {
+    border-color: var(--danger-color);
+}
+
+/* Textarea */
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Responsive Avatar Upload */
+@media (max-width: 768px) {
+    .avatar-upload-section {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .current-avatar {
+        min-width: auto;
+    }
+    
+    .avatar-preview {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .upload-area {
+        padding: 1.5rem;
+    }
+    
+    .upload-icon {
+        font-size: 2rem;
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .user-form-header {
@@ -615,6 +892,80 @@ function togglePassword(fieldId) {
         field.type = 'password';
         icon.classList.remove('fa-eye-slash');
         icon.classList.add('fa-eye');
+    }
+}
+
+function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const preview = document.getElementById('avatar-preview');
+            const placeholder = document.getElementById('avatar-placeholder');
+            
+            if (preview) {
+                preview.src = e.target.result;
+            } else if (placeholder) {
+                placeholder.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">`;
+            }
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Drag and drop functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('avatar');
+    
+    if (uploadArea && fileInput) {
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        // Highlight drop area when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        // Handle dropped files
+        uploadArea.addEventListener('drop', handleDrop, false);
+        
+        // Click to upload
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+    }
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function highlight(e) {
+    document.getElementById('upload-area').classList.add('dragover');
+}
+
+function unhighlight(e) {
+    document.getElementById('upload-area').classList.remove('dragover');
+}
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length > 0) {
+        const fileInput = document.getElementById('avatar');
+        fileInput.files = files;
+        previewAvatar(fileInput);
     }
 }
 </script>

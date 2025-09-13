@@ -178,6 +178,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{order}/reorder', [App\Http\Controllers\User\OrderController::class, 'reorder'])->name('orders.reorder');
     Route::get('/orders/{order}/review', [App\Http\Controllers\User\OrderController::class, 'review'])->name('orders.review');
     Route::post('/orders/{order}/review', [App\Http\Controllers\User\OrderController::class, 'storeReview'])->name('orders.store-review');
+    
+    // Routes cho thông tin cá nhân
+    Route::get('/profile', [App\Http\Controllers\User\ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [App\Http\Controllers\User\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [App\Http\Controllers\User\ProfileController::class, 'update'])->name('profile.update');
 });
 
 // Routes cho thanh toán

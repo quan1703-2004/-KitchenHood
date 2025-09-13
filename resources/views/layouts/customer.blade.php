@@ -828,7 +828,7 @@
                                 @endif
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">
+                                <li><a class="dropdown-item" href="{{ route('profile.show') }}">
                                     <i class="fas fa-user me-2"></i>Thông tin tài khoản
                                 </a></li>
                                 <li><a class="dropdown-item" href="{{ route('orders.index') }}">
