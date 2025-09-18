@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
@@ -89,6 +90,85 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Routes cho Social Login
+Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/auth/facebook', [SocialAuthController::class, 'redirectToFacebook'])->name('auth.facebook');
+Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
+
+// Routes cho Payment MoMo
+Route::get('/payment/momo/{orderId}', [App\Http\Controllers\PaymentController::class, 'momo'])->whereNumber('orderId')->name('payment.momo');
+Route::post('/payment/momo/{orderId}', [App\Http\Controllers\PaymentController::class, 'redirectToMoMo'])->whereNumber('orderId')->name('payment.momo.process');
+Route::get('/payment/momo/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.momo.callback');
+Route::post('/payment/momo/ipn', [App\Http\Controllers\PaymentController::class, 'ipn'])->name('payment.momo.ipn');
+Route::post('/payment/pay-again/{order}', [App\Http\Controllers\PaymentController::class, 'payAgain'])->name('payment.pay-again');
+
+// Route debug để test Google OAuth
+Route::get('/debug/google', function() {
+    $clientId = config('services.google.client_id');
+    $redirectUri = config('services.google.redirect');
+    $scope = 'openid email profile';
+    
+    $authUrl = 'https://accounts.google.com/o/oauth2/auth?' . http_build_query([
+        'client_id' => $clientId,
+        'redirect_uri' => $redirectUri,
+        'scope' => $scope,
+        'response_type' => 'code',
+        'access_type' => 'offline',
+        'state' => 'google'
+    ]);
+    
+    return response()->json([
+        'auth_url' => $authUrl,
+        'config' => config('services.google')
+    ]);
+});
+
+// Route debug để kiểm tra user
+Route::get('/debug/user/{email}', function($email) {
+    $user = \App\Models\User::where('email', $email)->first();
+    if($user) {
+        return response()->json([
+            'found' => true,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+            'google_id' => $user->google_id,
+            'facebook_id' => $user->facebook_id,
+            'created_at' => $user->created_at
+        ]);
+    }
+    return response()->json(['found' => false]);
+});
+
+// Route để manually verify email cho user hiện tại
+Route::get('/verify-email/{email}', function($email) {
+    $user = \App\Models\User::where('email', $email)->first();
+    if($user) {
+        if($user->email_verified_at) {
+            return response()->json([
+                'message' => 'Email đã được xác thực rồi!',
+                'verified_at' => $user->email_verified_at
+            ]);
+        }
+        
+        // Set email_verified_at bằng ngày tạo tài khoản
+        $user->email_verified_at = $user->created_at;
+        $user->save();
+        
+        return response()->json([
+            'message' => 'Email đã được xác thực thành công!',
+            'verified_at' => $user->email_verified_at,
+            'user' => [
+                'name' => $user->name,
+                'email' => $user->email
+            ]
+        ]);
+    }
+    return response()->json(['error' => 'User không tồn tại']);
+});
+
+
 // Route tạm thời để kiểm tra user (sẽ xóa sau)
 Route::get('/check-user/{email}', function($email) {
     $user = \App\Models\User::where('email', $email)->first();
@@ -103,6 +183,7 @@ Route::get('/check-user/{email}', function($email) {
     }
     return response()->json(['found' => false]);
 });
+
 
 // Route tạm thời để gửi lại email xác thực (sẽ xóa sau)
 Route::get('/resend-verification/{email}', function($email) {
@@ -191,9 +272,7 @@ Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'store
 Route::get('/checkout/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
 
 // Payment routes
-Route::get('/payment/qr-code/{order}', [App\Http\Controllers\PaymentController::class, 'qrCode'])->name('payment.qr-code');
 Route::get('/payment/momo/{order}', [App\Http\Controllers\PaymentController::class, 'momo'])->name('payment.momo');
-Route::post('/payment/confirm-qr/{order}', [App\Http\Controllers\PaymentController::class, 'confirmQrCode'])->name('payment.confirm-qr');
 Route::post('/payment/confirm-momo/{order}', [App\Http\Controllers\PaymentController::class, 'confirmMomo'])->name('payment.confirm-momo');
 Route::post('/payment/cancel/{order}', [App\Http\Controllers\PaymentController::class, 'cancel'])->name('payment.cancel');
 
@@ -262,6 +341,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/reports/customers', [App\Http\Controllers\Admin\ReportController::class, 'customers'])->name('reports.customers');
     Route::post('/reports/export', [App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
     
-    // Quản lý phương thức thanh toán
-    Route::resource('/payment-methods', App\Http\Controllers\Admin\PaymentMethodController::class)->names('payment-methods');
 });
+
+// Routes cho favorites
+Route::get('/favorites', [App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index')->middleware('auth');
+Route::post('/favorites/{product}', [App\Http\Controllers\FavoriteController::class, 'store'])->name('favorites.store')->middleware('auth');
+Route::delete('/favorites/{product}', [App\Http\Controllers\FavoriteController::class, 'destroy'])->name('favorites.destroy')->middleware('auth');
+Route::post('/favorites/{product}/toggle', [App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorites.toggle')->middleware('auth');
+Route::get('/favorites/{product}/check', [App\Http\Controllers\FavoriteController::class, 'check'])->name('favorites.check')->middleware('auth');

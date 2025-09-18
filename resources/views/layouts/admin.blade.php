@@ -753,10 +753,6 @@
                 <span>Báo cáo & Thống kê</span>
             </a>
             
-            <a class="nav-link {{ request()->routeIs('admin.payment-methods.*') ? 'active' : '' }}" href="{{ route('admin.payment-methods.index') }}">
-                <i class="fas fa-credit-card"></i>
-                <span>Quản lý Thanh toán</span>
-            </a>
                 
             <div class="nav-divider"></div>
             <a class="nav-link" href="/">

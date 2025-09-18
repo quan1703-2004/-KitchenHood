@@ -38,6 +38,8 @@
                 <div class="card-body p-4">
                     <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
                         @csrf
+                        <!-- Hidden input để gửi danh sách sản phẩm được chọn -->
+                        <input type="hidden" name="selected_items" id="selected-items-input" value="">
                         
                         <!-- Chọn địa chỉ giao hàng -->
                         <div class="mb-4">
@@ -127,9 +129,6 @@
                                 <option value="">Chọn phương thức thanh toán</option>
                                 <option value="cod" {{ old('payment_method') == 'cod' ? 'selected' : '' }}>
                                     Thanh toán khi nhận hàng (COD)
-                                </option>
-                                <option value="bank_transfer" {{ old('payment_method') == 'bank_transfer' ? 'selected' : '' }}>
-                                    Chuyển khoản ngân hàng (QR Code)
                                 </option>
                                 <option value="momo" {{ old('payment_method') == 'momo' ? 'selected' : '' }}>
                                     Thanh toán qua Momo
@@ -277,6 +276,34 @@
         </div>
     </div>
 </div>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lấy danh sách sản phẩm được chọn từ sessionStorage
+    const selectedItems = sessionStorage.getItem('selectedCartItems');
+    
+    if (selectedItems) {
+        // Parse JSON và set vào hidden input
+        const selectedProductIds = JSON.parse(selectedItems);
+        document.getElementById('selected-items-input').value = JSON.stringify(selectedProductIds);
+        
+        // Clear sessionStorage sau khi sử dụng
+        sessionStorage.removeItem('selectedCartItems');
+    }
+    
+    // Xử lý submit form
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        // Đảm bảo selected_items được gửi
+        const selectedItemsInput = document.getElementById('selected-items-input');
+        if (!selectedItemsInput.value) {
+            // Nếu không có selected items, lấy tất cả sản phẩm hiện tại
+            const currentProductIds = @json($selectedProductIds ?? []);
+            selectedItemsInput.value = JSON.stringify(currentProductIds);
+        }
+    });
+});
+</script>
 
 <!-- CSS tùy chỉnh -->
 <style>

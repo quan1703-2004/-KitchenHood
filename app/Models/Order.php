@@ -31,6 +31,8 @@ class Order extends Model
         'shipping_ward_id',
         'shipping_ward_name',
         'notes',
+        'momo_request_id',
+        'momo_order_id',
         'rating',
         'review_comment',
         'reviewed_at'
@@ -85,8 +87,7 @@ class Order extends Model
         $methods = [
             'cod' => 'Thanh toán khi nhận hàng (COD)',
             'bank_transfer' => 'Chuyển khoản ngân hàng',
-            'momo' => 'Ví MoMo',
-            'vnpay' => 'VNPay'
+            'momo' => 'Ví MoMo'
         ];
 
         return $methods[$this->payment_method] ?? 'Không xác định';

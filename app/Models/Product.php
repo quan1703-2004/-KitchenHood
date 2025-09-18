@@ -116,6 +116,40 @@ class Product extends Model
     }
 
     /**
+     * Quan hệ với favorites - nhiều user có thể yêu thích sản phẩm này
+     */
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * Lấy danh sách user đã yêu thích sản phẩm này
+     */
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites')
+                    ->withTimestamps()
+                    ->orderBy('favorites.created_at', 'desc');
+    }
+
+    /**
+     * Kiểm tra xem sản phẩm có được user yêu thích không
+     */
+    public function isFavoritedBy($userId)
+    {
+        return $this->favorites()->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * Lấy số lượng user đã yêu thích sản phẩm
+     */
+    public function getFavoritesCountAttribute()
+    {
+        return $this->favorites()->count();
+    }
+
+    /**
      * Kiểm tra sản phẩm có còn hàng không
      */
     public function getIsInStockAttribute()

@@ -29,6 +29,8 @@ implements MustVerifyEmail
         'birth_date',
         'gender',
         'address',
+        'google_id',
+        'facebook_id',
     ];
 
     /**
@@ -91,8 +93,43 @@ implements MustVerifyEmail
         return $this->hasMany(Order::class);
     }
 
+
     /**
-     * Relationship với Cart - một user có thể có một giỏ hàng
+     * Relationship với Review - một user có thể có nhiều đánh giá
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Relationship với Favorite - một user có thể yêu thích nhiều sản phẩm
+     */
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * Lấy danh sách sản phẩm yêu thích của user
+     */
+    public function favoriteProducts()
+    {
+        return $this->belongsToMany(Product::class, 'favorites')
+                    ->withTimestamps()
+                    ->orderBy('favorites.created_at', 'desc');
+    }
+
+    /**
+     * Kiểm tra xem user có yêu thích sản phẩm này không
+     */
+    public function isFavorite($productId)
+    {
+        return $this->favorites()->where('product_id', $productId)->exists();
+    }
+
+    /**
+     * Relationship với Cart - một user có một giỏ hàng
      */
     public function cart()
     {
@@ -113,11 +150,5 @@ implements MustVerifyEmail
     public function getIsAdminAttribute(): bool
     {
         return $this->isAdmin();
-    }
-
-    // quan hệ review của user
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
     }
 }

@@ -97,6 +97,82 @@
     color: var(--primary-color);
 }
 
+/* Product Selection */
+.product-select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-check {
+    margin: 0;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-check-input:checked::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.form-check-label {
+    display: none;
+}
+
+/* Select All Button */
+.select-all-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--bg-light);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.select-all-btn {
+    background: var(--info-color);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.select-all-btn:hover {
+    background: #0284c7;
+    transform: translateY(-1px);
+}
+
+.selected-count {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
 .cart-item {
     background: white;
     border: 1px solid var(--border-color);
@@ -106,7 +182,7 @@
     box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
     display: grid;
-    grid-template-columns: 140px 1fr auto auto auto;
+    grid-template-columns: 50px 140px 1fr auto auto auto;
     gap: 1.5rem;
     align-items: center;
     position: relative;
@@ -174,6 +250,36 @@
     font-size: 1rem;
     font-weight: 600;
     color: var(--primary-color);
+}
+
+/* Stock warnings */
+.stock-warning, .stock-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.stock-warning.out-of-stock {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.stock-warning.low-stock {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+.stock-info {
+    background: #dbeafe;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
 }
 
 /* Quantity Controls */
@@ -509,7 +615,7 @@
 
 @media (max-width: 992px) {
     .cart-item {
-        grid-template-columns: 100px 1fr;
+        grid-template-columns: 40px 100px 1fr;
         grid-template-rows: auto auto auto;
         gap: 1rem;
     }
@@ -526,12 +632,12 @@
     
     .cart-item .subtotal-section {
         grid-row: 2;
-        grid-column: 2;
+        grid-column: 3;
     }
     
     .cart-item .remove-section {
         grid-row: 3;
-        grid-column: 2;
+        grid-column: 3;
         justify-self: end;
     }
     
@@ -638,8 +744,31 @@
                         Sản phẩm trong giỏ hàng ({{ count($cartItems) }})
                     </h4>
 
+                    <!-- Chọn tất cả -->
+                    <div class="select-all-section">
+                        <button type="button" class="select-all-btn" id="select-all-btn">
+                            <i class="fas fa-check-square me-1"></i>Chọn tất cả
+                        </button>
+                        <span class="selected-count">
+                            Đã chọn: <span id="selected-count">{{ count($cartItems) }}</span>/{{ count($cartItems) }} sản phẩm
+                        </span>
+                    </div>
+
                     @foreach($cartItems as $item)
                     <div class="cart-item" data-product-id="{{ $item['product']->id }}" data-price="{{ $item['product']->price }}">
+                        <!-- Checkbox chọn sản phẩm -->
+                        <div class="product-select">
+                            <div class="form-check">
+                                <input class="form-check-input product-checkbox" type="checkbox" 
+                                       value="{{ $item['product']->id }}" 
+                                       id="product-{{ $item['product']->id }}"
+                                       checked>
+                                <label class="form-check-label" for="product-{{ $item['product']->id }}">
+                                    <i class="fas fa-check"></i>
+                                </label>
+                            </div>
+                        </div>
+                        
                         <div class="product-image-container">
                             @if($item['product']->image)
                                 <img src="{{ asset('storage/' . $item['product']->image) }}" alt="{{ $item['product']->name }}" class="product-image">
@@ -651,6 +780,23 @@
                             <div class="product-title">{{ $item['product']->name }}</div>
                             <div class="product-meta">{{ $item['product']->category->name ?? 'Không phân loại' }}</div>
                             <span class="product-price">{{ number_format($item['product']->price) }} VNĐ</span>
+                            
+                            @if($item['out_of_stock'] ?? false)
+                                <div class="stock-warning out-of-stock">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Sản phẩm đã hết hàng!</span>
+                                </div>
+                            @elseif($item['stock_warning'] ?? false)
+                                <div class="stock-warning low-stock">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>Chỉ còn {{ $item['product']->quantity }} sản phẩm trong kho!</span>
+                                </div>
+                            @elseif($item['product']->quantity <= 10)
+                                <div class="stock-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Còn {{ $item['product']->quantity }} sản phẩm</span>
+                                </div>
+                            @endif
                         </div>
                         <div class="quantity-section">
                             <div class="quantity-controls">
@@ -710,9 +856,9 @@
                         </div>
                     </div>
                     <div class="check-out-btn">
-                        <a href="{{ route('checkout.index') }}" class="checkout-btn">
+                        <button type="button" class="checkout-btn" id="checkout-btn">
                             <i class="fas fa-credit-card me-2"></i>Tiến Hành Thanh Toán
-                        </a>
+                        </button>
                     </div>
                     <div class="security-note">
                         <i class="fas fa-shield-alt me-1"></i>Thanh toán an toàn
@@ -741,10 +887,13 @@ document.addEventListener('DOMContentLoaded', function() {
     let subtotalDisplay = document.getElementById('subtotal-display');
     let totalDisplay = document.getElementById('total-display');
     
-    // Hàm tính toán tổng tiền
+    // Hàm tính toán tổng tiền chỉ cho sản phẩm được chọn
     function calculateTotal() {
         let subtotal = 0;
+        let selectedCount = 0;
+        
         cartItems.forEach(item => {
+            const checkbox = item.querySelector('.product-checkbox');
             const quantity = parseInt(item.querySelector('.quantity-input').value);
             const price = parseFloat(item.dataset.price);
             const itemSubtotal = quantity * price;
@@ -754,12 +903,19 @@ document.addEventListener('DOMContentLoaded', function() {
             subtotalElement.textContent = numberFormat(itemSubtotal) + ' VNĐ';
             subtotalElement.dataset.subtotal = itemSubtotal;
             
-            subtotal += itemSubtotal;
+            // Chỉ tính tổng cho sản phẩm được chọn
+            if (checkbox.checked) {
+                subtotal += itemSubtotal;
+                selectedCount++;
+            }
         });
         
         // Cập nhật hiển thị
         subtotalDisplay.textContent = numberFormat(subtotal) + ' VNĐ';
         totalDisplay.textContent = numberFormat(subtotal) + ' VNĐ';
+        
+        // Cập nhật số lượng đã chọn
+        document.getElementById('selected-count').textContent = selectedCount;
         
         return subtotal;
     }
@@ -768,6 +924,29 @@ document.addEventListener('DOMContentLoaded', function() {
     function numberFormat(number) {
         return new Intl.NumberFormat('vi-VN').format(number);
     }
+    
+    // Xử lý checkbox chọn sản phẩm
+    document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            calculateTotal();
+        });
+    });
+    
+    // Xử lý nút chọn tất cả
+    document.getElementById('select-all-btn').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
+        });
+        
+        this.innerHTML = allChecked ? 
+            '<i class="fas fa-check-square me-1"></i>Chọn tất cả' : 
+            '<i class="fas fa-square me-1"></i>Bỏ chọn tất cả';
+            
+        calculateTotal();
+    });
     
     // Xử lý tăng/giảm số lượng
     cartItems.forEach(item => {
@@ -952,6 +1131,65 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+    
+    // Hàm tiến hành thanh toán
+    function proceedToCheckout() {
+        const selectedProducts = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+            .map(checkbox => checkbox.value);
+            
+        if (selectedProducts.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Chưa chọn sản phẩm!',
+                text: 'Vui lòng chọn ít nhất một sản phẩm để thanh toán',
+                confirmButtonText: 'Đồng ý'
+            });
+            return;
+        }
+        
+        // Kiểm tra tồn kho trước khi checkout
+        const stockErrors = [];
+        document.querySelectorAll('.product-checkbox:checked').forEach(checkbox => {
+            const cartItem = checkbox.closest('.cart-item');
+            const quantityInput = cartItem.querySelector('.quantity-input');
+            const quantity = parseInt(quantityInput.value);
+            const productId = checkbox.value;
+            
+            // Kiểm tra nếu có cảnh báo tồn kho
+            const outOfStockWarning = cartItem.querySelector('.stock-warning.out-of-stock');
+            const lowStockWarning = cartItem.querySelector('.stock-warning.low-stock');
+            
+            if (outOfStockWarning) {
+                const productName = cartItem.querySelector('.product-title').textContent;
+                stockErrors.push(`Sản phẩm "${productName}" đã hết hàng!`);
+            } else if (lowStockWarning) {
+                const productName = cartItem.querySelector('.product-title').textContent;
+                const availableStock = lowStockWarning.querySelector('span').textContent.match(/(\d+)/)[1];
+                if (quantity > parseInt(availableStock)) {
+                    stockErrors.push(`Sản phẩm "${productName}" chỉ còn ${availableStock} sản phẩm trong kho!`);
+                }
+            }
+        });
+        
+        if (stockErrors.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Không thể thanh toán!',
+                html: stockErrors.join('<br>'),
+                confirmButtonText: 'Đồng ý'
+            });
+            return;
+        }
+        
+        // Lưu sản phẩm được chọn vào sessionStorage
+        sessionStorage.setItem('selectedCartItems', JSON.stringify(selectedProducts));
+        
+        // Chuyển đến trang checkout
+        window.location.href = '{{ route("checkout.index") }}';
+    }
+    
+    // Thêm event listener cho nút checkout
+    document.getElementById('checkout-btn').addEventListener('click', proceedToCheckout);
     
     // Khởi tạo tổng tiền
     calculateTotal();

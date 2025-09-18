@@ -837,7 +837,7 @@
                                 <li><a class="dropdown-item" href="{{ route('addresses.index') }}">
                                     <i class="fas fa-map-marker-alt me-2"></i>Quản lý địa chỉ
                                 </a></li>
-                                <li><a class="dropdown-item" href="#">
+                                <li><a class="dropdown-item" href="{{ route('favorites.index') }}">
                                     <i class="fas fa-heart me-2"></i>Sản phẩm yêu thích
                                 </a></li>
                                 

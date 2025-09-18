@@ -25,17 +25,19 @@ class CartController extends Controller
                 ->where('cart_id', $cart->id)
                 ->get();
 
-            foreach ($items as $item) {
-                if ($item->product) {
-                    $lineTotal = $item->product->price * $item->quantity;
-                    $cartItems[] = [
-                        'product' => $item->product,
-                        'quantity' => $item->quantity,
-                        'subtotal' => $lineTotal,
-                    ];
-                    $total += $lineTotal;
-                }
+        foreach ($items as $item) {
+            if ($item->product) {
+                $lineTotal = $item->product->price * $item->quantity;
+                $cartItems[] = [
+                    'product' => $item->product,
+                    'quantity' => $item->quantity,
+                    'subtotal' => $lineTotal,
+                    'stock_warning' => $item->quantity > $item->product->quantity, // Cảnh báo tồn kho
+                    'out_of_stock' => $item->product->quantity <= 0, // Hết hàng
+                ];
+                $total += $lineTotal;
             }
+        }
         }
 
         return view('customer.cart.index', compact('cartItems', 'total'));
@@ -49,12 +51,37 @@ class CartController extends Controller
         $this->authorizeUser();
         $product = Product::findOrFail($productId);
 
+        // Kiểm tra tồn kho
+        if ($product->quantity <= 0) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sản phẩm đã hết hàng!',
+                ], 400);
+            }
+            return redirect()->back()->with('error', 'Sản phẩm đã hết hàng!');
+        }
+
         $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
         $item = CartItem::firstOrNew([
             'cart_id' => $cart->id,
             'product_id' => $product->id,
         ]);
-        $item->quantity = ($item->exists ? $item->quantity : 0) + 1;
+        
+        $newQuantity = ($item->exists ? $item->quantity : 0) + 1;
+        
+        // Kiểm tra tổng số lượng trong giỏ không vượt quá tồn kho
+        if ($newQuantity > $product->quantity) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Chỉ còn {$product->quantity} sản phẩm trong kho!",
+                ], 400);
+            }
+            return redirect()->back()->with('error', "Chỉ còn {$product->quantity} sản phẩm trong kho!");
+        }
+        
+        $item->quantity = $newQuantity;
         $item->save();
 
         $count = CartItem::where('cart_id', $cart->id)->sum('quantity');
@@ -81,10 +108,19 @@ class CartController extends Controller
         $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
         $item = CartItem::where('cart_id', $cart->id)
             ->where('product_id', $productId)
+            ->with('product')
             ->first();
 
         if (!$item) {
             return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại trong giỏ hàng'], 404);
+        }
+
+        // Kiểm tra tồn kho
+        if ($quantity > $item->product->quantity) {
+            return response()->json([
+                'success' => false, 
+                'message' => "Chỉ còn {$item->product->quantity} sản phẩm trong kho!"
+            ], 400);
         }
 
         $item->quantity = $quantity;

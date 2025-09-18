@@ -59,6 +59,14 @@ class OrderController extends Controller
         }
 
         try {
+             // Cộng lại tồn kho cho tất cả sản phẩm trong đơn hàng
+             foreach ($order->orderItems as $item) {
+                $item->product->addStock(
+                    $item->quantity,
+                    "Hoàn lại hàng do hủy đơn hàng #{$order->order_number}",
+                    Auth::id()
+                );
+            }
             $order->update(['status' => 'cancelled']);
             
             return response()->json([
@@ -66,6 +74,7 @@ class OrderController extends Controller
                 'message' => 'Đơn hàng đã được hủy thành công'
             ]);
         } catch (\Exception $e) {
+            \Log::error('Cancel order error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Có lỗi xảy ra khi hủy đơn hàng'

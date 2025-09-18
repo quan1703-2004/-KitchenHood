@@ -16,19 +16,36 @@ class CheckoutController extends Controller
     /**
      * Hiển thị trang thanh toán
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!Auth::check()) {
             return redirect()->route('login');
         }
 
-        $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
-        $items = CartItem::with('product.category')
-            ->where('cart_id', $cart->id)
-            ->get();
+        // Lấy danh sách sản phẩm được chọn từ sessionStorage (được gửi qua AJAX)
+        $selectedProductIds = $request->input('selected_items', []);
+        
+        // Đảm bảo selectedProductIds là array
+        if (is_string($selectedProductIds)) {
+            $selectedProductIds = json_decode($selectedProductIds, true) ?: [];
+        }
+        
+        // Nếu không có sản phẩm được chọn, lấy tất cả sản phẩm trong giỏ hàng
+        if (empty($selectedProductIds)) {
+            $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+            $items = CartItem::with('product.category')
+                ->where('cart_id', $cart->id)
+                ->get();
+        } else {
+            $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+            $items = CartItem::with('product.category')
+                ->where('cart_id', $cart->id)
+                ->whereIn('product_id', $selectedProductIds)
+                ->get();
+        }
 
         if ($items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống!');
+            return redirect()->route('cart.index')->with('error', 'Không có sản phẩm nào được chọn để thanh toán!');
         }
 
         $cartItems = [];
@@ -57,7 +74,7 @@ class CheckoutController extends Controller
         $addresses = Auth::user()->addresses()->orderBy('is_default', 'desc')->get();
         $defaultAddress = Auth::user()->getDefaultAddress();
 
-        return view('customer.checkout.index', compact('cartItems', 'total', 'shippingFee', 'finalTotal', 'addresses', 'defaultAddress'));
+        return view('customer.checkout.index', compact('cartItems', 'total', 'shippingFee', 'finalTotal', 'addresses', 'defaultAddress', 'selectedProductIds'));
     }
 
     /**
@@ -84,13 +101,47 @@ class CheckoutController extends Controller
             return redirect()->back()->with('error', 'Địa chỉ không hợp lệ!');
         }
 
+        // Lấy danh sách sản phẩm được chọn từ request
+        $selectedProductIds = $request->input('selected_items', []);
+        
+        // Đảm bảo selectedProductIds là array
+        if (is_string($selectedProductIds)) {
+            $selectedProductIds = json_decode($selectedProductIds, true) ?: [];
+        }
+        
         $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
-        $items = CartItem::with('product')
-            ->where('cart_id', $cart->id)
-            ->get();
+        
+        // Nếu có sản phẩm được chọn, chỉ lấy những sản phẩm đó
+        if (!empty($selectedProductIds)) {
+            $items = CartItem::with('product')
+                ->where('cart_id', $cart->id)
+                ->whereIn('product_id', $selectedProductIds)
+                ->get();
+        } else {
+            // Fallback: lấy tất cả sản phẩm
+            $items = CartItem::with('product')
+                ->where('cart_id', $cart->id)
+                ->get();
+        }
 
         if ($items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống!');
+            return redirect()->route('cart.index')->with('error', 'Không có sản phẩm nào được chọn để thanh toán!');
+        }
+        
+        // Kiểm tra tồn kho trước khi đặt hàng
+        $stockErrors = [];
+        foreach ($items as $item) {
+            if ($item->product) {
+                if ($item->product->quantity <= 0) {
+                    $stockErrors[] = "Sản phẩm '{$item->product->name}' đã hết hàng!";
+                } elseif ($item->quantity > $item->product->quantity) {
+                    $stockErrors[] = "Sản phẩm '{$item->product->name}' chỉ còn {$item->product->quantity} sản phẩm trong kho!";
+                }
+            }
+        }
+        
+        if (!empty($stockErrors)) {
+            return redirect()->route('cart.index')->with('error', implode(' ', $stockErrors));
         }
         
         try {
@@ -133,7 +184,7 @@ class CheckoutController extends Controller
                 'status' => 'pending'
             ]);
             
-            // Tạo các mục đơn hàng
+            // Tạo các mục đơn hàng và trừ tồn kho
             foreach ($items as $ci) {
                 $product = $ci->product;
                 if ($product) {
@@ -145,11 +196,26 @@ class CheckoutController extends Controller
                         'quantity' => $ci->quantity,
                         'subtotal' => $product->price * $ci->quantity
                     ]);
+                    
+                    // Trừ tồn kho
+                    $product->reduceStock(
+                        $ci->quantity, 
+                        "Đặt hàng #{$order->order_number}", 
+                        $order->id, 
+                        Auth::id()
+                    );
                 }
             }
             
-            // Xóa giỏ hàng DB
-            CartItem::where('cart_id', $cart->id)->delete();
+            // Xóa chỉ những sản phẩm đã thanh toán khỏi giỏ hàng
+            if (!empty($selectedProductIds)) {
+                CartItem::where('cart_id', $cart->id)
+                       ->whereIn('product_id', $selectedProductIds)
+                       ->delete();
+            } else {
+                // Fallback: xóa tất cả nếu không có selected items
+                CartItem::where('cart_id', $cart->id)->delete();
+            }
             
             // Xử lý chuyển hướng theo phương thức thanh toán
             if ($request->payment_method === 'cod') {

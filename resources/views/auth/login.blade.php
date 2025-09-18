@@ -19,117 +19,347 @@
 @endif
 
 <style>
-/* From Uiverse.io by ilkhoeri */
-.card { --p: 32px; --h-form: auto; --w-form: 380px; --input-px: 0.75rem; --input-py: 0.65rem; --submit-h: 38px; --blind-w: 64px; --space-y: 0.5rem; width: var(--w-form); height: var(--h-form); max-width: 100%; border-radius: 16px; background: white; position: relative; display: flex; align-items: center; justify-content: space-evenly; flex-direction: column; overflow-y: auto; padding: var(--p); scrollbar-width: none; -webkit-overflow-scrolling: touch; -webkit-font-smoothing: antialiased; -webkit-user-select: none; user-select: none; font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif; }
-.avatar { --sz-avatar: 166px; order: 0; width: var(--sz-avatar); min-width: var(--sz-avatar); max-width: var(--sz-avatar); height: var(--sz-avatar); min-height: var(--sz-avatar); max-height: var(--sz-avatar); border: 1px solid #707070; border-radius: 9999px; overflow: hidden; cursor: pointer; z-index: 2; perspective: 80px; position: relative; margin: 0; display: flex; justify-content: center; align-items: center; --sz-svg: calc(var(--sz-avatar) - 10px); }
-.avatar svg { position: absolute; transition: transform 0.2s ease-in, opacity 0.1s; transform-origin: 50% 100%; height: var(--sz-svg); width: var(--sz-svg); pointer-events: none; }
-.avatar svg#monkey { z-index: 1; }
-.avatar svg#monkey-hands { z-index: 2; transform-style: preserve-3d; transform: translateY(calc(var(--sz-avatar) / 1.25)) rotateX(-21deg); }
-.avatar::before { content: ""; border-radius: 45%; width: calc(var(--sz-svg) / 3.889); height: calc(var(--sz-svg) / 5.833); border: 0; border-bottom: calc(var(--sz-svg) * (4 / 100)) solid #3c302a; bottom: 20%; position: absolute; transition: all 0.2s ease; z-index: 3; }
-.blind-check:checked ~ .avatar::before { width: calc(var(--sz-svg) * (9 / 100)); height: 0; border-radius: 50%; border-bottom: calc(var(--sz-svg) * (10 / 100)) solid #3c302a; }
-.avatar svg#monkey .monkey-eye-r, .avatar svg#monkey .monkey-eye-l { animation: blink 10s 1s infinite; transition: all 0.2s ease; }
-@keyframes blink { 0%, 2%, 4%, 26%, 28%, 71%, 73%, 100% { ry: 4.5; cy: 31.7; } 1%, 3%, 27%, 72% { ry: 0.5; cy: 30; } }
-.blind-check:checked ~ .avatar svg#monkey .monkey-eye-r, .blind-check:checked ~ .avatar svg#monkey .monkey-eye-l { ry: 0.5; cy: 30; }
-.blind-check:checked ~ .avatar svg#monkey-hands { transform: translate3d(0, 0, 0) rotateX(0deg); }
-.avatar svg#monkey, .avatar::before, .avatar svg#monkey .monkey-eye-nose, .avatar svg#monkey .monkey-eye-r, .avatar svg#monkey .monkey-eye-l { transition: all 0.2s ease; }
-.blind-check:checked ~ .form:focus-within ~ .avatar svg#monkey, .blind-check:checked ~ .form:focus-within ~ .avatar::before, .blind-check:checked ~ .form:focus-within ~ .avatar svg#monkey .monkey-eye-nose, .blind-check:checked ~ .form:focus-within ~ .avatar svg#monkey .monkey-eye-r, .blind-check:checked ~ .form:focus-within ~ .avatar svg#monkey .monkey-eye-l { animation: none; }
-.form:focus-within ~ .avatar svg#monkey { animation: slick 3s ease infinite 1s; --center: rotateY(0deg); --left: rotateY(-4deg); --right: rotateY(4deg); }
-.form:focus-within ~ .avatar::before, .form:focus-within ~ .avatar svg#monkey .monkey-eye-nose, .blind-check:not(:checked) ~ .form:focus-within ~ .avatar svg#monkey .monkey-eye-r, .blind-check:not(:checked) ~ .form:focus-within ~ .avatar svg#monkey .monkey-eye-l { ry: 3; cy: 35; animation: slick 3s ease infinite 1s; --center: translateX(0); --left: translateX(-0.5px); --right: translateX(0.5px); }
-@keyframes slick { 0%, 100% { transform: var(--center); } 25% { transform: var(--left); } 75% { transform: var(--right); } }
-.card label.blind_input { -webkit-user-select: none; user-select: none; cursor: pointer; z-index: 4; position: absolute; border: none; right: calc(var(--p) + (var(--input-px) / 2)); bottom: calc( var(--p) + var(--submit-h) + var(--space-y) + (var(--input-py) / 1) + 3px ); padding: 4px 0; width: var(--blind-w); border-radius: 4px; background-color: #fff; color: #4d4d4d; display: inline-flex; align-items: center; justify-content: center; }
-.card label.blind_input:before { content: ""; position: absolute; left: calc((var(--input-px) / 2) * -1); top: 0; height: 100%; width: 1px; background: #8f8f8f; }
-.card label.blind_input:hover { color: #262626; background-color: #f2f2f2; }
-.blind-check ~ label.blind_input span.show, .blind-check:checked ~ label.blind_input span.hide { display: none; }
-.blind-check ~ label.blind_input span.hide, .blind-check:checked ~ label.blind_input span.show { display: block; }
-.form { order: 1; position: relative; display: flex; align-items: center; justify-content: space-evenly; flex-direction: column; width: 100%; }
-.form .title { width: 100%; font-size: 1.5rem; font-weight: 600; margin-top: 0; margin-bottom: 1rem; padding-top: 0; padding-bottom: 1rem; color: rgba(0, 0, 0, 0.7); border-bottom: 2px solid rgba(0, 0, 0, 0.3); }
-.form .label_input { white-space: nowrap; font-size: 1rem; margin-top: calc(var(--space-y) / 2); color: rgba(0, 0, 0, 0.9); font-weight: 600; display: inline; text-align: left; margin-right: auto; position: relative; z-index: 99; -webkit-user-select: none; user-select: none; }
-.form .input { resize: vertical; background: white; border: 1px solid #8f8f8f; border-radius: 6px; outline: none; padding: var(--input-py) var(--input-px); font-size: 18px; width: 100%; color: #000000b3; margin: var(--space-y) 0; transition: all 0.25s ease; }
-.form .input#password-input { padding-right: calc(var(--blind-w) + var(--input-px) + 4px); }
-.form .input:focus { border: 1px solid #0969da; outline: 0; box-shadow: 0 0 0 2px #0969da; }
-.form .frg_pss { width: 100%; display: inline-flex; align-items: center; }
-.form .frg_pss a { background-color: transparent; cursor: pointer; text-decoration: underline; transition: color 0.25s ease; color: #000000b3; font-weight: 500; float: right; }
-.form .frg_pss a:hover { color: #000; }
-.form .submit { height: var(--submit-h); width: 100%; outline: none; cursor: pointer; background-color: #fff; background-image: linear-gradient( -180deg, rgba(255, 255, 255, 0.09) 0%, rgba(17, 17, 17, 0.04) 100% ); border: 1px solid rgba(22, 22, 22, 0.2); font-weight: 500; letter-spacing: 0.25px; color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1rem; text-align: center; text-decoration: none; padding: 0.5rem 1rem; border-radius: 0.25rem; -webkit-appearance: button; appearance: button; margin: var(--space-y) 0 0; }
-.form .submit:hover { background-image: linear-gradient( -180deg, rgba(255, 255, 255, 0.18) 0%, rgba(17, 17, 17, 0.08) 100% ); border: 1px solid rgba(22, 22, 22, 0.2); color: #111; }
-.blind-check:checked ~ .form .input[type="text"] { -webkit-text-security: disc; }
+/* Custom styles cho form đăng nhập */
+.login-form {
+    max-width: 100%;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    display: block;
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-group .form-control {
+    padding-left: 3rem;
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 16px 20px 16px 3rem;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    background: #fafbfc;
+}
+
+.input-group .form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
+    background: white;
+}
+
+.input-group .form-control.is-invalid {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15);
+}
+
+.input-group .form-control.is-invalid:focus {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.25);
+}
+
+.input-group .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.1rem;
+    z-index: 3;
+}
+
+.input-group .password-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 1.1rem;
+    cursor: pointer;
+    z-index: 3;
+    transition: color 0.3s ease;
+}
+
+.input-group .password-toggle:hover {
+    color: #3498db;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-bottom: 1.5rem;
+}
+
+.forgot-password a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: #2ecc71;
+    text-decoration: none;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 16px 32px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: white;
+    width: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(52, 152, 219, 0.3);
+    color: white;
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.btn-login:disabled {
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+}
+
+.login-loader {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.divider {
+    text-align: center;
+    margin: 2rem 0;
+    position: relative;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.divider span {
+    background: white;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.social-login {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: white;
+    color: #6c757d;
+    text-decoration: none;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.social-btn:hover {
+    border-color: #3498db;
+    color: #3498db;
+    transform: translateY(-1px);
+}
+
+.social-btn.google:hover {
+    border-color: #db4437;
+    color: #db4437;
+}
+
+.social-btn.facebook:hover {
+    border-color: #4267B2;
+    color: #4267B2;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .social-login {
+        flex-direction: column;
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+}
 </style>
 
-<!-- From Uiverse.io by ilkhoeri -->
-<div class="card">
-  <input value="" class="blind-check" type="checkbox" id="blind-input" name="blindcheck" hidden />
-
-  <label for="blind-input" class="blind_input">
-    <span class="hide">Hide</span>
-    <span class="show">Show</span>
-  </label>
-
-  <form class="form" method="POST" action="{{ route('login') }}">
+<div class="login-form">
+    <form method="POST" action="{{ route('login') }}">
     @csrf
-    <div class="title">Sign In</div>
-
-    <label class="label_input" for="email-input">Email</label>
-    <input spellcheck="false" class="input @error('email') is-invalid @enderror" type="email" name="email" id="email-input" value="{{ old('email') }}" required />
+        
+        <!-- Email Field -->
+        <div class="form-group">
+            <label for="email">Email</label>
+            <div class="input-group">
+                <i class="fas fa-envelope input-icon"></i>
+                <input 
+                    type="email" 
+                    class="form-control @error('email') is-invalid @enderror" 
+                    id="email" 
+                    name="email" 
+                    value="{{ old('email') }}" 
+                    placeholder="Nhập địa chỉ email của bạn"
+                    required 
+                    autocomplete="email"
+                />
+            </div>
     @error('email')
       <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror
+        </div>
 
-    <div class="frg_pss w-100 d-flex justify-content-between">
-      <label class="label_input" for="password-input">Password</label>
-      <a href="#">Forgot password?</a>
+        <!-- Password Field -->
+        <div class="form-group">
+            <label for="password">Mật khẩu</label>
+            <div class="input-group">
+                <i class="fas fa-lock input-icon"></i>
+                <input 
+                    type="password" 
+                    class="form-control @error('password') is-invalid @enderror" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Nhập mật khẩu của bạn"
+                    required 
+                    autocomplete="current-password"
+                />
+                <button type="button" class="password-toggle" onclick="togglePassword()">
+                    <i class="fas fa-eye" id="password-toggle-icon"></i>
+                </button>
     </div>
-    <input spellcheck="false" class="input @error('password') is-invalid @enderror" type="text" name="password" id="password-input" required />
     @error('password')
       <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror
-    <button class="submit" id="login-submit" type="submit">Submit</button>
-    <div id="login-loader" class="d-none" style="width:100%;margin-top:12px;">
-      <!-- From Uiverse.io by SteveBloX -->
-      <style>
-      .wrapper{display:flex;justify-content:center;align-items:center;height:60px}
-      .ball{--size:16px;width:var(--size);height:var(--size);border-radius:11px;margin:0 10px;animation:2s bounce ease infinite}
-      .blue{background-color:#4285f5}
-      .red{background-color:#ea4436;animation-delay:.25s}
-      .yellow{background-color:#fbbd06;animation-delay:.5s}
-      .green{background-color:#34a952;animation-delay:.75s}
-      @keyframes bounce{50%{transform:translateY(25px)}}
-      </style>
-      <div class="wrapper">
-        <div class="blue ball"></div>
-        <div class="red ball"></div>
-        <div class="yellow ball"></div>
-        <div class="green ball"></div>
-      </div>
-    </div>
-  </form>
+        </div>
 
-  <label for="blind-input" class="avatar">
-    <!-- SVG monkey -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 64 64" id="monkey">
-      <ellipse cx="53.7" cy="33" rx="8.3" ry="8.2" fill="#89664c"></ellipse>
-      <ellipse cx="53.7" cy="33" rx="5.4" ry="5.4" fill="#ffc5d3"></ellipse>
-      <ellipse cx="10.2" cy="33" rx="8.2" ry="8.2" fill="#89664c"></ellipse>
-      <ellipse cx="10.2" cy="33" rx="5.4" ry="5.4" fill="#ffc5d3"></ellipse>
-      <g fill="#89664c">
-        <path d="m43.4 10.8c1.1-.6 1.9-.9 1.9-.9-3.2-1.1-6-1.8-8.5-2.1 1.3-1 2.1-1.3 2.1-1.3-20.4-2.9-30.1 9-30.1 19.5h46.4c-.7-7.4-4.8-12.4-11.8-15.2"></path>
-        <path d="m55.3 27.6c0-9.7-10.4-17.6-23.3-17.6s-23.3 7.9-23.3 17.6c0 2.3.6 4.4 1.6 6.4-1 2-1.6 4.2-1.6 6.4 0 9.7 10.4 17.6 23.3 17.6s23.3-7.9 23.3-17.6c0-2.3-.6-4.4-1.6-6.4 1-2 1.6-4.2 1.6-6.4"></path>
-      </g>
-      <path d="m52 28.2c0-16.9-20-6.1-20-6.1s-20-10.8-20 6.1c0 4.7 2.9 9 7.5 11.7-1.3 1.7-2.1 3.6-2.1 5.7 0 6.1 6.6 11 14.7 11s14.7-4.9 14.7-11c0-2.1-.8-4-2.1-5.7 4.4-2.7 7.3-7 7.3-11.7" fill="#e0ac7e"></path>
-      <g fill="#3b302a" class="monkey-eye-nose">
-        <path d="m35.1 38.7c0 1.1-.4 2.1-1 2.1-.6 0-1-.9-1-2.1 0-1.1.4-2.1 1-2.1.6.1 1 1 1 2.1"></path>
-        <path d="m30.9 38.7c0 1.1-.4 2.1-1 2.1-.6 0-1-.9-1-2.1 0-1.1.4-2.1 1-2.1.5.1 1 1 1 2.1"></path>
-        <ellipse cx="40.7" cy="31.7" rx="3.5" ry="4.5" class="monkey-eye-r"></ellipse>
-        <ellipse cx="23.3" cy="31.7" rx="3.5" ry="4.5" class="monkey-eye-l"></ellipse>
-      </g>
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 64 64" id="monkey-hands">
-      <path fill="#89664C" d="M9.4,32.5L2.1,61.9H14c-1.6-7.7,4-21,4-21L9.4,32.5z"></path>
-      <path fill="#FFD6BB" d="M15.8,24.8c0,0,4.9-4.5,9.5-3.9c2.3,0.3-7.1,7.6-7.1,7.6s9.7-8.2,11.7-5.6c1.8,2.3-8.9,9.8-8.9,9.8 s10-8.1,9.6-4.6c-0.3,3.8-7.9,12.8-12.5,13.8C11.5,43.2,6.3,39,9.8,24.4C11.6,17,13.3,25.2,15.8,24.8"></path>
-      <path fill="#89664C" d="M54.8,32.5l7.3,29.4H50.2c1.6-7.7-4-21-4-21L54.8,32.5z"></path>
-      <path fill="#FFD6BB" d="M48.4,24.8c0,0-4.9-4.5-9.5-3.9c-2.3,0.3,7.1,7.6,7.1,7.6s-9.7-8.2-11.7-5.6c-1.8,2.3,8.9,9.8,8.9,9.8 s-10-8.1-9.7-4.6c0.4,3.8,8,12.8,12.6,13.8c6.6,1.3,11.8-2.9,8.3-17.5C52.6,17,50.9,25.2,48.4,24.8"></path>
-    </svg>
-  </label>
+        <!-- Forgot Password -->
+        <div class="forgot-password">
+            <a href="#" onclick="alert('Tính năng quên mật khẩu đang được phát triển')">
+                Quên mật khẩu?
+            </a>
+        </div>
+
+        <!-- Login Button -->
+        <button type="submit" class="btn-login" id="login-submit">
+            <span id="login-text">Đăng nhập</span>
+            <div class="login-loader" id="login-loader">
+                <div class="spinner"></div>
+      </div>
+        </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="divider">
+        <span>Hoặc đăng nhập bằng</span>
+    </div>
+
+    <!-- Social Login -->
+    <div class="social-login">
+        <a href="{{ route('auth.google') }}" class="social-btn google">
+            <i class="fab fa-google"></i>
+            Google
+        </a>
+        <a href="{{ route('auth.facebook') }}" class="social-btn facebook">
+            <i class="fab fa-facebook-f"></i>
+            Facebook
+        </a>
+    </div>
 </div>
+
+<script>
+// Toggle password visibility
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('password-toggle-icon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+// Handle form submission với loading state
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[action$="/login"]');
+    const submitBtn = document.getElementById('login-submit');
+    const loginText = document.getElementById('login-text');
+    const loginLoader = document.getElementById('login-loader');
+    
+    if (form && submitBtn) {
+        form.addEventListener('submit', function() {
+            // Disable button và hiển thị loading
+            submitBtn.disabled = true;
+            loginText.style.display = 'none';
+            loginLoader.style.display = 'flex';
+            
+            // Thêm hiệu ứng loading cho button
+            submitBtn.style.opacity = '0.8';
+        });
+    }
+});
+</script>
 @endsection
 
 @section('footer')
