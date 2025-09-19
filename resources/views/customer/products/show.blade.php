@@ -6,7 +6,18 @@
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h1 class="h2 fw-bold mb-3">{{ $product->name }}</h1>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 class="h2 fw-bold mb-0">{{ $product->name }}</h1>
+                        @auth
+                            <button class="btn btn-favorite btn-lg {{ auth()->user()->isFavorite($product->id) ? 'favorited' : '' }}" 
+                                    data-product-id="{{ $product->id }}"
+                                    data-store-url="{{ route('favorites.store', $product->id) }}"
+                                    data-destroy-url="{{ route('favorites.destroy', $product->id) }}"
+                                    title="{{ auth()->user()->isFavorite($product->id) ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích' }}">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        @endauth
+                    </div>
                     
                     <div class="d-flex flex-wrap gap-2 mb-4">
                         <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">

@@ -18,49 +18,55 @@
     --text-muted: #94a3b8;
     --border-color: #e2e8f0;
     --bg-light: #f8fafc;
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
 }
 
 /* Header Section */
 .favorites-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 3rem 0;
-    margin-bottom: 2rem;
-    border-radius: 0 0 24px 24px;
+    margin-bottom: 3rem;
 }
 
-.favorites-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
-.favorites-title i {
-    margin-right: 1rem;
-    color: #fbbf24;
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
 }
 
 .favorites-subtitle {
     text-align: center;
-    font-size: 1.1rem;
-    opacity: 0.9;
+    font-size: 1.2rem;
+    opacity: 0.95;
     margin: 0;
+    position: relative;
+    z-index: 1;
+    font-weight: 300;
 }
 
 /* Stats Section */
 .stats-section {
     background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: var(--shadow-sm);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    box-shadow: var(--shadow-lg);
     border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--bg-gradient);
 }
 
 .stats-grid {
@@ -71,31 +77,65 @@
 
 .stat-item {
     text-align: center;
-    padding: 1.5rem;
-    background: var(--bg-light);
-    border-radius: 12px;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 16px;
     border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--bg-gradient);
 }
 
 .stat-number {
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: 2.5rem;
+    font-weight: 900;
     color: var(--primary-color);
     margin-bottom: 0.5rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .stat-label {
     color: var(--text-light);
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Products Grid */
 .products-section {
     background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: var(--shadow-sm);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-lg);
     border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.products-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--bg-gradient);
 }
 
 .section-header {
@@ -130,50 +170,56 @@
 /* Product Card */
 .product-card {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
 
 .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-xl);
 }
 
 .product-image-container {
     position: relative;
     overflow: hidden;
-    height: 200px;
+    height: 220px;
 }
 
 .product-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s ease;
 }
 
 .product-card:hover .product-image {
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
 .favorite-badge {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: var(--danger-color);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    box-shadow: var(--shadow-md);
+    font-size: 1.3rem;
+    box-shadow: var(--shadow-lg);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
 }
 
 .product-info {
@@ -269,7 +315,7 @@
 }
 
 .empty-state i {
-    font-size: 4rem;
+    font-size: 1.5rem;
     color: var(--text-muted);
     margin-bottom: 1rem;
 }
@@ -360,36 +406,11 @@
 </style>
 
 <div class="favorites-header">
-    <div class="container">
-        <h1 class="favorites-title">
-            <i class="fas fa-heart"></i>
-            Sản Phẩm Yêu Thích
-        </h1>
-        <p class="favorites-subtitle">
-            Danh sách những sản phẩm bạn đã yêu thích
-        </p>
-    </div>
+   
 </div>
 
 <div class="container">
-    <!-- Stats Section -->
-    <div class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-number">{{ $favoriteProducts->total() }}</div>
-                <div class="stat-label">Sản phẩm yêu thích</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">{{ $favoriteProducts->where('quantity', '>', 0)->count() }}</div>
-                <div class="stat-label">Còn hàng</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">{{ $favoriteProducts->where('quantity', '<=', 0)->count() }}</div>
-                <div class="stat-label">Hết hàng</div>
-            </div>
-        </div>
-    </div>
-
+   
     <!-- Products Section -->
     <div class="products-section">
         <div class="section-header">

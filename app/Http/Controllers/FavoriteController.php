@@ -31,7 +31,7 @@ class FavoriteController extends Controller
     public function store(Request $request, $productId)
     {
         if (!Auth::check()) {
-            if ($request->ajax()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Bạn cần đăng nhập để thêm sản phẩm yêu thích!',
@@ -49,7 +49,7 @@ class FavoriteController extends Controller
             ->first();
 
         if ($existingFavorite) {
-            if ($request->ajax()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Sản phẩm đã có trong danh sách yêu thích!'
@@ -64,7 +64,7 @@ class FavoriteController extends Controller
             'product_id' => $productId
         ]);
 
-        if ($request->ajax()) {
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Đã thêm sản phẩm vào danh sách yêu thích!',
@@ -81,7 +81,7 @@ class FavoriteController extends Controller
     public function destroy(Request $request, $productId)
     {
         if (!Auth::check()) {
-            if ($request->ajax()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Bạn cần đăng nhập để xóa sản phẩm yêu thích!'
@@ -95,7 +95,7 @@ class FavoriteController extends Controller
             ->first();
 
         if (!$favorite) {
-            if ($request->ajax()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Sản phẩm không có trong danh sách yêu thích!'
@@ -107,7 +107,7 @@ class FavoriteController extends Controller
         $productName = $favorite->product->name;
         $favorite->delete();
 
-        if ($request->ajax()) {
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Đã xóa sản phẩm khỏi danh sách yêu thích!',

@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" crossorigin="anonymous">
     <!-- CDN dự phòng -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
+    <!-- Favorite Button CSS -->
+    <link href="{{ asset('css/favorite-button.css') }}" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3498db;
@@ -820,6 +822,12 @@
                             </a>
                         </li>
                     @else
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{{ route('chat.index') }}">
+                                <i class="fas fa-comments"></i>
+                                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" id="chat-unread-count" style="display: none;">0</span>
+                            </a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle me-1"></i>{{ Auth::user()->name }}
@@ -928,7 +936,7 @@
                     <h6 class="fw-bold mb-3">Liên hệ</h6>
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-map-marker-alt me-2"></i>
-                        <small>123 Đường ABC, Q.1, TP.HCM</small>
+                        <small>Hà Nội</small>
                     </div>
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-phone me-2"></i>
@@ -1143,5 +1151,58 @@
             window.addEventListener('pageshow', hideWhenReady);
         });
     </script>
+    
+    <!-- Chat unread count update -->
+    <script>
+        // Update chat unread count
+        function updateChatUnreadCount() {
+            @auth
+            fetch('{{ route("chat.unread-count") }}')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('chat-unread-count');
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating chat unread count:', error);
+                });
+            @endauth
+        }
+
+        // Update chat count on page load
+        updateChatUnreadCount();
+
+        // Update chat count every 30 seconds
+        setInterval(updateChatUnreadCount, 30000);
+    </script>
+    
+    <!-- Pusher & Echo -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
+    <script>
+        window.Pusher = Pusher;
+        window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key: '{{ env('PUSHER_APP_KEY') }}',
+            cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+            forceTLS: true,
+            encrypted: true,
+            wsHost: 'ws-ap1.pusher.com',
+            wsPort: 443,
+            wssPort: 443,
+            disableStats: true,
+            enabledTransports: ['ws', 'wss']
+        });
+        
+        console.log('Echo initialized:', window.Echo);
+    </script>
+
+    <!-- Favorite Button JavaScript -->
+    <script src="{{ asset('js/favorite-button-simple.js') }}"></script>
 </body>
 </html>

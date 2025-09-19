@@ -203,6 +203,18 @@
                         <div class="position-absolute top-0 end-0 m-2">
                             <span class="badge bg-danger">Mới</span>
                         </div>
+                        <!-- Favorite Button -->
+                        @auth
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <button class="btn btn-favorite {{ auth()->user()->isFavorite($product->id) ? 'favorited' : '' }}" 
+                                        data-product-id="{{ $product->id }}"
+                                        data-store-url="{{ route('favorites.store', $product->id) }}"
+                                        data-destroy-url="{{ route('favorites.destroy', $product->id) }}"
+                                        title="{{ auth()->user()->isFavorite($product->id) ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích' }}">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                        @endauth
                     </div>
                     <div class="card-body d-flex flex-column">
                         <div class="mb-2">

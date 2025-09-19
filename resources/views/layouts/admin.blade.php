@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin - KitchenHood Pro')</title>
     @if(View::hasSection('meta_description'))
     <meta name="description" content="@yield('meta_description')">
@@ -14,6 +15,9 @@
     <!-- Preload FontAwesome -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <!-- Preload Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -533,19 +537,28 @@
             background: var(--primary-color);
             border: none;
             color: white;
-            padding: 0.75rem 1rem;
+            padding: 10px 12px;
             border-radius: 8px;
             margin: 1rem;
             font-weight: 600;
             transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            font-size: 16px;
         }
         
         .sidebar-toggle:hover {
             background: var(--primary-dark);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
         
-        @media (max-width: 1024px) {
+        .sidebar-toggle:active {
+            transform: translateY(0);
+        }
+        
+        /* Tablet responsive */
+        @media (max-width: 1200px) {
             .admin-sidebar {
                 width: 250px;
             }
@@ -554,11 +567,27 @@
             }
         }
         
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 220px;
+            }
+            .admin-content {
+                margin-left: 220px;
+            }
+        }
+        
+        /* Mobile responsive */
         @media (max-width: 768px) {
             .admin-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 280px;
                 transform: translateX(-100%);
                 transition: transform 0.3s ease;
-                width: 280px;
+                z-index: 1000;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             }
             
             .admin-sidebar.show {
@@ -568,6 +597,7 @@
             .admin-content {
                 margin-left: 0;
                 padding: 1rem;
+                width: 100%;
             }
             
             .sidebar-toggle {
@@ -576,6 +606,17 @@
                 top: 1rem;
                 left: 1rem;
                 z-index: 1001;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 12px;
+                box-shadow: var(--shadow-md);
+            }
+            
+            .sidebar-toggle:hover {
+                background: var(--primary-dark);
+                transform: translateY(-2px);
             }
             
             .dashboard-card {
@@ -678,7 +719,6 @@
 
         /* Overlay for mobile sidebar */
         .sidebar-overlay {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -686,11 +726,15 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
         
         @media (max-width: 768px) {
             .sidebar-overlay.show {
-                display: block;
+                opacity: 1;
+                visibility: visible;
             }
         }
     </style>
@@ -753,6 +797,12 @@
                 <span>Báo cáo & Thống kê</span>
             </a>
             
+                            <a class="nav-link" href="{{ route('admin.admin.chat.index') }}">
+                                <i class="fas fa-comments"></i>
+                                <span>Chat với Khách hàng</span>
+                                <span class="badge bg-danger ms-auto" id="admin-chat-unread-count" style="display: none;">0</span>
+                            </a>
+            
                 
             <div class="nav-divider"></div>
             <a class="nav-link" href="/">
@@ -777,18 +827,39 @@
             
             sidebar.classList.toggle('show');
             overlay.classList.toggle('show');
+            
+            // Prevent body scroll when sidebar is open on mobile
+            if (sidebar.classList.contains('show')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
         }
         
         // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.querySelector('.admin-sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const overlay = document.querySelector('.sidebar-overlay');
             
             if (window.innerWidth <= 768) {
                 if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
                     sidebar.classList.remove('show');
-                    document.querySelector('.sidebar-overlay').classList.remove('show');
+                    overlay.classList.remove('show');
+                    document.body.style.overflow = 'auto';
                 }
+            }
+        });
+        
+        // Close sidebar on window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+                document.body.style.overflow = 'auto';
             }
         });
         
@@ -809,6 +880,51 @@
                 }, index * 100);
             });
         });
+        
+        // Update admin chat unread count
+        function updateAdminChatUnreadCount() {
+            fetch('{{ route("admin.admin.chat.unread-count") }}')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('admin-chat-unread-count');
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating admin chat unread count:', error);
+                });
+        }
+
+        // Update chat count on page load
+        updateAdminChatUnreadCount();
+
+        // Update chat count every 30 seconds
+        setInterval(updateAdminChatUnreadCount, 30000);
+    </script>
+
+    <!-- Pusher & Echo -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
+    <script>
+        window.Pusher = Pusher;
+        window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key: '{{ env('PUSHER_APP_KEY') }}',
+            cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+            forceTLS: true,
+            encrypted: true,
+            wsHost: 'ws-ap1.pusher.com',
+            wsPort: 443,
+            wssPort: 443,
+            disableStats: true,
+            enabledTransports: ['ws', 'wss']
+        });
+        
+        console.log('Echo initialized:', window.Echo);
     </script>
 </body>
 </html>

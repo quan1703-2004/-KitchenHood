@@ -180,6 +180,18 @@
                             <div class="position-absolute top-0 end-0 m-2">
                                 <span class="badge bg-danger">BÁN CHẠY</span>
                             </div>
+                            <!-- Favorite Button -->
+                            @auth
+                                <div class="position-absolute top-0 start-0 m-2">
+                                    <button class="btn btn-favorite {{ auth()->user()->isFavorite($product->id) ? 'favorited' : '' }}" 
+                                            data-product-id="{{ $product->id }}"
+                                            data-store-url="{{ route('favorites.store', $product->id) }}"
+                                            data-destroy-url="{{ route('favorites.destroy', $product->id) }}"
+                                            title="{{ auth()->user()->isFavorite($product->id) ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích' }}">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                            @endauth
                         </div>
                         
                         <div class="card-body d-flex flex-column">
@@ -549,5 +561,133 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Xử lý nút yêu thích
+document.querySelectorAll('.btn-favorite').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const productId = this.dataset.productId;
+        const isFavorited = this.classList.contains('favorited');
+        const productCard = this.closest('.card');
+        const productName = productCard.querySelector('.card-title').textContent;
+        
+        // Hiển thị loading
+        const originalIcon = this.innerHTML;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        this.disabled = true;
+        
+        // Gửi request
+        const url = isFavorited ? `/favorites/${productId}` : '/favorites';
+        const method = isFavorited ? 'DELETE' : 'POST';
+        
+        fetch(url, {
+            method: method,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: method === 'POST' ? JSON.stringify({ product_id: productId }) : null
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Cập nhật trạng thái nút
+                if (isFavorited) {
+                    this.classList.remove('favorited');
+                    this.title = 'Thêm vào yêu thích';
+                } else {
+                    this.classList.add('favorited');
+                    this.title = 'Xóa khỏi yêu thích';
+                }
+                
+                // Hiển thị thông báo
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            } else {
+                throw new Error(data.message || 'Có lỗi xảy ra');
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: error.message || 'Không thể cập nhật yêu thích',
+                confirmButtonText: 'Thử lại'
+            });
+        })
+        .finally(() => {
+            this.innerHTML = originalIcon;
+            this.disabled = false;
+        });
+    });
+});
 </script>
+
+<style>
+/* Favorite Button Styles */
+.btn-favorite {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: #ccc;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+.btn-favorite:hover {
+    background: rgba(255, 255, 255, 1);
+    color: #ef4444;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-favorite.favorited {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.btn-favorite.favorited:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Product Card Hover Effect */
+.product-card:hover .btn-favorite {
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-favorite {
+    opacity: 0.8;
+    visibility: visible;
+}
+
+@media (max-width: 768px) {
+    .btn-favorite {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+}
+</style>
 @endsection

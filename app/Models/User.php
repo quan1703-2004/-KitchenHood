@@ -66,7 +66,7 @@ implements MustVerifyEmail
             return asset('storage/' . $this->avatar);
         }
         
-        return asset('images/avatars/default-avatar.png');
+        return asset('images/avatars/default-avatar.svg');
     }
 
     /**
@@ -150,5 +150,63 @@ implements MustVerifyEmail
     public function getIsAdminAttribute(): bool
     {
         return $this->isAdmin();
+    }
+
+    /**
+     * Relationship với Message - messages sent by this user
+     */
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    /**
+     * Relationship với Message - messages received by this user
+     */
+    public function receivedMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    /**
+     * Get all messages for this user (both sent and received)
+     */
+    public function messages()
+    {
+        return Message::where('sender_id', $this->id)
+                     ->orWhere('receiver_id', $this->id)
+                     ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get unread messages count for this user
+     */
+    public function getUnreadMessagesCount()
+    {
+        return $this->receivedMessages()->where('is_read', false)->count();
+    }
+
+    /**
+     * Get conversations for this user
+     */
+    public function getConversations()
+    {
+        $conversations = Message::select('sender_id', 'receiver_id')
+            ->where('sender_id', $this->id)
+            ->orWhere('receiver_id', $this->id)
+            ->groupBy('sender_id', 'receiver_id')
+            ->get();
+
+        $userIds = [];
+        foreach ($conversations as $conversation) {
+            if ($conversation->sender_id != $this->id) {
+                $userIds[] = $conversation->sender_id;
+            }
+            if ($conversation->receiver_id != $this->id) {
+                $userIds[] = $conversation->receiver_id;
+            }
+        }
+
+        return User::whereIn('id', array_unique($userIds))->get();
     }
 }

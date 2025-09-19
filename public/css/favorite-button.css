@@ -1,0 +1,72 @@
+/* Favorite Button Styles */
+.btn-favorite {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: #ccc;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+}
+
+.btn-favorite:hover {
+    background: rgba(255, 255, 255, 1);
+    color: #ef4444;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-favorite.favorited {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.btn-favorite.favorited:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+}
+
+/* Large favorite button for product detail page */
+.btn-favorite.btn-lg {
+    width: 50px;
+    height: 50px;
+    font-size: 1.3rem;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Product Card Hover Effect */
+.product-card:hover .btn-favorite {
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-favorite {
+    opacity: 0.8;
+    visibility: visible;
+}
+
+@media (max-width: 768px) {
+    .btn-favorite {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    
+    .btn-favorite.btn-lg {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+}

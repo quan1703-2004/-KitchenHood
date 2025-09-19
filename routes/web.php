@@ -227,6 +227,11 @@ Route::get('/manual-verify/{email}', function($email) {
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
+// Route để lấy CSRF token
+Route::get('/csrf-token', function () {
+    return response()->json(['csrf_token' => csrf_token()]);
+})->name('csrf-token');
+
 // API routes để lấy tỉnh thành, quận huyện, phường xã (công khai)
 Route::get('/api/provinces', [AddressController::class, 'getProvinces'])->name('addresses.provinces');
 Route::get('/api/districts/{provinceId}', [AddressController::class, 'getDistricts'])->name('addresses.districts');
@@ -264,6 +269,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [App\Http\Controllers\User\ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [App\Http\Controllers\User\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [App\Http\Controllers\User\ProfileController::class, 'update'])->name('profile.update');
+
+        // Chat routes for users
+        Route::get('/chat', [App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/data', [App\Http\Controllers\ChatController::class, 'getChatData'])->name('chat.data');
+        Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.send');
+        Route::get('/customer/chatting/history', [App\Http\Controllers\ChatController::class, 'getChatHistory'])->name('chat.history');
+        Route::get('/chat/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount'])->name('chat.unread-count');
 });
 
 // Routes cho thanh toán
@@ -340,6 +352,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/reports/products', [App\Http\Controllers\Admin\ReportController::class, 'products'])->name('reports.products');
     Route::get('/reports/customers', [App\Http\Controllers\Admin\ReportController::class, 'customers'])->name('reports.customers');
     Route::post('/reports/export', [App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
+
+    // Chat routes for admin
+    Route::get('/chatting', [App\Http\Controllers\Admin\ChatController::class, 'index'])->name('admin.chat.index');
+    Route::get('/chatting/data', [App\Http\Controllers\Admin\ChatController::class, 'getChatData'])->name('admin.chat.data');
+    Route::post('/chatting/send-message', [App\Http\Controllers\Admin\ChatController::class, 'sendMessage'])->name('admin.chat.send-message');
+    Route::get('/chatting/history/{customerId}', [App\Http\Controllers\Admin\ChatController::class, 'getChatHistory'])->name('admin.chat.history');
+    Route::post('/chatting/mark-read/{customerId}', [App\Http\Controllers\Admin\ChatController::class, 'markAsRead'])->name('admin.chat.mark-read');
+    Route::get('/chatting/customer/{customerId}', [App\Http\Controllers\Admin\ChatController::class, 'getCustomerInfo'])->name('admin.chat.customer');
+    Route::get('/chatting/unread-count', [App\Http\Controllers\Admin\ChatController::class, 'getUnreadCount'])->name('admin.chat.unread-count');
     
 });
 
@@ -349,3 +370,15 @@ Route::post('/favorites/{product}', [App\Http\Controllers\FavoriteController::cl
 Route::delete('/favorites/{product}', [App\Http\Controllers\FavoriteController::class, 'destroy'])->name('favorites.destroy')->middleware('auth');
 Route::post('/favorites/{product}/toggle', [App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorites.toggle')->middleware('auth');
 Route::get('/favorites/{product}/check', [App\Http\Controllers\FavoriteController::class, 'check'])->name('favorites.check')->middleware('auth');
+
+// Test route để kiểm tra
+Route::get('/test-favorites', function() {
+    return response()->json([
+        'message' => 'Favorites routes are working',
+        'routes' => [
+            'GET /favorites' => 'favorites.index',
+            'POST /favorites/{product}' => 'favorites.store',
+            'DELETE /favorites/{product}' => 'favorites.destroy'
+        ]
+    ]);
+});
