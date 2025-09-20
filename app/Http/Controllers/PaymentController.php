@@ -51,7 +51,7 @@ class PaymentController extends Controller
         $orderInfo = "Thanh toán đơn hàng #{$order->id}";
         $amount = (string) max(1000, (int) $order->total_amount); // test nên >= 1000
         $extraData = ''; // có thể base64_encode(json_encode(...))
-        $requestType = 'payWithATM';
+        $requestType = 'payWithATM'; // có thể chuyển thành creditCard nếu lỗi
         
         $rawHash = "accessKey={$this->accessKey}&amount={$amount}&extraData={$extraData}&ipnUrl={$ipnUrl}"
             . "&orderId={$orderId}&orderInfo={$orderInfo}&partnerCode={$this->partnerCode}"
@@ -136,26 +136,39 @@ class PaymentController extends Controller
         }
 
         if ($resultCode === '0' || $resultCode === 0) {
-            // ✅ Thành công: cập nhật trạng thái đơn
+            // ✅ Thành công: cập nhật trạng thái đơn và xóa giỏ hàng
             if ($order) {
                 $order->update([
                     'status' => 'processing',
                     'payment_status' => 'paid'
                 ]);
+                
+                // Xóa giỏ hàng sau khi thanh toán thành công
+                $cart = Cart::where('user_id', $order->user_id)->first();
+                if ($cart) {
+                    // Lấy danh sách sản phẩm trong đơn hàng để xóa khỏi giỏ hàng
+                    $orderProductIds = $order->items->pluck('product_id')->toArray();
+                    CartItem::where('cart_id', $cart->id)
+                           ->whereIn('product_id', $orderProductIds)
+                           ->delete();
+                }
             }
-            // Trả về trang chủ sau khi thanh toán thành công
-            return redirect()->route('home')
+            // Chuyển về trang thanh toán thành công
+            return redirect()->route('payment.success', $order->id)
                 ->with('success', 'Thanh toán MoMo thành công! Đơn hàng của bạn đã được cập nhật.');
         }
 
-        // ❌ Thất bại/hủy: giữ nguyên trạng thái để user thử lại
+        // ❌ Thất bại/hủy: set trạng thái chờ thanh toán cho MoMo
         if ($order) {
-            $order->update(['status' => 'pending']); // hoặc 'chờ thanh toán' tuỳ bạn
+            $order->update([
+                'status' => 'waiting_payment', // Trạng thái đặc biệt cho MoMo chờ thanh toán
+                'payment_status' => 'pending'
+            ]);
         }
         
-        // Quay lại trang chủ để người dùng thử thanh toán lại
-        return redirect()->route('home')
-            ->with('error', 'Thanh toán MoMo thất bại hoặc bị hủy. Vui lòng thử lại.');
+        // Chuyển về trang thanh toán thất bại
+        return redirect()->route('payment.failed', $order->id)
+            ->with('error', 'Thanh toán MoMo thất bại hoặc bị hủy. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.');
     }
 
     /**
@@ -202,10 +215,119 @@ class PaymentController extends Controller
         }
 
         // Đưa về "chờ thanh toán" trước khi tạo giao dịch mới
-        $order->update(['status' => 'pending']);
+        $order->update(['status' => 'waiting_payment']);
         
         // PHẢI return
         return $this->redirectToMoMo(new Request(), $order->id);
+    }
+
+    /**
+     * Hiển thị trang thanh toán thành công
+     */
+    public function success(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền xem đơn hàng này.');
+        }
+
+        return view('customer.payment.success', compact('order'));
+    }
+
+    /**
+     * Hiển thị trang thanh toán thất bại
+     */
+    public function failed(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền xem đơn hàng này.');
+        }
+
+        return view('customer.payment.failed', compact('order'));
+    }
+
+    /**
+     * Chuyển đổi phương thức thanh toán sang COD
+     */
+    public function switchToCod(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền thay đổi phương thức thanh toán đơn này.');
+        }
+
+        if ($order->payment_status === 'paid') {
+            return redirect()->route('orders.index')->with('error', 'Đơn này đã thanh toán.');
+        }
+
+        $order->update([
+            'payment_method' => 'cod',
+            'status' => 'pending',
+            'payment_status' => 'pending'
+        ]);
+
+        return redirect()->route('payment.success', $order->id)
+            ->with('success', 'Đã chuyển sang thanh toán COD thành công!');
+    }
+
+    /**
+     * Hủy đơn hàng và khôi phục giỏ hàng (method chung)
+     */
+    public function cancelOrder(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền hủy đơn này.');
+        }
+
+        // Chỉ cho phép hủy đơn hàng chưa thanh toán
+        if ($order->payment_status === 'paid') {
+            return redirect()->route('orders.index')->with('error', 'Không thể hủy đơn hàng đã thanh toán.');
+        }
+
+        try {
+            // Khôi phục tồn kho cho các sản phẩm
+            foreach ($order->items as $item) {
+                $product = $item->product;
+                if ($product) {
+                    $product->addStock(
+                        $item->quantity,
+                        "Hủy đơn hàng #{$order->order_number}",
+                        Auth::id()
+                    );
+                }
+            }
+
+            // Khôi phục giỏ hàng
+            $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+            foreach ($order->items as $item) {
+                $existingCartItem = CartItem::where('cart_id', $cart->id)
+                                          ->where('product_id', $item->product_id)
+                                          ->first();
+                
+                if ($existingCartItem) {
+                    // Cập nhật số lượng nếu sản phẩm đã có trong giỏ hàng
+                    $existingCartItem->update([
+                        'quantity' => $existingCartItem->quantity + $item->quantity
+                    ]);
+                } else {
+                    // Thêm mới vào giỏ hàng
+                    CartItem::create([
+                        'cart_id' => $cart->id,
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity
+                    ]);
+                }
+            }
+
+            // Xóa đơn hàng
+            $order->delete();
+
+            return redirect()->route('cart.index')
+                           ->with('success', 'Đã hủy đơn hàng và khôi phục giỏ hàng thành công!');
+
+        } catch (\Exception $e) {
+            Log::error('Cancel order error: ' . $e->getMessage());
+            return redirect()->route('orders.index')
+                           ->with('error', 'Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại!');
+        }
     }
 
 }

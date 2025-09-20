@@ -145,6 +145,27 @@
         @endif
         
         <!-- Header Section -->
+        @if(request('q'))
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-info border-0 shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-search me-3 text-primary"></i>
+                        <div>
+                            <h6 class="mb-1">Kết quả tìm kiếm cho: <strong>"{{ request('q') }}"</strong></h6>
+                            <small class="text-muted">Tìm thấy {{ $products->total() }} sản phẩm</small>
+                        </div>
+                        <div class="ms-auto">
+                            <a href="{{ route('products.index') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-times me-1"></i>Xóa tìm kiếm
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        
         <!-- Filter Section -->
         <div class="row mb-5">
             <div class="col-12">
@@ -152,12 +173,15 @@
                     <div class="row align-items-center">
                         <div class="col-md-6">
                             <h5 class="fw-bold mb-3 mb-md-0">
-                                <i class="fas fa-filter me-2 text-primary" title="Lọc"></i>Lọc Sản Phẩm
+                                <i class="fas fa-filter me-2 text-primary" title="Lọc"></i>
+                                @if(request('q'))
+                                    Kết quả tìm kiếm
+                                @else
+                                    Lọc Sản Phẩm
+                                @endif
                                 <span class="badge bg-primary ms-2">{{ $products->total() }} sản phẩm</span>
                             </h5>
                         </div>
-                    
-
 
                         <div class="col-md-6">
                             <div class="d-flex gap-2 flex-wrap justify-content-md-end">
@@ -166,9 +190,11 @@
                                         <i class="fas fa-tags me-1" title="Danh mục"></i>Lọc theo danh mục
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item {{ !request('category') ? 'active' : '' }}" href="{{ route('products.index') }}">Tất cả danh mục</a></li>
+                                        <li><a class="dropdown-item {{ !request('category') ? 'active' : '' }}" 
+                                               href="{{ route('products.index', request()->only('q')) }}">Tất cả danh mục</a></li>
                                         @foreach($categories as $category)
-                                        <li><a class="dropdown-item {{ request('category') == $category->id ? 'active' : '' }}" href="{{ route('products.index', ['category' => $category->id]) }}">{{ $category->name }}</a></li>
+                                        <li><a class="dropdown-item {{ request('category') == $category->id ? 'active' : '' }}" 
+                                               href="{{ route('products.index', array_merge(request()->only('q'), ['category' => $category->id])) }}">{{ $category->name }}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -177,9 +203,14 @@
                                         <i class="fas fa-sort me-1" title="Sắp xếp"></i>Sắp xếp
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Giá thấp đến cao</a></li>
-                                        <li><a class="dropdown-item" href="#">Giá cao đến thấp</a></li>
-                                        <li><a class="dropdown-item" href="#">Mới nhất</a></li>
+                                        <li><a class="dropdown-item {{ request('sort') == 'newest' ? 'active' : '' }}" 
+                                               href="{{ route('products.index', array_merge(request()->only(['q', 'category']), ['sort' => 'newest'])) }}">Mới nhất</a></li>
+                                        <li><a class="dropdown-item {{ request('sort') == 'price_asc' ? 'active' : '' }}" 
+                                               href="{{ route('products.index', array_merge(request()->only(['q', 'category']), ['sort' => 'price_asc'])) }}">Giá thấp đến cao</a></li>
+                                        <li><a class="dropdown-item {{ request('sort') == 'price_desc' ? 'active' : '' }}" 
+                                               href="{{ route('products.index', array_merge(request()->only(['q', 'category']), ['sort' => 'price_desc'])) }}">Giá cao đến thấp</a></li>
+                                        <li><a class="dropdown-item {{ request('sort') == 'name' ? 'active' : '' }}" 
+                                               href="{{ route('products.index', array_merge(request()->only(['q', 'category']), ['sort' => 'name'])) }}">Tên A-Z</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -266,9 +297,23 @@
             @empty
             <div class="col-12 text-center py-5">
                 <div class="text-muted">
-                    <i class="fas fa-box-open fa-3x mb-3"></i>
-                    <h4>Không có sản phẩm nào</h4>
-                    <p>Vui lòng quay lại sau hoặc liên hệ với chúng tôi</p>
+                    @if(request('q'))
+                        <i class="fas fa-search fa-3x mb-3 text-primary"></i>
+                        <h4>Không tìm thấy sản phẩm nào</h4>
+                        <p>Không có sản phẩm nào phù hợp với từ khóa "<strong>{{ request('q') }}</strong>"</p>
+                        <div class="mt-4">
+                            <a href="{{ route('products.index') }}" class="btn btn-primary me-2">
+                                <i class="fas fa-list me-1"></i>Xem tất cả sản phẩm
+                            </a>
+                            <button class="btn btn-outline-primary" onclick="document.querySelector('.search-input').focus()">
+                                <i class="fas fa-search me-1"></i>Tìm kiếm lại
+                            </button>
+                        </div>
+                    @else
+                        <i class="fas fa-box-open fa-3x mb-3"></i>
+                        <h4>Không có sản phẩm nào</h4>
+                        <p>Vui lòng quay lại sau hoặc liên hệ với chúng tôi</p>
+                    @endif
                 </div>
             </div>
             @endforelse
@@ -379,6 +424,48 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     } catch (e) {
         // bỏ qua lỗi nếu DOM chưa sẵn
+    }
+    
+    // Cải thiện trải nghiệm tìm kiếm
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        // Highlight từ khóa tìm kiếm trong kết quả
+        const searchTerm = '{{ request("q") }}';
+        if (searchTerm) {
+            highlightSearchTerm(searchTerm);
+        }
+        
+        // Auto-focus vào ô tìm kiếm nếu có từ khóa
+        if (searchTerm && window.location.pathname.includes('/products')) {
+            searchInput.focus();
+            searchInput.select();
+        }
+    }
+    
+    // Highlight từ khóa tìm kiếm trong tên sản phẩm
+    function highlightSearchTerm(term) {
+        if (!term) return;
+        
+        const productTitles = document.querySelectorAll('.card-title');
+        productTitles.forEach(title => {
+            const originalText = title.textContent;
+            const regex = new RegExp(`(${term})`, 'gi');
+            const highlightedText = originalText.replace(regex, '<mark class="bg-warning text-dark">$1</mark>');
+            title.innerHTML = highlightedText;
+        });
+    }
+    
+    // Smooth scroll to products when searching
+    if (window.location.search.includes('q=')) {
+        setTimeout(() => {
+            const productsSection = document.querySelector('.row.g-4');
+            if (productsSection) {
+                productsSection.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }, 100);
     }
 });
 </script>

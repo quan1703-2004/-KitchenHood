@@ -512,9 +512,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Xóa card khỏi DOM
                         productCard.remove();
                         
-                        // Cập nhật số liệu thống kê
-                        updateStats();
-                        
                         // Hiển thị thông báo
                         showNotification(data.message, 'success');
                         
@@ -533,16 +530,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Cập nhật thống kê
-    function updateStats() {
-        const totalProducts = document.querySelectorAll('.product-card').length;
-        const inStockProducts = document.querySelectorAll('.product-card').length; // Simplified for now
-        
-        document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = totalProducts;
-        document.querySelector('.stat-item:nth-child(2) .stat-number').textContent = inStockProducts;
-        document.querySelector('.stat-item:nth-child(3) .stat-number').textContent = 0;
-    }
     
     // Hiển thị thông báo
     function showNotification(message, type) {

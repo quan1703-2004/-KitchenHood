@@ -15,12 +15,46 @@ class ProductController extends Controller
     {
         $query = Product::with(['category', 'reviews']);
         
+        // Tìm kiếm theo từ khóa
+        if ($request->has('q') && $request->q) {
+            $searchTerm = $request->q;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('category', function($categoryQuery) use ($searchTerm) {
+                      $categoryQuery->where('name', 'LIKE', "%{$searchTerm}%");
+                  });
+            });
+        }
+        
         // Lọc theo danh mục nếu có
         if ($request->has('category') && $request->category) {
             $query->where('category_id', $request->category);
         }
         
-        $products = $query->paginate(12);
+        // Sắp xếp theo yêu cầu
+        $sortBy = $request->get('sort', 'created_at');
+        $sortOrder = $request->get('order', 'desc');
+        
+        switch ($sortBy) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'name':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+        
+        $products = $query->paginate(12)->appends($request->query());
         $categories = \App\Models\Category::all();
         
         return view('customer.products.index', compact('products', 'categories'));

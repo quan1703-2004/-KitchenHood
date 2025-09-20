@@ -398,6 +398,7 @@
                     <th>Người Đánh Giá</th>
                     <th class="text-center">Đánh Giá</th>
                     <th>Bình Luận</th>
+                    <th class="text-center">Hình Ảnh</th>
                     <th>Ngày Đăng</th>
                     <th class="text-center">Hành Động</th>
                 </tr>
@@ -460,6 +461,23 @@
                             @endif
                         </div>
                     </td>
+                    <td class="text-center">
+                        @if($review->images && count($review->images) > 0)
+                            <div class="review-images-preview">
+                                @foreach(array_slice($review->images, 0, 3) as $image)
+                                    <img src="{{ asset('storage/' . $image) }}" 
+                                         alt="Hình ảnh đánh giá" 
+                                         class="img-thumbnail me-1" 
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                @endforeach
+                                @if(count($review->images) > 3)
+                                    <span class="badge bg-secondary">+{{ count($review->images) - 3 }}</span>
+                                @endif
+                            </div>
+                        @else
+                            <span class="text-muted">Không có</span>
+                        @endif
+                    </td>
                     <td>
                         <div>
                             <span class="fw-bold">{{ $review->created_at->format('d/m/Y') }}</span>
@@ -468,17 +486,25 @@
                         </div>
                     </td>
                     <td class="text-center">
-                        <button type="button" 
-                                class="btn btn-sm btn-outline-danger action-btn" 
-                                title="Xóa đánh giá"
-                                onclick="deleteReview({{ $review->id }})">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <a href="{{ route('products.show', $review->product->id) }}" 
+                               class="btn btn-sm btn-outline-primary action-btn" 
+                               title="Xem sản phẩm"
+                               target="_blank">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger action-btn" 
+                                    title="Xóa đánh giá"
+                                    onclick="deleteReview({{ $review->id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center">
+                    <td colspan="7" class="text-center">
                         <div class="empty-state">
                             <i class="fas fa-star"></i>
                             <p>Chưa có đánh giá nào</p>

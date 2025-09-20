@@ -108,8 +108,8 @@
                                 <th>Người dùng</th>
                                 <th>Email</th>
                                 <th>Số điện thoại</th>
-                                <th>Trạng thái</th>
-                                <th>Quyền hạn</th>
+                                <th style="width: 170px;">Trạng thái</th>
+                                <th style="width: 150px;">Quyền hạn</th>
                                 <th>Ngày tạo</th>
                                 <th>Hành động</th>
                             </tr>
@@ -468,7 +468,7 @@
 
 .users-table tbody td {
     border: none;
-    padding: 1.5rem;
+    padding: 1rem;
     vertical-align: middle;
     border-bottom: 1px solid var(--border-color);
 }

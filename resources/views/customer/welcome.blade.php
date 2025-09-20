@@ -316,44 +316,149 @@
     </div>
 </section>
 
-<!-- Stats Section -->
-<section class="py-5">
+<!-- Câu chuyện thành công / Testimonials -->
+<section class="py-5 bg-white">
     <div class="container">
-        <div class="row g-4">
-            <div class="col-md-3 col-6">
-                <div class="stats-card text-center p-4 bg-white rounded-3 shadow-sm h-100 border-0">
-                    <div class="feature-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
-                        <i class="fas fa-users fa-2x"></i>
+        <!-- Logo thương hiệu: chạy từ phải sang trái lặp vô hạn -->
+        @php
+            // Logo demo: dùng hình chữ với nền xám để hiển thị ngay, có thể thay bằng file thật trong public/images/brands
+            $brandLogos = [
+                ['name' => 'Bosch', 'logo' => 'https://assets.bosch.com/media/global/bosch_group/our_figures/brands/bosch-brand-bosch_res_1280x720.webp'],
+                ['name' => 'Teka', 'logo' => 'https://teka-vietnam.com/images/news/3314.jpg'],
+                ['name' => 'Siemens', 'logo' => 'https://vimf.vn/wp-content/uploads/2024/04/siemn.png'],
+                ['name' => 'Electrolux', 'logo' => 'https://kinghome.vn/data/handbook/full_images/thuong-hieu-electrolux-1.jpg'],
+                ['name' => 'Miele', 'logo' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKKEQjYZlOrUda8ufN6B3NuEM_Jm_S2n5_mVl8MNzsp97_SzwaA8CIP1BmfuLCEKF13Ek&usqp=CAU'],
+                ['name' => 'Hafele', 'logo' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkGNoflnIJqKAPAHaO2c3_sd2iRlywscuvPA&s'],
+                ['name' => 'Malloca', 'logo' => 'https://bizweb.dktcdn.net/thumb/grande/100/442/590/collections/thiet-bi-nha-bep-malloca-chinh-hang.jpg?v=1712720683203'],
+                ['name' => 'Sunhouse', 'logo' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpgEv6auPDEVsqCqKbndit7bHrWWStZpiKWA&s'],
+                ['name' => 'Canzy', 'logo' => 'https://bizweb.dktcdn.net/100/357/739/themes/723787/assets/logo.png?1756357471314'],
+                ['name' => 'Chefs', 'logo' => 'https://noithatphuongdong.vn/images/logo-chefs.jpg'],
+            ];
+            // Nhân đôi mảng để tạo hiệu ứng chạy vô hạn mượt mà
+            $brandTrack = array_merge($brandLogos, $brandLogos);
+        @endphp
+
+        <div class="brand-marquee">
+            <div class="brand-track">
+                @foreach($brandTrack as $b)
+                <div class="brand-item">
+                    <img src="{{ $b['logo'] }}" alt="{{ $b['name'] }}" class="brand-logo">
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Style cho testimonial: tập trung vào sự sạch sẽ, không dùng màu tím */
+        .testimonial-card { border-radius: 18px; transition: transform .35s ease, opacity .35s ease, box-shadow .35s ease; }
+        .tst-main{ transform: scale(1); opacity: 1; }
+        .tst-side{ transform: scale(.92); opacity: .6; }
+        .tst-side:hover{ opacity: .8; }
+        .indicator-dot{
+            width: 8px; height: 8px; border-radius: 999px; border: 0; background:#cbd5e1; transition: all .2s ease;
+        }
+        .indicator-dot.active, .indicator-dot:hover{ background:#0ea5e9; width: 32px; }
+        /* Marquee logo thương hiệu */
+        .brand-marquee{ position: relative; overflow: hidden; background: #ffffff;}
+        .brand-track{ display: flex; align-items: center; width: max-content; gap: 40px; animation: brand-scroll 25s linear infinite; }
+        .brand-item{ display: inline-flex; align-items: center; justify-content: center; padding: 8px 0; }
+        .brand-logo{ height: 60px; width: auto;; opacity: .8; transition: filter .2s, opacity .2s, transform .2s; }
+        .brand-item:hover .brand-logo{ filter: grayscale(0); opacity: 1; transform: scale(1.03); }
+        @keyframes brand-scroll{
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+</section>
+
+<!-- JS: cho phép bấm vào thẻ bên để chuyển slide mượt -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var carouselEl = document.querySelector('#testimonialCarousel');
+    if (!carouselEl) return;
+    var carousel = new bootstrap.Carousel(carouselEl, { interval: 6000, ride: false });
+
+    // Ủy quyền sự kiện click: khi bấm vào thẻ bên trái/phải sẽ trượt tương ứng
+    carouselEl.addEventListener('click', function(e){
+        var btnPrev = e.target.closest('.js-goto-prev');
+        var btnNext = e.target.closest('.js-goto-next');
+        if (btnPrev){ carousel.prev(); }
+        if (btnNext){ carousel.next(); }
+    });
+});
+</script>
+<!-- Stats Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Phần thống kê bên trái -->
+            <div class="col-lg-6">
+                <div class="stats-section">
+                    <!-- Tiêu đề chính -->
+                    <h2 class="stats-title mb-3">
+                        Máy Hút Mùi và hành trình 15 năm khai phá những con số ấn tượng
+                    </h2>
+                    
+                    <!-- Đường trang trí -->
+                    <div class="stats-decoration mb-4">
+                        <svg width="60" height="8" viewBox="0 0 60 8" fill="none">
+                            <path d="M2 4C2 4 8 1 15 4C22 7 28 1 35 4C42 7 48 1 55 4C58 5.5 58 2.5 58 4" stroke="#333" stroke-width="2" fill="none"/>
+                        </svg>
                     </div>
-                    <h3 class="fw-bold text-primary">15,000+</h3>
-                    <p class="text-muted mb-0">Khách hàng hài lòng</p>
+                    
+                    <!-- Các ô thống kê -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="stats-box">
+                                <div class="stats-number">
+                                    <span class="number">15,000+</span>
+                                    <div class="stats-line" style="background: #007bff;"></div>
+                                </div>
+                                <p class="stats-description">khách hàng hài lòng</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-box">
+                                <div class="stats-number">
+                                    <span class="number">500+</span>
+                                    <div class="stats-line" style="background: #28a745;"></div>
+                                </div>
+                                <p class="stats-description">sản phẩm chất lượng cao</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-box">
+                                <div class="stats-number">
+                                    <span class="number">5</span>
+                                    <div class="stats-line" style="background: #007bff;"></div>
+                                </div>
+                                <p class="stats-description">năm bảo hành chính hãng</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-box">
+                                <div class="stats-number">
+                                    <span class="number">24/7</span>
+                                    <div class="stats-line" style="background: #28a745;"></div>
+                                </div>
+                                <p class="stats-description">hỗ trợ kỹ thuật</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3 col-6">
-                <div class="stats-card text-center p-4 bg-white rounded-3 shadow-sm h-100 border-0">
-                    <div class="feature-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
-                        <i class="fas fa-box fa-2x"></i>
+            
+            <!-- Bản đồ Việt Nam bên phải -->
+            <div class="col-lg-6">
+                <div class="vietnam-map-container">
+                    <!-- Placeholder cho ảnh bản đồ Việt Nam -->
+                    <div class="map-image-placeholder">
+                        <img src="{{ asset('images/map.jpg') }}" 
+                             alt="Bản đồ Việt Nam - Phân phối máy hút mùi" 
+                             class="vietnam-map-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     </div>
-                    <h3 class="fw-bold text-success">{{ $latestProducts->count() ?? 0 }}+</h3>
-                    <p class="text-muted mb-0">Sản phẩm chất lượng</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stats-card text-center p-4 bg-white rounded-3 shadow-sm h-100 border-0">
-                    <div class="feature-icon bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
-                        <i class="fas fa-award fa-2x"></i>
-                    </div>
-                    <h3 class="fw-bold text-warning">5</h3>
-                    <p class="text-muted mb-0">Năm bảo hành</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stats-card text-center p-4 bg-white rounded-3 shadow-sm h-100 border-0">
-                    <div class="feature-icon bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
-                        <i class="fas fa-star fa-2x"></i>
-                    </div>
-                    <h3 class="fw-bold text-info">4.9/5</h3>
-                    <p class="text-muted mb-0">Đánh giá trung bình</p>
                 </div>
             </div>
         </div>
@@ -361,42 +466,68 @@
 </section>
 
 <!-- FAQ Section -->
+
+<!-- FAQ Section (đưa về layout giống mockup) -->
 @if(isset($faqs) && count($faqs) > 0)
-<section class="py-5 bg-white">
+<section class="py-5 bg-light">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="sec-heading text-center mb-4">
-                    <h2>Câu hỏi thường gặp</h2>
-                    <p>Những thắc mắc phổ biến nhất của khách hàng về sản phẩm và dịch vụ của chúng tôi.</p>
+        <!-- Header nhỏ gọn theo mockup -->
+        <div class="text-center mb-4">
+            <span class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill fw-semibold" style="background:#e8f5e9;color:#2e7d32;">
+                <i class="fas fa-slash"></i>
+                FAQ
+            </span>
+            <h2 class="mt-3 mb-2 fw-bold text-dark">Frequently Asked <span class="text-primary">questions</span></h2>
+            <p class="text-muted mb-0">Duyệt nhanh các câu hỏi thường gặp để tìm câu trả lời bạn cần.</p>
+        </div>
+
+        <div class="row align-items-center g-4">
+            <!-- Bên trái: hình minh hoạ -->
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="text-center pe-lg-4">
+                    <img src="{{ asset('images/FAQ.jpg') }}" alt="FAQ Illustration" class="img-fluid" style="max-height:420px; object-fit:contain;">
                 </div>
             </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="accordion" id="faqAccordion">
-                    @foreach($faqs as $index => $faq)
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading{{ $index }}">
-                            <button class="accordion-button @if($index > 0) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $index }}" aria-expanded="{{ $index == 0 ? 'true' : 'false' }}" aria-controls="collapse{{ $index }}">
-                                {{ $faq->question }}
-                            </button>
-                        </h2>
-                        <div id="collapse{{ $index }}" class="accordion-collapse collapse @if($index == 0) show @endif" aria-labelledby="heading{{ $index }}" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">
-                                {!! $faq->answer !!}
+
+            <!-- Bên phải: Accordion -->
+            <div class="col-lg-7">
+                <div class="bg-white rounded-4 shadow-sm p-2 p-sm-3 p-md-4">
+                    <div class="accordion accordion-flush" id="faqAccordion">
+                        @foreach($faqs as $index => $faq)
+                        <div class="accordion-item border-0">
+                            <h2 class="accordion-header" id="heading{{ $index }}">
+                                <button class="accordion-button rounded-3 px-3 py-3 @if($index > 0) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $index }}" aria-expanded="{{ $index == 0 ? 'true' : 'false' }}" aria-controls="collapse{{ $index }}">
+                                    {{ $faq->question }}
+                                </button>
+                            </h2>
+                            <div id="collapse{{ $index }}" class="accordion-collapse collapse @if($index == 0) show @endif" aria-labelledby="heading{{ $index }}" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    {!! $faq->answer !!}
+                                </div>
                             </div>
                         </div>
+                        @endforeach
                     </div>
-                    @endforeach
                 </div>
             </div>
         </div>
     </div>
+
     <style>
-        /* Làm đẹp phần FAQ */
-        .accordion-button { font-weight: 600; }
-        .accordion-button:not(.collapsed) { color: #1e40af; background-color: #eef2ff; }
+        /* Style nhấn mạnh giống mockup nhưng tránh màu tím */
+        #faqAccordion .accordion-button {
+            background-color: #ffffff;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        #faqAccordion .accordion-button:not(.collapsed) {
+            color: #1565c0; /* xanh dương đậm, không dùng tím */
+            background-color: #e3f2fd; /* nền xanh nhạt */
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,.05);
+        }
+        #faqAccordion .accordion-item + .accordion-item {
+            border-top: 1px solid #f1f5f9;
+        }
     </style>
 </section>
 @endif
@@ -497,6 +628,138 @@
         text-rendering: auto !important;
         -webkit-font-smoothing: antialiased !important;
         -moz-osx-font-smoothing: grayscale !important;
+    }
+    
+    /* Stats Section Styles */
+    .stats-section {
+        padding: 2rem 0;
+    }
+    
+    .stats-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #000;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-decoration {
+        margin-bottom: 2rem;
+    }
+    
+    .stats-box {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .stats-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .stats-number {
+        position: relative;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-number .number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #000;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-line {
+        position: absolute;
+        left: -1.5rem;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        border-radius: 2px;
+    }
+    
+    .stats-description {
+        font-size: 0.9rem;
+        color: #666;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    /* Vietnam Map Styles */
+    .vietnam-map-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+    
+    .map-image-placeholder {
+        width: 100%;
+        max-width: 400px;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 2px dashed #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .map-image-placeholder:hover {
+        border-color: #007bff;
+        background: #f0f8ff;
+    }
+    
+    .vietnam-map-image {
+        height: 162%;
+    }
+    
+    .map-fallback {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .map-placeholder-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .stats-title {
+            font-size: 1.8rem;
+        }
+        
+        .stats-number .number {
+            font-size: 2rem;
+        }
+        
+        .stats-box {
+            padding: 1rem;
+        }
+        
+        .vietnam-map-container {
+            padding: 1rem;
+        }
+        
+        .map-image-placeholder {
+            height: 250px;
+        }
+        
+        .map-fallback {
+            padding: 1rem;
+        }
     }
 </style>
 

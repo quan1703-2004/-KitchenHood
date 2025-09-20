@@ -225,6 +225,7 @@ Route::get('/manual-verify/{email}', function($email) {
 
 // Routes cho customer (công khai - không cần đăng nhập)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/search', [ProductController::class, 'index'])->name('products.search');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 // Route để lấy CSRF token
@@ -285,8 +286,17 @@ Route::get('/checkout/success/{order}', [App\Http\Controllers\CheckoutController
 
 // Payment routes
 Route::get('/payment/momo/{order}', [App\Http\Controllers\PaymentController::class, 'momo'])->name('payment.momo');
-Route::post('/payment/confirm-momo/{order}', [App\Http\Controllers\PaymentController::class, 'confirmMomo'])->name('payment.confirm-momo');
-Route::post('/payment/cancel/{order}', [App\Http\Controllers\PaymentController::class, 'cancel'])->name('payment.cancel');
+Route::post('/payment/momo/{order}/process', [App\Http\Controllers\PaymentController::class, 'redirectToMoMo'])->name('payment.momo.process');
+Route::get('/payment/momo/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.momo.callback');
+Route::post('/payment/momo/ipn', [App\Http\Controllers\PaymentController::class, 'ipn'])->name('payment.momo.ipn');
+Route::post('/payment/momo/{order}/pay-again', [App\Http\Controllers\PaymentController::class, 'payAgain'])->name('payment.momo.pay-again');
+Route::post('/payment/momo/{order}/cancel-order', [App\Http\Controllers\PaymentController::class, 'cancelOrder'])->name('payment.momo.cancel-order');
+
+// Routes cho trang thanh toán thành công và thất bại
+Route::get('/payment/success/{order}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+Route::get('/payment/failed/{order}', [App\Http\Controllers\PaymentController::class, 'failed'])->name('payment.failed');
+Route::post('/payment/switch-to-cod/{order}', [App\Http\Controllers\PaymentController::class, 'switchToCod'])->name('payment.switch-to-cod');
+Route::post('/payment/cancel-order/{order}', [App\Http\Controllers\PaymentController::class, 'cancelOrder'])->name('payment.cancel-order');
 
 // Routes cho admin (cần đăng nhập và quyền admin)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -364,12 +374,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
 });
 
-// Routes cho favorites
-Route::get('/favorites', [App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index')->middleware('auth');
+// Routes cho favorites - sắp xếp từ cụ thể đến chung
 Route::post('/favorites/{product}', [App\Http\Controllers\FavoriteController::class, 'store'])->name('favorites.store')->middleware('auth');
 Route::delete('/favorites/{product}', [App\Http\Controllers\FavoriteController::class, 'destroy'])->name('favorites.destroy')->middleware('auth');
 Route::post('/favorites/{product}/toggle', [App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorites.toggle')->middleware('auth');
 Route::get('/favorites/{product}/check', [App\Http\Controllers\FavoriteController::class, 'check'])->name('favorites.check')->middleware('auth');
+Route::get('/favorites', [App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index')->middleware('auth');
 
 // Test route để kiểm tra
 Route::get('/test-favorites', function() {

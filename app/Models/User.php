@@ -24,6 +24,7 @@ implements MustVerifyEmail
         'email',
         'password',
         'role',
+        'email_verified_at',
         'avatar',
         'phone',
         'birth_date',

@@ -71,8 +71,8 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->boolean('is_admin') ? 'admin' : 'user',
-            'email_verified_at' => $request->boolean('is_admin') ? now() : null,
+            'role' => $request->boolean('is_admin') ? 'admin' : 'customer',
+            'email_verified_at' => now(), // Admin tạo người dùng thì tự động verify email
         ]);
 
         return redirect()->route('admin.users.index')
@@ -123,7 +123,7 @@ class UserController extends Controller
         $updateData = [
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->boolean('is_admin') ? 'admin' : 'user',
+            'role' => $request->boolean('is_admin') ? 'admin' : 'customer',
             'phone' => $request->phone,
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,

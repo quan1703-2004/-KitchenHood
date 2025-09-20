@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log('Sending request to:', url, 'Method:', method);
             
+            // Kiểm tra URL trước khi gửi request
+            if (!url || url.includes('/favorites/') === false) {
+                console.error('Invalid URL:', url);
+                throw new Error('URL không hợp lệ');
+            }
+            
             fetch(url, {
                 method: method,
                 headers: {

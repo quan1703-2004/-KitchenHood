@@ -27,6 +27,9 @@
                         <button class="btn btn-outline-warning" data-filter="pending">
                             <i class="fas fa-clock me-1"></i>Chờ xử lý
                         </button>
+                        <button class="btn btn-outline-orange" data-filter="waiting_payment" style="border-color: #ff6b35; color: #ff6b35;">
+                            <i class="fas fa-credit-card me-1"></i>Chờ thanh toán
+                        </button>
                         <button class="btn btn-outline-info" data-filter="processing">
                             <i class="fas fa-cog me-1"></i>Đang xử lý
                         </button>
@@ -64,6 +67,11 @@
                                             @case('pending')
                                                 <span class="badge bg-warning text-dark px-3 py-2">
                                                     <i class="fas fa-clock me-1"></i>Chờ xử lý
+                                                </span>
+                                                @break
+                                            @case('waiting_payment')
+                                                <span class="badge bg-orange text-white px-3 py-2" style="background-color: #ff6b35 !important;">
+                                                    <i class="fas fa-credit-card me-1"></i>Chờ thanh toán
                                                 </span>
                                                 @break
                                             @case('processing')
@@ -106,9 +114,12 @@
                                 </div>
                             </div>
                             <div class="col-md-3 text-md-end">
-                                <button class="btn btn-outline-primary btn-sm" type="button" 
-                                        data-bs-toggle="collapse" data-bs-target="#orderDetails{{ $order->id }}">
+                                <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline-primary btn-sm me-2">
                                     <i class="fas fa-eye me-1"></i>Xem chi tiết
+                                </a>
+                                <button class="btn btn-outline-secondary btn-sm" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#orderDetails{{ $order->id }}">
+                                    <i class="fas fa-list me-1"></i>Tóm tắt
                                 </button>
                             </div>
                         </div>
@@ -196,6 +207,43 @@
                                 </div>
                             </div>
 
+                            <!-- Review Status -->
+                            @if($order->status === 'delivered')
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h6 class="fw-bold mb-3">
+                                        <i class="fas fa-star me-2"></i>Trạng thái đánh giá
+                                    </h6>
+                                    <div class="review-status">
+                                        @php
+                                            $totalProducts = $order->items->count();
+                                            $reviewedProducts = 0;
+                                            foreach($order->items as $item) {
+                                                if($item->product && $item->product->reviews()->where('user_id', auth()->id())->exists()) {
+                                                    $reviewedProducts++;
+                                                }
+                                            }
+                                        @endphp
+                                        
+                                        @if($reviewedProducts === $totalProducts)
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                <strong>Đã đánh giá tất cả sản phẩm</strong>
+                                                <p class="mb-0 mt-1">Bạn đã hoàn thành đánh giá cho {{ $reviewedProducts }}/{{ $totalProducts }} sản phẩm trong đơn hàng này.</p>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                <strong>Chưa đánh giá sản phẩm</strong>
+                                                <p class="mb-0 mt-1">Bạn đã đánh giá {{ $reviewedProducts }}/{{ $totalProducts }} sản phẩm. 
+                                                <a href="{{ route('orders.show', $order->id) }}" class="text-decoration-none">Đánh giá ngay</a></p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                             <!-- Order Timeline -->
                             <div class="row mt-4">
                                 <div class="col-12">
@@ -265,15 +313,36 @@
                             </div>
 
                             <!-- Order Actions -->
-                            @if($order->status == 'pending')
+                            @if(in_array($order->status, ['pending', 'waiting_payment']))
                             <div class="row mt-4">
                                 <div class="col-12 text-center">
-                                    <button class="btn btn-danger me-2" onclick="cancelOrder({{ $order->id }})">
-                                        <i class="fas fa-times me-1"></i>Hủy đơn hàng
-                                    </button>
-                                    <a href="{{ route('checkout.index') }}" class="btn btn-primary">
-                                        <i class="fas fa-edit me-1"></i>Chỉnh sửa đơn hàng
-                                    </a>
+                                    @if($order->status == 'waiting_payment' && $order->payment_method == 'momo')
+                                        <!-- Nút thanh toán lại cho MoMo -->
+                                        <form action="{{ route('payment.momo.pay-again', $order->id) }}" method="POST" class="d-inline me-2">
+                                            @csrf
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-mobile-alt me-1"></i>Thanh toán lại MoMo
+                                            </button>
+                                        </form>
+                                        
+                                        <!-- Nút hủy đơn hàng -->
+                                        <form action="{{ route('payment.momo.cancel-order', $order->id) }}" method="POST" 
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này? Giỏ hàng sẽ được khôi phục.')" 
+                                              class="d-inline me-2">
+                                            @csrf
+                                            <button type="submit" class="btn btn-outline-danger">
+                                                <i class="fas fa-times me-1"></i>Hủy đơn hàng
+                                            </button>
+                                        </form>
+                                    @elseif($order->status == 'pending')
+                                        <!-- Nút hủy đơn hàng cho các phương thức khác -->
+                                        <button class="btn btn-danger me-2" onclick="cancelOrder({{ $order->id }})">
+                                            <i class="fas fa-times me-1"></i>Hủy đơn hàng
+                                        </button>
+                                        <a href="{{ route('checkout.index') }}" class="btn btn-primary">
+                                            <i class="fas fa-edit me-1"></i>Chỉnh sửa đơn hàng
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                             @endif

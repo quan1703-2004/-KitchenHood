@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
     <!-- Favorite Button CSS -->
     <link href="{{ asset('css/favorite-button.css') }}" rel="stylesheet">
+    <!-- Review Styles CSS -->
+    <link href="{{ asset('css/review-styles.css') }}" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3498db;
@@ -56,6 +58,10 @@
         .navbar.smart-sticky.navbar-scrolled {
             box-shadow: 0 6px 20px rgba(44, 62, 80, 0.08);
             background-color: var(--white) !important;
+        }
+        
+        .navbar.smart-sticky.search-active {
+            transform: translateY(0) !important;
         }
         
         .navbar-brand {
@@ -758,6 +764,155 @@
             color: var(--accent-color);
             transform: translateX(5px);
         }
+        
+        /* Search bar styling */
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .search-toggle-btn:hover {
+            background: var(--light-blue);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .search-form {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%) scaleX(0);
+            transform-origin: right center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            min-width: 250px;
+        }
+        
+        .search-form.active {
+            transform: translateY(-50%) scaleX(1);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .search-input {
+            border-radius: 25px 0 0 25px;
+            border: 2px solid var(--border-color);
+            padding: 8px 16px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: var(--white);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            background: var(--white);
+        }
+        
+        .search-input::placeholder {
+            color: #adb5bd;
+            font-style: italic;
+        }
+        
+        .search-btn {
+            border-radius: 0 25px 25px 0;
+            border: 2px solid var(--primary-color);
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: var(--white);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .search-btn:focus {
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        /* Overlay để đóng search khi click bên ngoài */
+        .search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            z-index: 999;
+            display: none;
+        }
+        
+        .search-overlay.active {
+            display: block;
+        }
+        
+        /* Responsive search bar */
+        @media (max-width: 768px) {
+            .search-form {
+                min-width: 250px;
+            }
+            
+            .search-input {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+            
+            .search-btn {
+                padding: 6px 12px;
+            }
+            
+            .search-toggle-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .search-form {
+                min-width: 200px;
+            }
+            
+            .search-input {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+            
+            .search-btn {
+                padding: 5px 10px;
+            }
+            
+            .search-toggle-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -798,10 +953,24 @@
                 </ul>
                 
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="#">
-                            <i class="fas fa-search"></i>
-                        </a>
+                    <!-- Thanh tìm kiếm -->
+                    <li class="nav-item me-3">
+                        <div class="search-container">
+                            <button class="search-toggle-btn" type="button" onclick="toggleSearch()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <form class="search-form" action="{{ route('products.search') }}" method="GET">
+                                <div class="input-group">
+                                    <input type="text" name="q" class="form-control search-input" 
+                                           placeholder="Tìm kiếm sản phẩm..." 
+                                           value="{{ request('q') }}"
+                                           autocomplete="off">
+                                    <button class="btn btn-outline-primary search-btn" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{{ route('cart.index') }}">
@@ -882,6 +1051,9 @@
             </div>
         </div>
     </nav>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay" onclick="closeSearch()"></div>
 
     <!-- Main Content -->
     <main class="flex-grow-1">
@@ -1179,6 +1351,88 @@
 
         // Update chat count every 30 seconds
         setInterval(updateChatUnreadCount, 30000);
+    </script>
+    
+    <!-- Search functionality -->
+    <script>
+        let searchOpen = false;
+        
+        function toggleSearch() {
+            const searchForm = document.querySelector('.search-form');
+            const searchOverlay = document.getElementById('searchOverlay');
+            const searchInput = document.querySelector('.search-input');
+            
+            if (!searchOpen) {
+                // Mở search
+                searchForm.classList.add('active');
+                searchOverlay.classList.add('active');
+                searchOpen = true;
+                
+                // Focus vào input sau khi animation hoàn thành
+                setTimeout(() => {
+                    searchInput.focus();
+                    if (searchInput.value) {
+                        searchInput.select();
+                    }
+                }, 300);
+                
+                // Thêm class để navbar không bị ẩn khi cuộn
+                document.querySelector('.navbar').classList.add('search-active');
+            } else {
+                closeSearch();
+            }
+        }
+        
+        function closeSearch() {
+            const searchForm = document.querySelector('.search-form');
+            const searchOverlay = document.getElementById('searchOverlay');
+            const searchInput = document.querySelector('.search-input');
+            
+            // Đóng search
+            searchForm.classList.remove('active');
+            searchOverlay.classList.remove('active');
+            searchOpen = false;
+            
+            // Xóa class navbar
+            document.querySelector('.navbar').classList.remove('search-active');
+            
+            // Blur input
+            searchInput.blur();
+        }
+        
+        // Đóng search khi nhấn Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && searchOpen) {
+                closeSearch();
+            }
+        });
+        
+        // Mở search khi có từ khóa trong URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('q');
+            
+            if (searchQuery) {
+                // Delay một chút để đảm bảo DOM đã load xong
+                setTimeout(() => {
+                    toggleSearch();
+                }, 500);
+            }
+        });
+        
+        // Smooth scroll khi submit search
+        document.querySelector('.search-form').addEventListener('submit', function(e) {
+            // Chỉ scroll nếu không phải trang products
+            if (!window.location.pathname.includes('/products')) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const searchQuery = formData.get('q');
+                
+                if (searchQuery.trim()) {
+                    window.location.href = `{{ route('products.search') }}?q=${encodeURIComponent(searchQuery)}`;
+                }
+            }
+        });
     </script>
     
     <!-- Pusher & Echo -->

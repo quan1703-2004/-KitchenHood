@@ -71,7 +71,7 @@
         
         .admin-sidebar .sidebar-header {
             padding: 1.25rem 1.25rem 0.75rem 1.25rem;
-            text-align: left;
+            text-align: center;
             color: var(--text-dark);
             position: relative;
         }
@@ -702,7 +702,7 @@
         .btn-warning:hover { background: #f59e0b; color: #92400e; transform: translateY(-1px); }
         .btn-danger { background: #ef4444; border: none; }
         .btn-danger:hover { background: #dc2626; transform: translateY(-1px); }
-        .btn-success { color: #0f5132; }
+        .btn-success { color: #ffffff; }
 
         /* Badge mở rộng để dùng chung */
         .badge-info { background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%); color: #fff; }

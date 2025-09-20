@@ -10,9 +10,9 @@
                     <i class="fas fa-check fa-3x"></i>
                 </div>
             </div>
-            <h1 class="display-4 fw-bold text-success mb-3">Đặt Hàng Thành Công!</h1>
+            <h1 class="display-4 fw-bold text-success mb-3">Thanh Toán Thành Công!</h1>
             <p class="lead text-muted mb-4">
-                Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.
+                Cảm ơn bạn đã thanh toán. Đơn hàng của bạn đã được xác nhận và sẽ được xử lý trong thời gian sớm nhất.
             </p>
             <div class="alert alert-success d-inline-block">
                 <i class="fas fa-info-circle me-2"></i>
@@ -37,7 +37,7 @@
         <!-- Chi tiết đơn hàng -->
         <div class="col-lg-8">
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-primary text-white py-3">
+                <div class="card-header bg-success text-white py-3">
                     <h5 class="mb-0 fw-bold">
                         <i class="fas fa-receipt me-2"></i>
                         Chi Tiết Đơn Hàng
@@ -48,7 +48,7 @@
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <h6 class="fw-bold text-dark mb-3">
-                                <i class="fas fa-user me-2 text-primary"></i>
+                                <i class="fas fa-user me-2 text-success"></i>
                                 Thông Tin Khách Hàng
                             </h6>
                             <div class="customer-info">
@@ -68,7 +68,7 @@
                         </div>
                         <div class="col-md-6">
                             <h6 class="fw-bold text-dark mb-3">
-                                <i class="fas fa-credit-card me-2 text-primary"></i>
+                                <i class="fas fa-credit-card me-2 text-success"></i>
                                 Thông Tin Thanh Toán
                             </h6>
                             <div class="payment-info">
@@ -77,7 +77,7 @@
                                 </p>
                                 <p class="mb-2">
                                     <strong>Trạng thái:</strong> 
-                                    <span class="badge bg-warning text-dark">{{ $order->status_text }}</span>
+                                    <span class="badge bg-success text-white">{{ $order->status_text }}</span>
                                 </p>
                                 <p class="mb-2">
                                     <strong>Ngày đặt:</strong> {{ $order->created_at->format('d/m/Y H:i') }}
@@ -94,7 +94,7 @@
                     <!-- Danh sách sản phẩm -->
                     <div class="order-products">
                         <h6 class="fw-bold text-dark mb-3">
-                            <i class="fas fa-shopping-bag me-2 text-primary"></i>
+                            <i class="fas fa-shopping-bag me-2 text-success"></i>
                             Sản Phẩm Đã Đặt
                         </h6>
                         @foreach($order->items as $item)
@@ -119,7 +119,7 @@
                                 </p>
                             </div>
                             <div class="product-total">
-                                <span class="fw-bold text-primary fs-5">{{ number_format($item->subtotal) }} VNĐ</span>
+                                <span class="fw-bold text-success fs-5">{{ number_format($item->subtotal) }} VNĐ</span>
                             </div>
                         </div>
                         @endforeach
@@ -132,7 +132,7 @@
                                 <div class="total-breakdown">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span class="text-muted">Tổng tiền sản phẩm:</span>
-                                        <span class="fw-bold">{{ number_format($order->total_amount) }} VNĐ</span>
+                                        <span class="fw-bold">{{ number_format($order->subtotal) }} VNĐ</span>
                                     </div>
                                     
                                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -148,7 +148,7 @@
                                     
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span class="h5 fw-bold text-dark">Tổng cộng:</span>
-                                        <span class="h5 fw-bold text-primary">{{ number_format($order->final_amount) }} VNĐ</span>
+                                        <span class="h5 fw-bold text-success">{{ number_format($order->total_amount) }} VNĐ</span>
                                     </div>
                                 </div>
                             </div>
@@ -196,7 +196,7 @@
                             </h6>
                             <p class="text-muted small mb-0">
                                 Hotline: <strong>1900-xxxx</strong><br>
-                                Email: <strong>support@example.com</strong>
+                                Email: <strong>support@kitchenhood.com</strong>
                             </p>
                         </div>
                         
@@ -286,12 +286,12 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #d82d8b 0%, #e91e63 100%);
     border: none;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    background: linear-gradient(135deg, #c2185b 0%, #d81b60 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }

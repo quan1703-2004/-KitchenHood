@@ -207,23 +207,31 @@ class CheckoutController extends Controller
                 }
             }
             
-            // Xóa chỉ những sản phẩm đã thanh toán khỏi giỏ hàng
-            if (!empty($selectedProductIds)) {
-                CartItem::where('cart_id', $cart->id)
-                       ->whereIn('product_id', $selectedProductIds)
-                       ->delete();
-            } else {
-                // Fallback: xóa tất cả nếu không có selected items
-                CartItem::where('cart_id', $cart->id)->delete();
-            }
-            
             // Xử lý chuyển hướng theo phương thức thanh toán
             if ($request->payment_method === 'cod') {
+                // COD: Xóa giỏ hàng ngay vì đã thanh toán thành công
+                if (!empty($selectedProductIds)) {
+                    CartItem::where('cart_id', $cart->id)
+                           ->whereIn('product_id', $selectedProductIds)
+                           ->delete();
+                } else {
+                    CartItem::where('cart_id', $cart->id)->delete();
+                }
                 return redirect()->route('checkout.success', $order->id)
                                ->with('success', 'Đặt hàng thành công!');
             } elseif ($request->payment_method === 'bank_transfer') {
+                // Bank transfer: Xóa giỏ hàng ngay vì đã có QR code
+                if (!empty($selectedProductIds)) {
+                    CartItem::where('cart_id', $cart->id)
+                           ->whereIn('product_id', $selectedProductIds)
+                           ->delete();
+                } else {
+                    CartItem::where('cart_id', $cart->id)->delete();
+                }
                 return redirect()->route('payment.qr-code', $order->id);
             } elseif ($request->payment_method === 'momo') {
+                // MoMo: Set trạng thái chờ thanh toán và KHÔNG xóa giỏ hàng ngay
+                $order->update(['status' => 'waiting_payment']);
                 return redirect()->route('payment.momo', $order->id);
             }
                            

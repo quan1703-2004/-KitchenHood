@@ -215,8 +215,8 @@
                     <div class="card">
                         <div class="card-body">
                             <div id="specs-container">
-                                @if($product->detail && $product->detail->specs)
-                                    @foreach($product->detail->specs as $index => $spec)
+                                @if($product->features && count($product->features) > 0)
+                                    @foreach($product->features as $index => $spec)
                                     <div class="spec-item row mb-3">
                                         <div class="col-md-5">
                                             <input type="text" 
@@ -308,7 +308,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let specIndex = {{ $product->detail && $product->detail->specs ? count($product->detail->specs) : 1 }};
+    let specIndex = {{ $product->features && count($product->features) > 0 ? count($product->features) : 1 }};
     
     // Thêm thông số mới
     document.getElementById('add-spec').addEventListener('click', function() {

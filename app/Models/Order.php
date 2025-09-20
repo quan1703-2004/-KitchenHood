@@ -70,6 +70,7 @@ class Order extends Model
     {
         $statuses = [
             'pending' => 'Chờ xử lý',
+            'waiting_payment' => 'Chờ thanh toán',
             'processing' => 'Đang xử lý',
             'shipped' => 'Đang giao hàng',
             'delivered' => 'Đã giao hàng',

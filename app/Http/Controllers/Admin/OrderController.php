@@ -35,20 +35,29 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $newStatus = $request->status;
 
-        // Nếu chuyển từ pending sang processing và thanh toán thành công
-        if ($oldStatus === 'pending' && $newStatus === 'processing' && $order->payment_status === 'paid') {
-            // Trừ tồn kho cho tất cả sản phẩm trong đơn hàng
-            foreach ($order->items as $item) {
-                try {
-                    $item->product->reduceStock(
-                        $item->quantity,
-                        "Xuất hàng cho đơn hàng #{$order->order_number}",
-                        $order->id,
-                        auth()->id()
-                    );
-                } catch (\Exception $e) {
-                    // Nếu không đủ hàng, rollback trạng thái đơn hàng
-                    return redirect()->back()->with('error', "Không đủ hàng cho sản phẩm: {$item->product->name}. Chỉ còn {$item->product->quantity} sản phẩm.");
+        // Nếu chuyển từ pending sang processing
+        if ($oldStatus === 'pending' && $newStatus === 'processing') {
+            // Đối với hình thức thanh toán COD (Cash on Delivery) và Bank Transfer,
+            // khi admin xử lý đơn hàng thì coi như đã thanh toán rồi
+            if (in_array($order->payment_method, ['cod', 'bank_transfer']) && $order->payment_status === 'pending') {
+                $order->payment_status = 'paid';
+            }
+            
+            // Chỉ trừ tồn kho khi thanh toán thành công
+            if ($order->payment_status === 'paid') {
+                // Trừ tồn kho cho tất cả sản phẩm trong đơn hàng
+                foreach ($order->items as $item) {
+                    try {
+                        $item->product->reduceStock(
+                            $item->quantity,
+                            "Xuất hàng cho đơn hàng #{$order->order_number}",
+                            $order->id,
+                            auth()->id()
+                        );
+                    } catch (\Exception $e) {
+                        // Nếu không đủ hàng, rollback trạng thái đơn hàng
+                        return redirect()->back()->with('error', "Không đủ hàng cho sản phẩm: {$item->product->name}. Chỉ còn {$item->product->quantity} sản phẩm.");
+                    }
                 }
             }
         }

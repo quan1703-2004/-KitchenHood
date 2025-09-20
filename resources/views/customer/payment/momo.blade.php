@@ -122,11 +122,22 @@
                     </div>
                     
                     <!-- Nút thanh toán MoMo -->
-                    <form action="{{ route('payment.momo.process', $order->id) }}" method="POST" id="momoForm">
+                    <form action="{{ route('payment.momo.process', $order->id) }}" method="POST" id="momoForm" target="_blank">
                         @csrf
                         <button type="submit" class="btn btn-primary w-100 py-3 mb-3" id="momoBtn">
                             <i class="fas fa-mobile-alt me-2"></i>
                             Thanh Toán Bằng MoMo
+                        </button>
+                    </form>
+                    
+                    <!-- Nút hủy đơn hàng -->
+                    <form action="{{ route('payment.momo.cancel-order', $order->id) }}" method="POST" 
+                          onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này? Giỏ hàng sẽ được khôi phục.')" 
+                          class="mb-3">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger w-100 py-2">
+                            <i class="fas fa-times me-2"></i>
+                            Hủy Đơn Hàng
                         </button>
                     </form>
                     

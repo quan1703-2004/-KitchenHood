@@ -87,22 +87,19 @@ class ProductController extends Controller
             $data['quantity'] = 0;
         }
 
-        // Tạo sản phẩm
-        $product = Product::create($data);
-        
-        // Lưu chi tiết sản phẩm nếu có
+        // Xử lý thông số sản phẩm
         if ($request->has('specs') && !empty($request->specs)) {
             $specs = collect($request->specs)->filter(function($spec) {
                 return !empty($spec['key']) && !empty($spec['value']);
             })->values()->toArray();
             
             if (!empty($specs)) {
-                ProductDetail::create([
-                    'product_id' => $product->id,
-                    'specs' => $specs
-                ]);
+                $data['features'] = $specs;
             }
         }
+
+        // Tạo sản phẩm
+        $product = Product::create($data);
         
         return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được tạo thành công!');
     }
@@ -111,7 +108,6 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::all();
-        $product->load('detail'); // Load chi tiết sản phẩm
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
@@ -178,29 +174,23 @@ class ProductController extends Controller
             $data['quantity'] = 0;
         }
 
-        // Cập nhật sản phẩm
-        $product->update($data);
-        
-        // Cập nhật chi tiết sản phẩm
+        // Xử lý thông số sản phẩm
         if ($request->has('specs') && !empty($request->specs)) {
             $specs = collect($request->specs)->filter(function($spec) {
                 return !empty($spec['key']) && !empty($spec['value']);
             })->values()->toArray();
             
             if (!empty($specs)) {
-                // Cập nhật hoặc tạo mới chi tiết
-                $product->detail()->updateOrCreate(
-                    ['product_id' => $product->id],
-                    ['specs' => $specs]
-                );
+                $data['features'] = $specs;
             } else {
-                // Xóa chi tiết nếu không có specs
-                $product->detail()->delete();
+                $data['features'] = null;
             }
         } else {
-            // Xóa chi tiết nếu không có specs
-            $product->detail()->delete();
+            $data['features'] = null;
         }
+
+        // Cập nhật sản phẩm
+        $product->update($data);
         
         return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được cập nhật!');
     }

@@ -30,19 +30,49 @@
                         @endif
                     </div>
 
-                    <!-- Hình ảnh sản phẩm -->
-                    <div class="text-center mb-4">
-                        @if($product->image)
-                            <img src="{{ asset('storage/' . $product->image) }}" 
-                                 class="img-fluid rounded shadow" 
+                    <!-- Gallery hình ảnh sản phẩm -->
+                    <div class="product-gallery mb-4">
+                        <!-- Ảnh chính -->
+                        <div class="main-image-container text-center mb-3">
+                            <img id="mainImage" 
+                                 src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/500x400/cccccc/666666?text=Không+có+ảnh' }}" 
+                                 class="img-fluid rounded shadow-lg main-image" 
                                  alt="{{ $product->name }}"
-                                 style="max-height: 400px; max-width: 100%;">
-                        @else
-                            <img src="https://via.placeholder.com/400x400/cccccc/666666?text=Không+có+ảnh" 
-                                 class="img-fluid rounded shadow" 
-                                 alt="{{ $product->name }}"
-                                 style="max-height: 400px; max-width: 100%;">
-                        @endif
+                                 style="max-height: 500px; max-width: 100%; cursor: pointer; transition: all 0.3s ease;">
+                        </div>
+                        
+                        <!-- Thumbnail gallery -->
+                        <div class="thumbnail-gallery">
+                            <div class="row g-2">
+                                @if($product->image)
+                                <div class="col-auto">
+                                    <img src="{{ asset('storage/' . $product->image) }}" 
+                                         class="thumbnail-img active" 
+                                         alt="{{ $product->name }}"
+                                         data-main-src="{{ asset('storage/' . $product->image) }}"
+                                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 3px solid #007bff; transition: all 0.3s ease;">
+                                </div>
+                                @endif
+                                @if($product->image2)
+                                <div class="col-auto">
+                                    <img src="{{ asset('storage/' . $product->image2) }}" 
+                                         class="thumbnail-img" 
+                                         alt="{{ $product->name }} - Hình ảnh 2"
+                                         data-main-src="{{ asset('storage/' . $product->image2) }}"
+                                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s ease;">
+                                </div>
+                                @endif
+                                @if($product->image3)
+                                <div class="col-auto">
+                                    <img src="{{ asset('storage/' . $product->image3) }}" 
+                                         class="thumbnail-img" 
+                                         alt="{{ $product->name }} - Hình ảnh 3"
+                                         data-main-src="{{ asset('storage/' . $product->image3) }}"
+                                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s ease;">
+                                </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Mô tả sản phẩm -->
@@ -108,6 +138,26 @@
                                             <span class="badge bg-primary ms-2">{{ $review->rating }}/5</span>
                                         </div>
                                         <p>{{ $review->comment }}</p>
+                                        
+                                        <!-- Hiển thị hình ảnh đánh giá -->
+                                        @if($review->images && count($review->images) > 0)
+                                            <div class="review-images mt-3">
+                                                <div class="row g-2">
+                                                    @foreach($review->images as $image)
+                                                        <div class="col-auto">
+                                                            <img src="{{ asset('storage/' . $image) }}" 
+                                                                 alt="Hình ảnh đánh giá" 
+                                                                 class="img-thumbnail" 
+                                                                 style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                                                                 data-bs-toggle="modal" 
+                                                                 data-bs-target="#imageModal"
+                                                                 onclick="showImageModal('{{ asset('storage/' . $image) }}')">
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                        
                                         <small class="text-muted">Đăng vào {{ $review->created_at->format('d/m/Y') }}</small>
                                     </div>
                                 </div>
@@ -118,7 +168,7 @@
                     </div>
 
                     <!-- Gửi form đánh Giá -->
-                    <hr class="my-5">
+                    <hr class="my-5" id="review-section">
 
                     <div class="row">
                         <div class="col-12">
@@ -137,30 +187,70 @@
                                 @endphp
 
                                 @if ($hasPurchased && !$hasReviewed)
-                                    <h4 class="mb-4">Viết đánh giá của bạn</h4>
-                                    <form action="{{ route('reviews.store', $product->id) }}" method="POST">
-                                        @csrf
-                                        <div class="form-group mb-3">
-                                            <label for="rating">Đánh giá (số sao):</label>
-                                            <select name="rating" id="rating" class="form-control" required>
-                                                <option value="5">5 sao (Tuyệt vời)</option>
-                                                <option value="4">4 sao (Tốt)</option>
-                                                <option value="3">3 sao (Bình thường)</option>
-                                                <option value="2">2 sao (Tệ)</option>
-                                                <option value="1">1 sao (Rất tệ)</option>
-                                            </select>
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h4 class="mb-0">
+                                                <i class="fas fa-star me-2"></i>Viết đánh giá của bạn
+                                            </h4>
                                         </div>
-                                        <div class="form-group mb-3">
-                                            <label for="comment">Bình luận:</label>
-                                            <textarea name="comment" id="comment" rows="4" class="form-control" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+                                        <div class="card-body">
+                                            <form action="{{ route('reviews.store', $product->id) }}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group mb-3">
+                                                            <label class="form-label fw-bold">Đánh giá (số sao):</label>
+                                                            <x-rating-stars-interactive name="rating" value="0" size="large" />
+                                                            <small class="text-muted d-block mt-2">Nhấp vào ngôi sao để chọn điểm đánh giá</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group mb-3">
+                                                            <label for="images" class="form-label fw-bold">Hình ảnh đánh giá:</label>
+                                                            <input type="file" name="images[]" id="images" class="form-control" multiple accept="image/*">
+                                                            <small class="text-muted d-block mt-1">Có thể chọn nhiều hình ảnh (tối đa 2MB mỗi ảnh)</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label for="comment" class="form-label fw-bold">Bình luận:</label>
+                                                    <textarea name="comment" id="comment" rows="4" class="form-control" 
+                                                              placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-info-circle me-1"></i>
+                                                        Đánh giá của bạn sẽ giúp khách hàng khác đưa ra quyết định mua hàng
+                                                    </small>
+                                                    <button type="submit" class="btn btn-primary btn-lg">
+                                                        <i class="fas fa-paper-plane me-2"></i>Gửi đánh giá
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
-                                        <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
-                                    </form>
+                                    </div>
                                 @elseif($hasPurchased && $hasReviewed)
-                                    <p class="alert alert-info">Bạn đã đánh giá sản phẩm này.</p>
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <strong>Cảm ơn bạn!</strong> Bạn đã đánh giá sản phẩm này.
+                                    </div>
+                                @elseif(!$hasPurchased)
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>Thông báo:</strong> Bạn cần mua sản phẩm này để có thể đánh giá.
+                                        <a href="{{ route('products.index') }}" class="btn btn-outline-primary btn-sm ms-2">
+                                            <i class="fas fa-shopping-cart me-1"></i>Mua ngay
+                                        </a>
+                                    </div>
                                 @endif
                             @else
-                                <p>Vui lòng <a href="{{ route('login') }}">đăng nhập</a> để viết đánh giá.</p>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Vui lòng đăng nhập</strong> để viết đánh giá.
+                                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm ms-2">
+                                        <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+                                    </a>
+                                </div>
                             @endauth
                         </div>
                     </div>
@@ -279,8 +369,224 @@
 </div>
 @endsection
 
+@section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const ratingSelect = document.getElementById('rating');
+    const ratingPreview = document.getElementById('rating-preview');
+    
+    if (ratingSelect && ratingPreview) {
+        ratingSelect.addEventListener('change', function() {
+            const rating = parseInt(this.value);
+            if (rating >= 1 && rating <= 5) {
+                let stars = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= rating) {
+                        stars += '⭐';
+                    } else {
+                        stars += '☆';
+                    }
+                }
+                ratingPreview.innerHTML = stars + ' (' + rating + ' sao)';
+            } else {
+                ratingPreview.innerHTML = '<span class="text-muted">Chọn số sao để xem trước</span>';
+            }
+        });
+    }
+});
+</script>
+
+<!-- Modal xem hình ảnh đánh giá -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Hình ảnh đánh giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Hình ảnh đánh giá" class="img-fluid rounded">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Function hiển thị modal hình ảnh đánh giá
+function showImageModal(imageSrc) {
+    document.getElementById('modalImage').src = imageSrc;
+}
+</script>
+@endsection
+
+<style>
+/* Product Gallery Styles */
+.product-gallery {
+    position: relative;
+}
+
+.main-image {
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.main-image:hover {
+    box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+}
+
+.thumbnail-img {
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.thumbnail-img:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.thumbnail-img.active {
+    opacity: 1;
+    border-color: #007bff !important;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+}
+
+.thumbnail-gallery {
+    padding: 10px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-image {
+        max-height: 350px !important;
+    }
+    
+    .thumbnail-img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-image {
+        max-height: 300px !important;
+    }
+    
+    .thumbnail-img {
+        width: 50px !important;
+        height: 50px !important;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Product Gallery Functionality
+    const mainImage = document.getElementById('mainImage');
+    const thumbnails = document.querySelectorAll('.thumbnail-img');
+    
+    // Click thumbnail để thay đổi ảnh chính
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', function() {
+            // Cập nhật ảnh chính
+            const newSrc = this.getAttribute('data-main-src');
+            const newAlt = this.getAttribute('alt');
+            
+            // Thêm hiệu ứng fade
+            mainImage.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                mainImage.src = newSrc;
+                mainImage.alt = newAlt;
+                mainImage.style.opacity = '1';
+            }, 150);
+            
+            // Cập nhật trạng thái active của thumbnail
+            thumbnails.forEach(thumb => {
+                thumb.classList.remove('active');
+                thumb.style.borderColor = 'transparent';
+            });
+            
+            this.classList.add('active');
+            this.style.borderColor = '#007bff';
+        });
+    });
+    
+    // Click ảnh chính để phóng to
+    mainImage.addEventListener('click', function() {
+        showImageModal(this.src, this.alt);
+    });
+    
+    // Function hiển thị modal phóng to ảnh
+    function showImageModal(imageSrc, imageAlt) {
+        // Tạo modal HTML
+        const modalHtml = `
+            <div class="image-modal" id="imageModal" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            ">
+                <div style="position: relative; max-width: 90%; max-height: 90%;">
+                    <img src="${imageSrc}" alt="${imageAlt}" style="
+                        max-width: 100%;
+                        max-height: 100%;
+                        border-radius: 8px;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                    ">
+                    <button id="closeModal" style="
+                        position: absolute;
+                        top: -40px;
+                        right: 0;
+                        background: rgba(255,255,255,0.2);
+                        border: none;
+                        color: white;
+                        font-size: 24px;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">×</button>
+                </div>
+            </div>
+        `;
+        
+        // Thêm modal vào body
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Xử lý đóng modal
+        const modal = document.getElementById('imageModal');
+        const closeBtn = document.getElementById('closeModal');
+        
+        function closeModal() {
+            modal.remove();
+        }
+        
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // Đóng modal bằng phím ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    }
     // Xử lý nút yêu thích
     const favoriteBtn = document.querySelector('.favorite-btn');
     if (favoriteBtn) {

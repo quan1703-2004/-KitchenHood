@@ -21,14 +21,26 @@
                     <div class="row g-0" style="height: 80vh;">
                         <!-- Danh sách khách hàng -->
                         <div class="col-md-4 border-end bg-light">
+                            <!-- Header với tìm kiếm -->
                             <div class="p-3 border-bottom bg-white">
-                                <h6 class="mb-0 text-primary">
-                                    <i class="fas fa-users me-2"></i>Danh sách khách hàng
-                                </h6>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0 text-primary fw-bold">
+                                        <i class="fas fa-users me-2"></i>Danh sách khách hàng
+                                    </h6>
+                                    <span class="badge bg-primary rounded-pill" id="customerCount">0</span>
+                                </div>
+                                <!-- Thanh tìm kiếm -->
+                                <div class="position-relative">
+                                    <input type="text" id="customerSearch" class="form-control form-control-sm" 
+                                           placeholder="Tìm kiếm khách hàng..." autocomplete="off">
+                                    <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+                                </div>
                             </div>
-                            <div id="adminCustomersList" class="p-3" style="height: calc(100% - 60px); overflow-y: auto;">
-                                <div class="text-center text-muted py-4">
-                                    <i class="fas fa-spinner fa-spin fa-2x mb-3 text-primary"></i>
+                            
+                            <!-- Danh sách khách hàng -->
+                            <div id="adminCustomersList" class="p-3" style="height: calc(100% - 120px); overflow-y: auto;">
+                                <div class="empty-state loading-pulse">
+                                    <i class="fas fa-spinner fa-spin text-primary"></i>
                                     <p>Đang tải danh sách khách hàng...</p>
                                 </div>
                             </div>
@@ -108,46 +120,159 @@
 
 /* Customer list styling */
 .customer-item {
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 10px;
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid transparent;
     background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.customer-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #007bff, #00d4ff);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
 }
 
 .customer-item:hover {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-color: #007bff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,123,255,0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,123,255,0.15);
+}
+
+.customer-item:hover::before {
+    transform: scaleX(1);
 }
 
 .customer-item.active {
     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
     border-color: #2196f3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(33,150,243,0.25);
 }
 
-.customer-item .customer-name {
+.customer-item.active::before {
+    transform: scaleX(1);
+    background: linear-gradient(90deg, #2196f3, #00bcd4);
+}
+
+/* Customer avatar */
+.customer-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff 0%, #00d4ff 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 6px;
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.customer-item.active .customer-avatar {
+    background: linear-gradient(135deg, #2196f3 0%, #00bcd4 100%);
+    box-shadow: 0 4px 12px rgba(33,150,243,0.4);
+}
+
+/* Customer content */
+.customer-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.customer-name {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 4px;
     font-size: 16px;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.customer-item .customer-info {
+.customer-item.active .customer-name {
+    color: #1976d2;
+}
+
+.customer-info {
     font-size: 0.9em;
-    color: #666;
+    color: #6c757d;
     margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.customer-item .customer-meta {
+.customer-info i {
     font-size: 0.8em;
-    color: #999;
+    color: #007bff;
+}
+
+.customer-meta {
+    font-size: 0.8em;
+    color: #8e9aaf;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.customer-meta i {
+    font-size: 0.7em;
+}
+
+/* Status indicators */
+.status-verified {
+    color: #28a745;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-unverified {
+    color: #dc3545;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Search styling */
+#customerSearch {
+    border-radius: 25px;
+    border: 2px solid #e9ecef;
+    padding: 8px 16px 8px 40px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+#customerSearch:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.15);
+    background: white;
+}
+
+#customerSearch::placeholder {
+    color: #adb5bd;
+    font-style: italic;
 }
 
 .unread-badge {
@@ -323,6 +448,105 @@
     box-shadow: 0 4px 12px rgba(0,123,255,0.3);
 }
 
+/* Loading animation */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.loading-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Empty state styling */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state small {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Scrollbar styling for customer list */
+#adminCustomersList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#adminCustomersList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#adminCustomersList::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+#adminCustomersList::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Hover effects for interactive elements */
+.customer-item {
+    position: relative;
+}
+
+.customer-item::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: #007bff;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.customer-item:hover::after {
+    opacity: 1;
+}
+
+.customer-item.active::after {
+    background: #2196f3;
+    opacity: 1;
+}
+
+/* Badge styling improvements */
+.unread-badge {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 4px 8px;
+    font-size: 0.75em;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(220,53,69,0.3);
+    animation: pulse 2s infinite;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .row.g-0 {
@@ -338,6 +562,61 @@
         width: 35px;
         height: 35px;
         font-size: 14px;
+    }
+    
+    .customer-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .customer-item {
+        padding: 12px;
+    }
+    
+    .customer-name {
+        font-size: 15px;
+    }
+    
+    .customer-info {
+        font-size: 0.85em;
+    }
+    
+    .customer-meta {
+        font-size: 0.75em;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .customer-item {
+        padding: 10px;
+        margin-bottom: 8px;
+    }
+    
+    .customer-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+        margin-right: 8px;
+    }
+    
+    .customer-name {
+        font-size: 14px;
+    }
+    
+    .customer-info {
+        font-size: 0.8em;
+    }
+    
+    .customer-meta {
+        font-size: 0.7em;
+        gap: 6px;
+    }
+    
+    #customerSearch {
+        font-size: 13px;
+        padding: 6px 12px 6px 35px;
     }
 }
 </style>
@@ -402,6 +681,9 @@ async function checkForNewMessages() {
     }
 }
 
+// Biến lưu trữ danh sách khách hàng gốc
+let allCustomers = [];
+
 // Load danh sách khách hàng
 async function loadCustomersList() {
     try {
@@ -415,49 +697,129 @@ async function loadCustomersList() {
         
         if (!response.ok) throw new Error(data?.error || 'Không thể tải danh sách khách hàng');
         
-        const customersList = document.getElementById('adminCustomersList');
-        customersList.innerHTML = '';
+        // Lưu danh sách gốc
+        allCustomers = data.customers || [];
         
-        if (data.customers && data.customers.length > 0) {
-            data.customers.forEach(customer => {
-                const customerDiv = document.createElement('div');
-                customerDiv.className = 'customer-item';
-                customerDiv.onclick = () => selectCustomer(customer.id, customer.name, customer.email);
-                
-                customerDiv.innerHTML = `
-                    <div class="customer-name d-flex justify-content-between align-items-center">
-                        ${customer.name}
-                        ${customer.unread_count > 0 ? `<span class="unread-badge">${customer.unread_count}</span>` : ''}
-                    </div>
-                    <div class="customer-info">${customer.email}</div>
-                    <div class="customer-meta">
-                        Đăng ký: ${customer.created_at} | 
-                        ${customer.email_verified_at === 'Đã xác thực' ? '✅' : '❌'} ${customer.email_verified_at}
-                    </div>
-                `;
-                
-                customersList.appendChild(customerDiv);
-            });
-        } else {
-            customersList.innerHTML = `
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-users fa-2x mb-3 opacity-50"></i>
-                    <p>Chưa có khách hàng nào</p>
-                </div>
-            `;
-        }
+        // Hiển thị danh sách
+        displayCustomers(allCustomers);
+        
+        // Cập nhật số lượng khách hàng
+        updateCustomerCount(allCustomers.length);
         
     } catch (err) {
         console.error('Lỗi load danh sách khách hàng:', err);
         const customersList = document.getElementById('adminCustomersList');
         customersList.innerHTML = `
-            <div class="text-center text-muted py-4">
-                <i class="fas fa-exclamation-triangle fa-2x mb-3 opacity-50"></i>
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
                 <p>Không thể tải danh sách khách hàng</p>
                 <small>Vui lòng thử lại sau</small>
             </div>
         `;
     }
+}
+
+// Hiển thị danh sách khách hàng
+function displayCustomers(customers) {
+    const customersList = document.getElementById('adminCustomersList');
+    customersList.innerHTML = '';
+    
+    if (customers && customers.length > 0) {
+        customers.forEach(customer => {
+            const customerDiv = document.createElement('div');
+            customerDiv.className = 'customer-item';
+            customerDiv.onclick = () => selectCustomer(customer.id, customer.name, customer.email);
+            
+            // Tạo avatar từ tên
+            const avatarText = customer.name.charAt(0).toUpperCase();
+            
+            // Tạo ngày đăng ký đẹp hơn
+            const registerDate = formatDate(customer.created_at);
+            
+            // Trạng thái xác thực
+            const isVerified = customer.email_verified_at === 'Đã xác thực';
+            const statusClass = isVerified ? 'status-verified' : 'status-unverified';
+            const statusIcon = isVerified ? 'fas fa-check-circle' : 'fas fa-times-circle';
+            const statusText = isVerified ? 'Đã xác thực' : 'Chưa xác thực';
+            
+            customerDiv.innerHTML = `
+                <div class="d-flex align-items-start">
+                    <div class="customer-avatar">
+                        ${avatarText}
+                    </div>
+                    <div class="customer-content">
+                        <div class="customer-name">
+                            <span>${customer.name}</span>
+                            ${customer.unread_count > 0 ? `<span class="unread-badge">${customer.unread_count}</span>` : ''}
+                        </div>
+                        <div class="customer-info">
+                            <i class="fas fa-envelope"></i>
+                            <span>${customer.email}</span>
+                        </div>
+                        <div class="customer-meta">
+                            <span><i class="fas fa-calendar-alt"></i> ${registerDate}</span>
+                            <span class="${statusClass}">
+                                <i class="${statusIcon}"></i>
+                                ${statusText}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            customersList.appendChild(customerDiv);
+        });
+    } else {
+        customersList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <p>Chưa có khách hàng nào</p>
+                <small>Tìm kiếm để lọc danh sách</small>
+            </div>
+        `;
+    }
+}
+
+// Cập nhật số lượng khách hàng
+function updateCustomerCount(count) {
+    const countElement = document.getElementById('customerCount');
+    if (countElement) {
+        countElement.textContent = count;
+    }
+}
+
+// Định dạng ngày tháng
+function formatDate(dateString) {
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    } catch (err) {
+        return dateString;
+    }
+}
+
+// Tìm kiếm khách hàng
+function searchCustomers(searchTerm) {
+    if (!searchTerm.trim()) {
+        displayCustomers(allCustomers);
+        updateCustomerCount(allCustomers.length);
+        return;
+    }
+    
+    const filteredCustomers = allCustomers.filter(customer => {
+        const name = customer.name.toLowerCase();
+        const email = customer.email.toLowerCase();
+        const search = searchTerm.toLowerCase();
+        
+        return name.includes(search) || email.includes(search);
+    });
+    
+    displayCustomers(filteredCustomers);
+    updateCustomerCount(filteredCustomers.length);
 }
 
 // Chọn khách hàng để chat
@@ -660,6 +1022,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendButton = document.getElementById('adminSendButton');
     const messageInput = document.getElementById('adminMessageInput');
     const refreshButton = document.getElementById('refreshAdminChat');
+    const searchInput = document.getElementById('customerSearch');
 
     if (sendButton) {
         sendButton.addEventListener('click', sendAdminMessage);
@@ -685,6 +1048,25 @@ document.addEventListener('DOMContentLoaded', function() {
     if (refreshButton) {
         refreshButton.addEventListener('click', function() {
             loadCustomersList();
+        });
+    }
+    
+    // Chức năng tìm kiếm khách hàng
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchCustomers(e.target.value);
+            }, 300); // Delay 300ms để tránh tìm kiếm quá nhiều lần
+        });
+        
+        // Xóa tìm kiếm khi nhấn Escape
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                e.target.value = '';
+                searchCustomers('');
+            }
         });
     }
     
