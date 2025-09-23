@@ -372,6 +372,8 @@
     </style>
 </section>
 
+
+
 <!-- JS: cho phép bấm vào thẻ bên để chuyển slide mượt -->
 <script>
 document.addEventListener('DOMContentLoaded', function(){
@@ -531,7 +533,190 @@ document.addEventListener('DOMContentLoaded', function(){
     </style>
 </section>
 @endif
+<!-- Mục Hỏi Đáp -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <div class="badge bg-info text-white px-3 py-2 rounded-pill mb-3 fw-bold">
+                        <i class="fas fa-question-circle me-1"></i>HỎI ĐÁP
+                    </div>
+                    <h2 class="section-title display-5 fw-bold text-dark">Đặt Câu Hỏi</h2>
+                    <p class="lead text-muted">Bạn có thắc mắc gì về sản phẩm? Hãy đặt câu hỏi và chúng tôi sẽ trả lời sớm nhất!</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Form đặt câu hỏi -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold text-primary mb-3">
+                            <i class="fas fa-pen me-2"></i>Đặt Câu Hỏi Mới
+                        </h5>
+                        <form id="questionForm">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="questionTitle" class="form-label fw-semibold">
+                                    <i class="fas fa-heading me-1"></i>Tiêu đề câu hỏi 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="questionTitle" 
+                                       name="title" 
+                                       placeholder="Nhập tiêu đề câu hỏi ngắn gọn..." 
+                                       required
+                                       minlength="5"
+                                       maxlength="255">
+                                <div class="form-text">Tối thiểu 5 ký tự, tối đa 255 ký tự</div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="questionCategory" class="form-label fw-semibold">
+                                    <i class="fas fa-tags me-1"></i>Danh mục câu hỏi 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" 
+                                        id="questionCategory" 
+                                        name="category" 
+                                        required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <option value="general">Tổng quát</option>
+                                    <option value="product">Sản phẩm</option>
+                                    <option value="category">Danh mục</option>
+                                    <option value="warranty">Bảo hành</option>
+                                    <option value="shipping">Vận chuyển</option>
+                                    <option value="payment">Thanh toán</option>
+                                    <option value="return">Đổi trả</option>
+                                    <option value="technical">Kỹ thuật</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                                <div class="form-text">Chọn danh mục phù hợp với câu hỏi của bạn</div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="questionContent" class="form-label fw-semibold">
+                                    <i class="fas fa-align-left me-1"></i>Nội dung câu hỏi 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <textarea class="form-control" 
+                                          id="questionContent" 
+                                          name="content" 
+                                          rows="4" 
+                                          placeholder="Mô tả chi tiết câu hỏi của bạn..." 
+                                          required
+                                          minlength="10"
+                                          maxlength="2000"></textarea>
+                                <div class="form-text">Tối thiểu 10 ký tự, tối đa 2000 ký tự</div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>Gửi Câu Hỏi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
+                <!-- Hiển thị một số câu hỏi mới nhất -->
+                @php
+                    $recentQuestions = \App\Models\Question::with(['user', 'answers.user'])
+                        ->orderBy('created_at', 'desc')
+                        ->take(2)
+                        ->get();
+                @endphp
+                @if($recentQuestions->count() > 0)
+                <div class="mt-4">
+                    <h6 class="fw-bold text-dark mb-3">
+                        <i class="fas fa-clock me-2"></i>Câu Hỏi Gần Đây
+                    </h6>
+                    @foreach($recentQuestions as $question)
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                        <i class="fas fa-question fa-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <h6 class="fw-bold text-dark mb-0 me-2">{{ Str::limit($question->title, 50) }}</h6>
+                                        <span class="badge bg-secondary">{{ $question->category_name }}</span>
+                                    </div>
+                                    <p class="text-muted mb-2 small">{{ Str::limit($question->content, 80) }}</p>
+                                    <div class="d-flex align-items-center text-muted small">
+                                        <i class="fas fa-user me-1"></i>
+                                        <span class="me-3">{{ $question->user->name }}</span>
+                                        <i class="fas fa-clock me-1"></i>
+                                        <span class="me-3">{{ $question->created_at->format('d/m/Y H:i') }}</span>
+                                        @if($question->is_answered)
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Đã trả lời
+                                            </span>
+                                        @else
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Chưa trả lời
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hiển thị câu trả lời nếu có -->
+                            @if($question->answers->count() > 0)
+                                <div class="answer-section mt-3">
+                                    @foreach($question->answers as $answer)
+                                        <div class="answer-item">
+                                            <div class="d-flex align-items-start">
+                                                <div class="flex-shrink-0">
+                                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                                                        <i class="fas fa-reply fa-xs"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <div class="answer-content">
+                                                        <p class="text-dark mb-1 small">{{ Str::limit($answer->content, 100) }}</p>
+                                                        <div class="answer-meta">
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-user-tie me-1"></i>
+                                                                {{ $answer->user->name }} (Admin) - 
+                                                                <i class="fas fa-clock me-1"></i>
+                                                                {{ $answer->created_at->format('d/m/Y H:i') }}
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @if(!$loop->last)
+                                            <hr class="answer-divider my-2">
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+
+                <!-- Link đến trang hỏi đáp đầy đủ -->
+                <div class="text-center">
+                    <a href="{{ route('question-answer.index') }}" class="btn btn-outline-primary btn-lg px-5">
+                        <i class="fas fa-comments me-2"></i>Xem Tất Cả Câu Hỏi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 <!-- Thêm CSS cho giao diện sản phẩm -->
 <style>
     .product-card {
@@ -761,6 +946,128 @@ document.addEventListener('DOMContentLoaded', function(){
             padding: 1rem;
         }
     }
+
+
+    /* css cho hỏi đáp */
+    .qa-item {
+        transition: all 0.3s ease;
+    }
+    
+    .qa-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .qa-avatar {
+        font-size: 0.9rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* CSS cho phần câu trả lời trong welcome page */
+    .answer-section {
+        margin-top: 1rem;
+        padding-left: 1.5rem;
+        border-left: 3px solid #e9ecef;
+        background: #f8f9fa;
+        border-radius: 0 8px 8px 0;
+        padding: 1rem;
+    }
+    
+    .answer-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    .answer-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .answer-content {
+        background: white;
+        padding: 0.75rem;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .answer-meta {
+        margin-top: 0.25rem;
+        padding-top: 0.25rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .answer-divider {
+        margin: 0.5rem 0;
+        border-color: #dee2e6;
+        opacity: 0.5;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .form-control.is-valid, .form-select.is-valid {
+        border-color: #198754;
+    }
+    
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: #dc3545;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #3498db;
+        border-color: #3498db;
+        transform: translateY(-2px);
+    }
+    
+    .badge {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        animation: slideInUp 0.6s ease-out;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .display-5 {
+            font-size: 1.8rem;
+        }
+        
+        .answer-section {
+            padding-left: 1rem;
+            margin-left: 0.5rem;
+        }
+        
+        .answer-content {
+            padding: 0.5rem;
+        }
+    }
 </style>
 
 <!-- Thêm JavaScript để xử lý thêm vào giỏ hàng -->
@@ -889,6 +1196,179 @@ document.querySelectorAll('.btn-favorite').forEach(button => {
             this.innerHTML = originalIcon;
             this.disabled = false;
         });
+    });
+});
+
+// xử lý hỏi đáp
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Xử lý form đặt câu hỏi
+    const questionForm = document.getElementById('questionForm');
+    if (questionForm) {
+        questionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form trước khi gửi
+            if (!validateForm()) {
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            // Hiển thị loading
+            Swal.fire({
+                title: 'Đang gửi câu hỏi...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Gửi request
+            fetch('{{ route("question-answer.store") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Gửi thành công!',
+                        text: data.message,
+                        confirmButtonText: 'Đồng ý'
+                    }).then(() => {
+                        // Reset form
+                        questionForm.reset();
+                        $('.form-control, .form-select').removeClass('is-valid is-invalid');
+                        // Chuyển đến trang hỏi đáp đầy đủ
+                        window.location.href = '{{ route("question-answer.index") }}';
+                    });
+                } else {
+                    throw new Error(data.message || 'Có lỗi xảy ra');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: error.message || 'Không thể gửi câu hỏi',
+                    confirmButtonText: 'Thử lại'
+                });
+            });
+        });
+    }
+    
+    // Hàm validate form
+    function validateForm() {
+        let isValid = true;
+        
+        // Validate title
+        const title = $('#questionTitle').val().trim();
+        if (!title) {
+            showFieldError('questionTitle', 'Vui lòng nhập tiêu đề câu hỏi.');
+            isValid = false;
+        } else if (title.length < 5) {
+            showFieldError('questionTitle', 'Tiêu đề phải có ít nhất 5 ký tự.');
+            isValid = false;
+        } else if (title.length > 255) {
+            showFieldError('questionTitle', 'Tiêu đề không được vượt quá 255 ký tự.');
+            isValid = false;
+        } else {
+            showFieldSuccess('questionTitle');
+        }
+        
+        // Validate category
+        const category = $('#questionCategory').val();
+        if (!category) {
+            showFieldError('questionCategory', 'Vui lòng chọn danh mục câu hỏi.');
+            isValid = false;
+        } else {
+            showFieldSuccess('questionCategory');
+        }
+        
+        // Validate content
+        const content = $('#questionContent').val().trim();
+        if (!content) {
+            showFieldError('questionContent', 'Vui lòng nhập nội dung câu hỏi.');
+            isValid = false;
+        } else if (content.length < 10) {
+            showFieldError('questionContent', 'Nội dung phải có ít nhất 10 ký tự.');
+            isValid = false;
+        } else if (content.length > 2000) {
+            showFieldError('questionContent', 'Nội dung không được vượt quá 2000 ký tự.');
+            isValid = false;
+        } else {
+            showFieldSuccess('questionContent');
+        }
+        
+        return isValid;
+    }
+    
+    // Hàm hiển thị lỗi cho field
+    function showFieldError(fieldName, message) {
+        const input = $(`#${fieldName}`);
+        const feedback = input.siblings('.invalid-feedback');
+        
+        input.removeClass('is-valid').addClass('is-invalid');
+        feedback.text(message);
+    }
+    
+    // Hàm hiển thị thành công cho field
+    function showFieldSuccess(fieldName) {
+        const input = $(`#${fieldName}`);
+        const feedback = input.siblings('.invalid-feedback');
+        
+        input.removeClass('is-invalid').addClass('is-valid');
+        feedback.text('');
+    }
+    
+    // Real-time validation
+    $('#questionTitle').on('input', function() {
+        const value = $(this).val().trim();
+        if (value.length >= 5 && value.length <= 255) {
+            showFieldSuccess('questionTitle');
+        } else if (value.length > 0) {
+            if (value.length < 5) {
+                showFieldError('questionTitle', 'Tiêu đề phải có ít nhất 5 ký tự.');
+            } else if (value.length > 255) {
+                showFieldError('questionTitle', 'Tiêu đề không được vượt quá 255 ký tự.');
+            }
+        } else {
+            $(this).removeClass('is-valid is-invalid');
+            $(this).siblings('.invalid-feedback').text('');
+        }
+    });
+    
+    $('#questionCategory').on('change', function() {
+        const value = $(this).val();
+        if (value) {
+            showFieldSuccess('questionCategory');
+        } else {
+            $(this).removeClass('is-valid is-invalid');
+            $(this).siblings('.invalid-feedback').text('');
+        }
+    });
+    
+    $('#questionContent').on('input', function() {
+        const value = $(this).val().trim();
+        if (value.length >= 10 && value.length <= 2000) {
+            showFieldSuccess('questionContent');
+        } else if (value.length > 0) {
+            if (value.length < 10) {
+                showFieldError('questionContent', 'Nội dung phải có ít nhất 10 ký tự.');
+            } else if (value.length > 2000) {
+                showFieldError('questionContent', 'Nội dung không được vượt quá 2000 ký tự.');
+            }
+        } else {
+            $(this).removeClass('is-valid is-invalid');
+            $(this).siblings('.invalid-feedback').text('');
+        }
     });
 });
 </script>

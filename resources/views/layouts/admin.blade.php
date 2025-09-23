@@ -797,12 +797,15 @@
                 <span>Báo cáo & Thống kê</span>
             </a>
             
-                            <a class="nav-link" href="{{ route('admin.admin.chat.index') }}">
-                                <i class="fas fa-comments"></i>
-                                <span>Chat với Khách hàng</span>
-                                <span class="badge bg-danger ms-auto" id="admin-chat-unread-count" style="display: none;">0</span>
-                            </a>
-            
+            <a class="nav-link" href="{{ route('admin.admin.chat.index') }}">
+                <i class="fas fa-comments"></i>
+                <span>Chat với Khách hàng</span>
+                <span class="badge bg-danger ms-auto" id="admin-chat-unread-count" style="display: none;">0</span>
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.question-answer.*') ? 'active' : '' }}" href="{{ route('admin.question-answer.index') }}">
+                <i class="fas fa-question-circle"></i>
+                <span>Quản lý Hỏi Đáp</span>
+            </a>    
                 
             <div class="nav-divider"></div>
             <a class="nav-link" href="/">
@@ -898,6 +901,135 @@
                     console.error('Error updating admin chat unread count:', error);
                 });
         }
+          // Hàm load câu hỏi chưa trả lời
+          function loadUnansweredQuestions() {
+            console.log('Loading unanswered questions...');
+            
+            $.ajax({
+                url: '{{ route("admin.question-answer.unanswered") }}',
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(data) {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        const questions = data.questions;
+                        const count = questions.length;
+                        
+                        console.log('Found questions:', count);
+                        
+                        // Cập nhật badge số lượng
+                        const badge = document.getElementById('unansweredCount');
+                        if (badge) {
+                            badge.textContent = count;
+                            badge.style.display = count > 0 ? 'block' : 'none';
+                        }
+                        
+                        // Cập nhật danh sách câu hỏi
+                        const questionList = document.getElementById('questionList');
+                        if (questionList) {
+                            if (count === 0) {
+                                questionList.innerHTML = '<small class="text-muted">Không có câu hỏi nào</small>';
+                            } else {
+                                let html = '';
+                                questions.slice(0, 3).forEach(question => {
+                                    html += `
+                                        <div class="mb-2 p-2 border rounded">
+                                            <div class="fw-semibold">${question.user.name}</div>
+                                            <div class="small text-muted">${question.content.substring(0, 50)}...</div>
+                                            <div class="small text-muted">${new Date(question.created_at).toLocaleDateString('vi-VN')}</div>
+                                            <button class="btn btn-sm btn-primary mt-1" onclick="answerQuestion(${question.id})">
+                                                <i class="fas fa-reply me-1"></i>Trả lời
+                                            </button>
+                                        </div>
+                                    `;
+                                });
+                                questionList.innerHTML = html;
+                            }
+                        }
+                    } else {
+                        console.error('Error loading unanswered questions:', data.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', xhr, status, error);
+                }
+            });
+        }
+        
+        // Xử lý click "Xem tất cả"
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewAllBtn = document.getElementById('viewAllQuestions');
+            if (viewAllBtn) {
+                viewAllBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Mở trang hỏi đáp trong tab mới
+                    window.open('{{ route("admin.question-answer.index") }}', '_blank');
+                });
+            }
+        });
+        
+        // Hàm trả lời câu hỏi
+        function answerQuestion(questionId) {
+            Swal.fire({
+                title: 'Trả lời câu hỏi',
+                input: 'textarea',
+                inputPlaceholder: 'Nhập câu trả lời...',
+                inputAttributes: {
+                    'aria-label': 'Nhập câu trả lời'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Gửi trả lời',
+                cancelButtonText: 'Hủy',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Vui lòng nhập câu trả lời!';
+                    }
+                    if (value.length < 5) {
+                        return 'Câu trả lời phải có ít nhất 5 ký tự!';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `{{ route("admin.question-answer.answer", ":id") }}`.replace(':id', questionId),
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: JSON.stringify({
+                            content: result.value
+                        }),
+                        success: function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: data.message,
+                                confirmButtonText: 'Đồng ý'
+                            });
+                            // Reload danh sách câu hỏi
+                            loadUnansweredQuestions();
+                        },
+                        error: function(xhr) {
+                            let errorMessage = 'Có lỗi xảy ra khi gửi trả lời';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: errorMessage,
+                                confirmButtonText: 'Thử lại'
+                            });
+                        }
+                    });
+                }
+            });
+        }   
 
         // Update chat count on page load
         updateAdminChatUnreadCount();

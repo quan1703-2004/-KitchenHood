@@ -228,6 +228,12 @@ Route::get('/products', [ProductController::class, 'index'])->name('products.ind
 Route::get('/products/search', [ProductController::class, 'index'])->name('products.search');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
+// Routes cho hỏi đáp customer (chỉ cần đăng nhập)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/hoi-dap', [App\Http\Controllers\QuestionAnswerController::class, 'index'])->name('question-answer.index');
+    Route::post('/hoi-dap', [App\Http\Controllers\QuestionAnswerController::class, 'store'])->name('question-answer.store');
+});
+
 // Route để lấy CSRF token
 Route::get('/csrf-token', function () {
     return response()->json(['csrf_token' => csrf_token()]);
@@ -371,6 +377,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/chatting/mark-read/{customerId}', [App\Http\Controllers\Admin\ChatController::class, 'markAsRead'])->name('admin.chat.mark-read');
     Route::get('/chatting/customer/{customerId}', [App\Http\Controllers\Admin\ChatController::class, 'getCustomerInfo'])->name('admin.chat.customer');
     Route::get('/chatting/unread-count', [App\Http\Controllers\Admin\ChatController::class, 'getUnreadCount'])->name('admin.chat.unread-count');
+
+    // Quản lý hỏi đáp cho admin
+    Route::get('/hoi-dap', [App\Http\Controllers\QuestionAnswerController::class, 'adminIndex'])->name('question-answer.index');
+    
+    // API routes cho admin hỏi đáp
+    Route::get('/api/unanswered-questions', [App\Http\Controllers\QuestionAnswerController::class, 'getUnansweredQuestions'])->name('question-answer.unanswered');
+    Route::post('/api/answer/{question}', [App\Http\Controllers\QuestionAnswerController::class, 'answer'])->name('question-answer.answer');
+    Route::get('/api/unanswered-count', [App\Http\Controllers\QuestionAnswerController::class, 'getUnansweredCount'])->name('question-answer.count');
+    Route::get('/api/question-statistics', [App\Http\Controllers\QuestionAnswerController::class, 'getStatistics'])->name('question-answer.statistics');
     
 });
 
