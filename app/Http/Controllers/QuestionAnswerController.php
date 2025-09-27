@@ -105,6 +105,32 @@ class QuestionAnswerController extends Controller
     }
 
     /**
+     * Cập nhật câu hỏi (chỉ chủ sở hữu và chưa có trả lời admin)
+     */
+    public function update(Request $request, Question $question)
+    {
+        $this->authorize('update', $question);
+
+        $validated = $request->validate([
+            'title' => 'required|string|min:5|max:255',
+            'category' => 'required|string|in:' . implode(',', array_keys(Question::getCategories())),
+            'content' => 'required|string|min:10|max:2000',
+        ]);
+
+        $question->update([
+            'title' => trim($validated['title']),
+            'category' => $validated['category'],
+            'content' => trim($validated['content']),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật câu hỏi thành công.',
+            'question' => $question->fresh()->load('user')
+        ]);
+    }
+
+    /**
      * Lấy danh sách câu hỏi chưa trả lời (cho admin)
      */
     public function getUnansweredQuestions()

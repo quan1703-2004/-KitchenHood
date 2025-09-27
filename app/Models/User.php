@@ -77,7 +77,6 @@ implements MustVerifyEmail
     {
         return $this->hasMany(Address::class);
     }
-
     /**
      * Lấy địa chỉ mặc định của user
      */
@@ -132,11 +131,21 @@ implements MustVerifyEmail
     /**
      * Relationship với Cart - một user có một giỏ hàng
      */
+    /**
+     * Quan hệ với Cart (singular - trả về cart đầu tiên)
+     */
     public function cart()
     {
-        return $this->hasOne(Cart::class);
+        return $this->hasOne(Cart::class)->latest();
     }
 
+    /**
+     * Quan hệ với Cart (plural - trả về tất cả carts)
+     */
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
+    }
     /**
      * Kiểm tra xem user có phải là admin không
      */
@@ -210,4 +219,5 @@ implements MustVerifyEmail
 
         return User::whereIn('id', array_unique($userIds))->get();
     }
+
 }

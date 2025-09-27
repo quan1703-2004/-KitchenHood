@@ -237,22 +237,5 @@
 </div>
 
 <!-- Newsletter Section -->
-<div class="bg-primary text-white py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h3 class="fw-bold mb-2">Đăng ký nhận tin tức mới nhất</h3>
-                <p class="mb-0">Nhận thông báo về tin tức mới và khuyến mãi đặc biệt</p>
-            </div>
-            <div class="col-lg-4">
-                <div class="input-group">
-                    <input type="email" class="form-control" placeholder="Email của bạn">
-                    <button class="btn btn-warning" type="button">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@include('components.newsletter-subscribe')
 @endsection

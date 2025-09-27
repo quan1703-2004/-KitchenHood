@@ -2,10 +2,12 @@
 
 @section('content')
 <style>
+    /* Hero section với gradient đẹp */
     .hero-section {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         position: relative;
         overflow: hidden;
+        padding: 80px 0;
     }
     
     .hero-section::before {
@@ -19,231 +21,302 @@
         opacity: 0.3;
     }
     
-    .contact-card {
-        transition: all 0.3s ease;
-        border: none;
-        border-radius: 15px;
-        overflow: hidden;
-        background: white;
-    }
-    
-    .contact-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    }
-    
+    /* Form liên hệ chính - giống ảnh */
     .contact-form {
         background: white;
-        border-radius: 15px;
-        padding: 2.5rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        margin-bottom: 0;
+        height: 100%;
     }
     
+    .contact-form h2 {
+        color: #1e3a8a;
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .contact-form p {
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+    
+    /* Input fields đẹp */
     .form-control {
         border: 2px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 12px 16px;
+        border-radius: 12px;
+        padding: 15px 20px;
         transition: all 0.3s ease;
+        font-size: 1rem;
+        background: #f9fafb;
     }
     
     .form-control:focus {
-        border-color: #2c5aa0;
-        box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        background: white;
     }
     
-    .btn-submit {
-        background: linear-gradient(45deg, #2c5aa0, #1e40af);
-        border: none;
-        padding: 12px 30px;
+    .form-label {
         font-weight: 600;
-        border-radius: 25px;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    
+    /* Button submit đẹp */
+    .btn-submit {
+        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+        border: none;
+        padding: 15px 40px;
+        font-weight: 600;
+        border-radius: 12px;
         transition: all 0.3s ease;
+        font-size: 1.1rem;
+        width: 100%;
     }
     
     .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(44, 90, 160, 0.3);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        background: linear-gradient(45deg, #2563eb, #1e40af);
     }
     
+    /* Thông tin liên hệ */
     .contact-info {
-        /* Nền trắng, bố cục rõ ràng cho khối thông tin liên hệ */
         background: #ffffff;
         color: #0f172a;
-        border-radius: 15px;
-        padding: 2rem;
-        height: 97%;
+        border-radius: 20px;
+        padding: 2.5rem;
         border: 1px solid #eef2f7;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
     }
     
-    /* Item thông tin liên hệ đẹp, rõ ràng */
+    .contact-info h4 {
+        color: #1e3a8a;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    /* Item thông tin liên hệ */
     .info-item {
         display: flex;
         align-items: start;
-        gap: 14px;
-        padding: 14px 16px;
-        border-radius: 12px;
-        transition: all .25s ease;
-        position: relative;
+        gap: 15px;
+        padding: 20px;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
     }
+    
+    .info-item:hover {
+        background: #f1f5f9;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
     .info-item .info-icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 10px;
-        background: rgba(44,90,160,.1);
-        color: #2c5aa0;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        flex: 0 0 46px;
+        flex: 0 0 50px;
+        font-size: 1.2rem;
     }
+    
     .info-item .info-content h6 {
-        margin: 0 0 4px 0;
+        margin: 0 0 5px 0;
         font-weight: 700;
-        color: #0f172a;
+        color: #1e3a8a;
+        font-size: 1.1rem;
     }
+    
     .info-item .info-content p {
         margin: 0;
-        color: #475569;
+        color: #6b7280;
+        font-size: 1rem;
     }
+    
     .info-actions {
         display: flex;
-        gap: 8px;
-        margin-top: 10px;
+        gap: 10px;
+        margin-top: 12px;
         flex-wrap: wrap;
     }
-    .btn-soft-primary { background: rgba(44,90,160,.1); color: #1e40af; border: 0; }
-    .btn-soft-primary:hover { background: rgba(44,90,160,.16); color: #1e3a8a; }
-    .btn-soft-dark { background: #eef2f7; color: #0f172a; border: 0; }
-    .btn-soft-dark:hover { background: #e5eaf2; }
-
-    .contact-icon {
-        width: 60px;
-        height: 60px;
-        background: rgba(44,90,160,0.1);
-        color: #2c5aa0;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    
+    .btn-soft-primary { 
+        background: rgba(59, 130, 246, 0.1); 
+        color: #3b82f6; 
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-soft-primary:hover { 
+        background: rgba(59, 130, 246, 0.15); 
+        color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+    
+    /* Social links */
+    .social-links {
+        text-align: center;
+        margin-top: 2rem;
+    }
+    
+    .social-links h6 {
+        color: #1e3a8a;
+        font-weight: 600;
         margin-bottom: 1rem;
     }
     
-    .map-container {
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    .wrapper {
+        display: inline-flex;
+        list-style: none;
+        width: 100%;
+        font-family: "Poppins", sans-serif;
+        justify-content: center;
+        gap: 15px;
     }
     
-    .social-links a {
-        display: inline-flex;
+    .wrapper .icon {
+        position: relative;
+        background: #fff;
+        border-radius: 50%;
+        width: 55px;
+        height: 55px;
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        border: 2px solid #f1f5f9;
+    }
+    
+    .wrapper .icon:hover {
+        transform: translateY(-5px);
+    }
+    
+    .wrapper .tooltip {
+        position: absolute;
+        top: -40px;
+        font-size: 12px;
+        background: #1e3a8a;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .wrapper .icon:hover .tooltip {
+        opacity: 1;
+        transform: translateY(-5px);
+    }
+    
+    .wrapper .facebook:hover {
+        background: #1877f2;
+        color: #fff;
+        border-color: #1877f2;
+    }
+    
+    .wrapper .github:hover {
+        background: #0f172a;
+        color: #fff;
+        border-color: #0f172a;
+    }
+    
+    .wrapper .instagram:hover {
+        background: #e4405f;
+        color: #fff;
+        border-color: #e4405f;
+    }
+    
+    /* Cards dịch vụ */
+    .service-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        background: white;
+        height: 100%;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .service-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
         align-items: center;
         justify-content: center;
-        width: 50px;
-        height: 50px;
-        background: #f1f5f9;
-        color: #1f2a44;
-        border-radius: 50%;
-        margin: 0 10px;
-        transition: all 0.3s ease;
-        text-decoration: none;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
     }
     
-    .social-links a:hover {
-        background: rgba(44,90,160,0.12);
-        transform: translateY(-3px);
-        color: #1e40af;
-    }
-    /* Breadcrumb đồng bộ layout */
+    /* Breadcrumb */
     .breadcrumb-wrapper {
         background: #f8fafc;
         border-bottom: 1px solid #eef2f7;
     }
+    
     .breadcrumb-item + .breadcrumb-item::before {
         color: #9aa3af;
     }
     
-    /* From Uiverse.io by david-mohseni - Social icons hover đẹp */
-    .wrapper {
-      display: inline-flex;
-      list-style: none;
-      width: 100%;
-      font-family: "Poppins", sans-serif;
-      justify-content: center;
+    /* Map container */
+    .map-container {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        margin-bottom: 3rem;
     }
-    .wrapper .icon {
-      position: relative;
-      background: #fff;
-      border-radius: 50%;
-      margin: 10px;
-      width: 50px;
-      height: 50px;
-      font-size: 18px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Alert thông báo */
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
     }
-    .wrapper .tooltip {
-      position: absolute;
-      top: 0;
-      font-size: 14px;
-      background: #fff;
-      color: #fff;
-      padding: 5px 8px;
-      border-radius: 5px;
-      box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    .wrapper .tooltip::before {
-      position: absolute;
-      content: "";
-      height: 8px;
-      width: 8px;
-      background: #fff;
-      bottom: -3px;
-      left: 50%;
-      transform: translate(-50%) rotate(45deg);
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    .wrapper .icon:hover .tooltip {
-      top: -45px;
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-    .wrapper .icon:hover span,
-    .wrapper .icon:hover .tooltip {
-      text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.1);
-    }
-    .wrapper .facebook:hover,
-    .wrapper .facebook:hover .tooltip,
-    .wrapper .facebook:hover .tooltip::before {
-      background: #1877f2;
-      color: #fff;
-    }
-    .wrapper .github:hover,
-    .wrapper .github:hover .tooltip,
-    .wrapper .github:hover .tooltip::before {
-      background: #0f172a;
-      color: #fff;
-    }
-    .wrapper .twitter:hover,
-    .wrapper .twitter:hover .tooltip,
-    .wrapper .twitter:hover .tooltip::before {
-      background: #1da1f2;
-      color: #fff;
-    }
-    .wrapper .instagram:hover,
-    .wrapper .instagram:hover .tooltip,
-    .wrapper .instagram:hover .tooltip::before {
-      background: #e4405f;
-      color: #fff;
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .contact-form {
+            padding: 2rem;
+            margin: 1rem;
+        }
+        
+        .contact-form h2 {
+            font-size: 2rem;
+        }
+        
+        .info-item {
+            padding: 15px;
+        }
     }
 </style>
 
@@ -262,17 +335,12 @@
 
 <div class="bg-light py-5">
     <div class="container">
-        <!-- Thông tin liên hệ và form -->
+        <!-- Form gửi tin nhắn và thông tin liên hệ -->
         <div class="row mb-5">
             <div class="col-lg-8 mb-4">
                 <div class="contact-form">
-                    <h3 class="fw-bold text-dark mb-4">
-                        <i class="fas fa-envelope text-primary me-2"></i>
-                        Gửi Tin Nhắn Cho Chúng Tôi
-                    </h3>
-                    <p class="text-muted mb-4">
-                        Hãy để lại thông tin, chúng tôi sẽ liên hệ lại trong thời gian sớm nhất
-                    </p>
+                    <h2>Liên Hệ Với Chúng Tôi</h2>
+                    <p>Hãy để lại thông tin, chúng tôi sẽ liên hệ lại trong thời gian sớm nhất</p>
                     
                     <!-- Thông báo kết quả gửi -->
                     <div id="contactAlert" class="alert alert-success d-none" role="alert">
@@ -282,35 +350,20 @@
                     <form id="contactForm" novalidate>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="firstName" class="form-label fw-bold">Họ và tên *</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
-                                    <input type="text" class="form-control" id="firstName" placeholder="Nhập họ và tên" required>
-                                </div>
+                                <label for="firstName" class="form-label">Họ và tên *</label>
+                                <input type="text" class="form-control" id="firstName" placeholder="Nhập họ và tên" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label fw-bold">Số điện thoại *</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="fas fa-phone"></i></span>
-                                    <input type="tel" class="form-control" id="phone" placeholder="Nhập số điện thoại" required>
-                                </div>
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn" required>
                             </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="email" class="form-label fw-bold">Email</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-envelope"></i></span>
-                                <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn">
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="subject" class="form-label fw-bold">Chủ đề *</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-tag"></i></span>
-                                <select class="form-control" id="subject" required>
-                                    <option value="">Chọn chủ đề</option>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="service" class="form-label">Chọn dịch vụ *</label>
+                                <select class="form-control" id="service" required>
+                                    <option value="">Chọn dịch vụ</option>
                                     <option value="tư-vấn">Tư vấn sản phẩm</option>
                                     <option value="báo-giá">Báo giá</option>
                                     <option value="lắp-đặt">Lắp đặt</option>
@@ -318,18 +371,26 @@
                                     <option value="khác">Khác</option>
                                 </select>
                             </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="message" class="form-label fw-bold">Nội dung tin nhắn *</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-comment-dots"></i></span>
-                                <textarea class="form-control" id="message" rows="5" placeholder="Mô tả chi tiết yêu cầu của bạn..." required></textarea>
+                            <div class="col-md-6 mb-3">
+                                <label for="budget" class="form-label">Chọn ngân sách</label>
+                                <select class="form-control" id="budget">
+                                    <option value="">Chọn ngân sách</option>
+                                    <option value="dưới-5tr">Dưới 5 triệu</option>
+                                    <option value="5-10tr">5 - 10 triệu</option>
+                                    <option value="10-20tr">10 - 20 triệu</option>
+                                    <option value="20-50tr">20 - 50 triệu</option>
+                                    <option value="trên-50tr">Trên 50 triệu</option>
+                                </select>
                             </div>
                         </div>
                         
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Tin nhắn *</label>
+                            <textarea class="form-control" id="message" rows="5" placeholder="Mô tả chi tiết yêu cầu của bạn..." required></textarea>
+                        </div>
+                        
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-submit text-white btn-lg">
+                            <button type="submit" class="btn btn-submit text-white">
                                 <i class="fas fa-paper-plane me-2"></i>Gửi Tin Nhắn
                             </button>
                         </div>
@@ -339,16 +400,10 @@
             
             <div class="col-lg-4">
                 <div class="contact-info">
-                    <div class="text-center mb-3">
-                        <div class="contact-icon mx-auto">
-                            <i class="fas fa-info-circle fa-2x"></i>
-                        </div>
-                        <h4 class="fw-bold mb-0">Thông Tin Liên Hệ</h4>
-                        <small class="text-muted">Chúng tôi luôn sẵn sàng hỗ trợ bạn</small>
-                    </div>
-
+                    <h4>Thông Tin Liên Hệ</h4>
+                    
                     <!-- Địa chỉ -->
-                    <div class="info-item mb-3">
+                    <div class="info-item">
                         <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
                         <div class="info-content">
                             <h6>Địa chỉ</h6>
@@ -357,13 +412,12 @@
                                 <a class="btn btn-sm btn-soft-primary" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=Xu%C3%A2n%20La%2C%20T%C3%A2y%20H%E1%BB%93%2C%20H%C3%A0%20N%E1%BB%99i">
                                     <i class="fas fa-directions me-1"></i>Chỉ đường
                                 </a>
-                              
                             </div>
                         </div>
                     </div>
 
                     <!-- Điện thoại -->
-                    <div class="info-item mb-3">
+                    <div class="info-item">
                         <div class="info-icon"><i class="fas fa-phone"></i></div>
                         <div class="info-content">
                             <h6>Điện thoại</h6>
@@ -372,13 +426,12 @@
                                 <a class="btn btn-sm btn-soft-primary" href="tel:0987654321">
                                     <i class="fas fa-phone-alt me-1"></i>Gọi ngay
                                 </a>
-                    
                             </div>
                         </div>
                     </div>
 
                     <!-- Email -->
-                    <div class="info-item mb-4">
+                    <div class="info-item">
                         <div class="info-icon"><i class="fas fa-envelope"></i></div>
                         <div class="info-content">
                             <h6>Email</h6>
@@ -387,14 +440,12 @@
                                 <a class="btn btn-sm btn-soft-primary" href="mailto:tam@kitchenhoodpro.com">
                                     <i class="fas fa-paper-plane me-1"></i>Gửi email
                                 </a>
-                              
                             </div>
                         </div>
                     </div>
 
-                    <div class="text-center pt-2">
-                        <h6 class="fw-bold mb-2">Kết Nối Với Chúng Tôi</h6>
-                        <!-- From Uiverse.io by david-mohseni -->
+                    <div class="social-links">
+                        <h6>Kết Nối Với Chúng Tôi</h6>
                         <ul class="wrapper">
                           <li class="icon facebook" title="Facebook" onclick="window.open('https://www.facebook.com/tamxbl?locale=vi_VN', '_blank')">
                             <span class="tooltip">Facebook</span>
@@ -437,19 +488,19 @@
             </div>
         </div>
 
-        <!-- Thông tin bổ sung -->
+        <!-- Cards dịch vụ -->
         <div class="row">
             <div class="col-md-4 mb-4">
-                <div class="contact-card card shadow-sm h-100">
+                <div class="service-card card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-headset fa-2x"></i>
+                        <div class="service-icon bg-primary text-white">
+                            <i class="fas fa-headset"></i>
                         </div>
                         <h5 class="fw-bold text-dark mb-3">Hỗ Trợ 24/7</h5>
                         <p class="text-muted mb-3">
                             Đội ngũ tư vấn chuyên nghiệp luôn sẵn sàng hỗ trợ bạn mọi lúc
                         </p>
-                        <a href="tel:0123456789" class="btn btn-outline-primary">
+                        <a href="tel:0987654321" class="btn btn-outline-primary">
                             <i class="fas fa-phone me-2"></i>Gọi Ngay
                         </a>
                     </div>
@@ -457,10 +508,10 @@
             </div>
             
             <div class="col-md-4 mb-4">
-                <div class="contact-card card shadow-sm h-100">
+                <div class="service-card card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-tools fa-2x"></i>
+                        <div class="service-icon bg-success text-white">
+                            <i class="fas fa-tools"></i>
                         </div>
                         <h5 class="fw-bold text-dark mb-3">Lắp Đặt Miễn Phí</h5>
                         <p class="text-muted mb-3">
@@ -474,16 +525,18 @@
             </div>
             
             <div class="col-md-4 mb-4">
-                <div class="contact-card card shadow-sm h-100">
+                <div class="service-card card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-shield-alt fa-2x"></i>
+                        <div class="service-icon bg-warning text-white">
+                            <i class="fas fa-shield-alt"></i>
                         </div>
                         <h5 class="fw-bold text-dark mb-3">Bảo Hành 5 Năm</h5>
                         <p class="text-muted mb-3">
                             Cam kết bảo hành chính hãng 5 năm với dịch vụ hậu mãi tốt nhất
                         </p>
-            
+                        <a href="{{ route('products.index') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-shield-alt me-2"></i>Tìm Hiểu Thêm
+                        </a>
                     </div>
                 </div>
             </div>
@@ -503,20 +556,20 @@
         // Thu thập dữ liệu form
         const formData = {
             firstName: document.getElementById('firstName').value.trim(),
-            phone: document.getElementById('phone').value.trim(),
             email: document.getElementById('email').value.trim(),
-            subject: document.getElementById('subject').value.trim(),
+            service: document.getElementById('service').value.trim(),
+            budget: document.getElementById('budget').value.trim(),
             message: document.getElementById('message').value.trim()
         };
 
         // Kiểm tra bắt buộc (logic đơn giản ở FE, BE nên kiểm tra lại)
-        const isInvalid = !formData.firstName || !formData.phone || !formData.subject || !formData.message;
+        const isInvalid = !formData.firstName || !formData.email || !formData.service || !formData.message;
         if (isInvalid) {
             // Thêm class Bootstrap để báo lỗi trực quan
             [
                 ['firstName', formData.firstName],
-                ['phone', formData.phone],
-                ['subject', formData.subject],
+                ['email', formData.email],
+                ['service', formData.service],
                 ['message', formData.message]
             ].forEach(([id, value]) => {
                 const el = document.getElementById(id);
@@ -534,7 +587,7 @@
         contactFormElement.reset();
 
         // Xóa trạng thái lỗi nếu có
-        ['firstName','phone','subject','message'].forEach(id => {
+        ['firstName','email','service','message'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.remove('is-invalid');
         });

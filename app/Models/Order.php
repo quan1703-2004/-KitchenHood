@@ -14,6 +14,7 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'order_number',
+        'order_code', // Mã đơn hàng từ GHN API
         'status',
         'subtotal',
         'shipping_fee',
@@ -30,6 +31,7 @@ class Order extends Model
         'shipping_district_name',
         'shipping_ward_id',
         'shipping_ward_name',
+        'shipping_ward_code', // Mã phường/xã cho GHN
         'notes',
         'momo_request_id',
         'momo_order_id',
@@ -64,6 +66,14 @@ class Order extends Model
     }
 
     /**
+     * Relationship với OrderHistory
+     */
+    public function orderHistories(): HasMany
+    {
+        return $this->hasMany(OrderHistory::class);
+    }
+
+    /**
      * Lấy trạng thái đơn hàng dạng text
      */
     public function getStatusTextAttribute()
@@ -72,9 +82,17 @@ class Order extends Model
             'pending' => 'Chờ xử lý',
             'waiting_payment' => 'Chờ thanh toán',
             'processing' => 'Đang xử lý',
+            'shipping' => 'Đang giao hàng',
             'shipped' => 'Đang giao hàng',
             'delivered' => 'Đã giao hàng',
-            'cancelled' => 'Đã hủy'
+            'delivery_failed' => 'Giao hàng thất bại',
+            'returning' => 'Đang trả hàng',
+            'returned' => 'Đã trả hàng',
+            'exception' => 'Ngoại lệ',
+            'cancelled' => 'Đã hủy',
+            'lost' => 'Mất hàng',
+            'damaged' => 'Hàng hỏng',
+            'unknown' => 'Không xác định'
         ];
 
         return $statuses[$this->status] ?? 'Không xác định';
@@ -177,5 +195,20 @@ class Order extends Model
     public function scopeNotReviewed($query)
     {
         return $query->whereNull('reviewed_at');
+    }
+    /**
+     * Kiểm tra đơn hàng đã có mã GHN chưa
+     */
+    public function hasGhnOrderCode(): bool
+    {
+        return !empty($this->order_code);
+    }
+
+    /**
+     * Lấy mã đơn hàng GHN hoặc thông báo chưa có
+     */
+    public function getGhnOrderCodeAttribute($value)
+    {
+        return !empty($value) ? $value : 'Chưa có mã GHN';
     }
 }

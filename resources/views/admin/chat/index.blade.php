@@ -3,91 +3,110 @@
 @section('title', 'Chat với Khách hàng')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-gradient-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="card-title mb-0">
-                            <i class="fas fa-comments me-2"></i>Chat với Khách hàng
-                        </h3>
-                        <button class="btn btn-light btn-sm" id="refreshAdminChat" title="Làm mới">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
+<div class="chat-container">
+    <!-- Sidebar bên trái -->
+    <div class="chat-sidebar">
+        <!-- Profile Admin -->
+        <div class="admin-profile">
+            <div class="admin-avatar">
+                <div class="avatar-circle">
+                    @if(Auth::user()->avatar)
+                        <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="admin-avatar-img">
+                    @else
+                        <span class="admin-avatar-initial">{{ mb_strtoupper(mb_substr(Auth::user()->name, 0, 1, 'UTF-8'), 'UTF-8') }}</span>
+                    @endif
+                </div>
+                <div class="admin-info">
+                    <h4 class="admin-name">{{ Auth::user()->name }}</h4>
+                    <span class="admin-role">Quản trị viên</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thanh tìm kiếm -->
+        <div class="search-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="customerSearch" class="search-input" 
+                       placeholder="Tìm kiếm khách hàng..." autocomplete="off">
+            </div>
+        </div>
+
+        <!-- Danh sách khách hàng -->
+        <div class="customers-section">
+            <div class="section-header">
+                <h3 class="section-title">Tin nhắn gần đây</h3>
+                <button class="refresh-btn" id="refreshAdminChat" title="Làm mới">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            
+            <div id="adminCustomersList" class="customers-list">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Đang tải danh sách khách hàng...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Khung chat bên phải -->
+    <div class="chat-main">
+        <div id="adminChatWindow" class="chat-window">
+            <!-- Header chat -->
+            <div class="chat-header">
+                <div class="chat-user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h4 class="user-name" id="selectedCustomerName">Chọn khách hàng để bắt đầu chat</h4>
+                        <span class="user-status" id="selectedCustomerInfo">Nhấn vào tên khách hàng bên trái</span>
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="row g-0" style="height: 80vh;">
-                        <!-- Danh sách khách hàng -->
-                        <div class="col-md-4 border-end bg-light">
-                            <!-- Header với tìm kiếm -->
-                            <div class="p-3 border-bottom bg-white">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="mb-0 text-primary fw-bold">
-                                        <i class="fas fa-users me-2"></i>Danh sách khách hàng
-                                    </h6>
-                                    <span class="badge bg-primary rounded-pill" id="customerCount">0</span>
-                                </div>
-                                <!-- Thanh tìm kiếm -->
-                                <div class="position-relative">
-                                    <input type="text" id="customerSearch" class="form-control form-control-sm" 
-                                           placeholder="Tìm kiếm khách hàng..." autocomplete="off">
-                                    <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
-                                </div>
-                            </div>
-                            
-                            <!-- Danh sách khách hàng -->
-                            <div id="adminCustomersList" class="p-3" style="height: calc(100% - 120px); overflow-y: auto;">
-                                <div class="empty-state loading-pulse">
-                                    <i class="fas fa-spinner fa-spin text-primary"></i>
-                                    <p>Đang tải danh sách khách hàng...</p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="chat-actions">
+                    <button class="action-btn" title="Gọi điện">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="action-btn" title="Video call">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="action-btn" title="Thêm người">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                </div>
+            </div>
 
-                        <!-- Khung chat -->
-                        <div class="col-md-8">
-                            <div id="adminChatWindow" class="d-flex flex-column h-100">
-                                <!-- Header chat -->
-                                <div class="p-3 border-bottom bg-gradient-light">
-                                    <div class="d-flex align-items-center">
-                                        <div class="chat-avatar me-3">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1" id="selectedCustomerName">Chọn khách hàng để bắt đầu chat</h6>
-                                            <small class="text-muted" id="selectedCustomerInfo">Nhấn vào tên khách hàng bên trái</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Khung tin nhắn -->
-                                <div id="adminChatMessages" class="flex-grow-1 p-3 chat-messages-container">
-                                    <div class="text-center text-muted py-5">
-                                        <i class="fas fa-comments fa-3x mb-3 opacity-50 text-primary"></i>
-                                        <p>Chọn khách hàng để xem lịch sử chat</p>
-                                        <small>Tin nhắn sẽ hiển thị ở đây</small>
-                                    </div>
-                                </div>
-
-                                <!-- Form gửi tin nhắn -->
-                                <div class="p-3 border-top bg-white">
-                                    <div class="input-group">
-                                        <input type="text" id="adminMessageInput" class="form-control form-control-lg" placeholder="Nhập tin nhắn..." maxlength="500" disabled>
-                                        <button class="btn btn-primary btn-lg" id="adminSendButton" disabled>
-                                            <i class="fas fa-paper-plane me-2"></i>Gửi
-                                        </button>
-                                    </div>
-                                    <div class="mt-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-info-circle me-1"></i>Tin nhắn sẽ được gửi tới khách hàng đã chọn
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Khung tin nhắn -->
+            <div id="adminChatMessages" class="messages-container">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-comments"></i>
                     </div>
+                    <h3>Chọn khách hàng để xem lịch sử chat</h3>
+                    <p>Tin nhắn sẽ hiển thị ở đây</p>
+                </div>
+            </div>
+
+            <!-- Form gửi tin nhắn -->
+            <div class="message-input-section">
+                <div class="input-container">
+                    <button class="input-btn emoji-btn" type="button" title="Emoji">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                    <div class="message-input-wrapper">
+                        <input type="text" id="adminMessageInput" class="message-input" 
+                               placeholder="Nhập tin nhắn..." maxlength="500" disabled>
+                    </div>
+                    <button class="input-btn attach-btn" type="button" title="Đính kèm hình ảnh">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="input-btn attach-btn" type="button" title="Đính kèm file">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="send-btn" id="adminSendButton" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -95,40 +114,369 @@
 </div>
 
 <style>
-/* Gradient backgrounds */
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+/* ===== CSS Variables & Reset ===== */
+:root {
+    /* Color Palette */
+    --primary-color: #1976d2;
+    --primary-light: #42a5f5;
+    --primary-dark: #1565c0;
+    --secondary-color: #26a69a;
+    --accent-color: #ff7043;
+    
+    /* Neutral Colors */
+    --white: #ffffff;
+    --gray-50: #fafafa;
+    --gray-100: #f5f5f5;
+    --gray-200: #eeeeee;
+    --gray-300: #e0e0e0;
+    --gray-400: #bdbdbd;
+    --gray-500: #9e9e9e;
+    --gray-600: #757575;
+    --gray-700: #616161;
+    --gray-800: #424242;
+    --gray-900: #212121;
+    
+    /* Status Colors */
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --info-color: #2196f3;
+    
+    /* Typography */
+    --font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    
+    /* Spacing */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Transitions */
+    --transition-fast: 150ms ease-in-out;
+    --transition-normal: 250ms ease-in-out;
+    --transition-slow: 350ms ease-in-out;
 }
 
-.bg-gradient-light {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-/* Chat avatar */
-.chat-avatar {
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    color: white;
-    border-radius: 50%;
+body {
+    font-family: var(--font-family);
+    background-color: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Main Container ===== */
+.chat-container {
+    display: flex;
+    height: 100vh;
+    background: var(--white);
+    overflow: hidden;
+}
+
+/* ===== Sidebar ===== */
+.chat-sidebar {
+    width: 360px;
+    background: var(--white);
+    border-right: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Admin Profile */
+.admin-profile {
+    padding: 1rem;
+    background: linear-gradient(135deg, #78a3c5 0%, #5e7b93 100%);
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px 10px 0 0; 
+}
+
+.admin-profile::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    transform: rotate(45deg);
+}
+
+.admin-avatar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    position: relative;
+    z-index: 2;
+}
+
+.avatar-circle {
+    width: 52px;
+    height: 52px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+    font-size: var(--font-size-xl);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-/* Customer list styling */
-.customer-item {
-    padding: 16px;
-    border-radius: 16px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
-    background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+/* Ảnh avatar admin hiển thị tròn, cover đầy đủ */
+.admin-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-full);
+    display: block;
+}
+
+/* Chữ cái đầu khi không có ảnh */
+.admin-avatar-initial {
+    color: var(--white);
+    font-weight: 700;
+}
+
+.avatar-circle::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), transparent);
+    border-radius: var(--radius-full);
+    z-index: -1;
+}
+
+.admin-info {
+    flex: 1;
+}
+
+.admin-name {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    margin-bottom: var(--space-1);
+    color: var(--white);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.admin-role {
+    font-size: var(--font-size-sm);
+    opacity: 0.9;
+    color: var(--white);
+    font-weight: 500;
+}
+
+/* Search Section */
+.search-section {
+    padding: 1rem;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.search-container {
     position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+    z-index: 2;
+}
+
+.search-input {
+    width: 100%;
+    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-10);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
+    background: var(--gray-50);
+    transition: all var(--transition-normal);
+    outline: none;
+    font-weight: 500;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
+    transform: translateY(-1px);
+}
+
+.search-input::placeholder {
+    color: var(--gray-500);
+    font-weight: 400;
+}
+
+/* Customers Section */
+.customers-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--gray-50);
+}
+
+.section-header {
+    padding: 1rem 1rem 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    border-radius: 0 0 10px 10px;
+}
+
+.section-title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -0.025em;
+}
+
+.refresh-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--gray-100);
+    border-radius: var(--radius-lg);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.refresh-btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: rotate(180deg) scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.refresh-btn:active {
+    transform: rotate(180deg) scale(0.95);
+}
+
+/* Customers List */
+.customers-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-4);
+    background: var(--gray-50);
+}
+
+.customers-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.customers-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.customers-list::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: var(--radius-full);
+}
+
+.customers-list::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12);
+    color: var(--gray-500);
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--gray-200);
+    border-top: 3px solid var(--primary-color);
+    border-radius: var(--radius-full);
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--space-4);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
+/* ===== Customer Items ===== */
+.customer-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 1rem;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    background: var(--white);
+    border: 2px solid transparent;
+    position: relative;
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
 }
 
@@ -138,183 +486,374 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #007bff, #00d4ff);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(25, 118, 210, 0.02) 100%);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
 }
 
 .customer-item:hover {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-color: #007bff;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,123,255,0.15);
+    background: var(--white);
+    border-color: var(--gray-300);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 .customer-item:hover::before {
-    transform: scaleX(1);
+    opacity: 1;
 }
 
 .customer-item.active {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    border-color: #2196f3;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(33,150,243,0.25);
+    background: var(--white);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px rgba(25, 118, 210, 0.2), var(--shadow-lg);
+    transform: translateY(-2px);
 }
 
 .customer-item.active::before {
-    transform: scaleX(1);
-    background: linear-gradient(90deg, #2196f3, #00bcd4);
+    opacity: 1;
+    background: linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(25, 118, 210, 0.05) 100%);
 }
 
-/* Customer avatar */
+.customer-item.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Customer Avatar */
 .customer-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #007bff 0%, #00d4ff 100%);
-    color: white;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-full);
+    background: #9E9E9E;
+    color: var(--white);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
-    margin-right: 12px;
+    font-size: var(--font-size-lg);
+    font-weight: 700;
     flex-shrink: 0;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    z-index: 2;
+}
+
+/* Ảnh avatar khách hàng */
+.customer-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-full);
+    display: block;
+}
+
+.customer-avatar::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: var(--radius-full);
+    z-index: -1;
+    opacity: 0.3;
 }
 
 .customer-item.active .customer-avatar {
-    background: linear-gradient(135deg, #2196f3 0%, #00bcd4 100%);
-    box-shadow: 0 4px 12px rgba(33,150,243,0.4);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    box-shadow: var(--shadow-lg);
+    transform: scale(1.05);
 }
 
-/* Customer content */
+/* Customer Content */
 .customer-content {
     flex: 1;
     min-width: 0;
+    position: relative;
+    z-index: 2;
 }
 
 .customer-name {
+    font-size: var(--font-size-base);
     font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 4px;
-    font-size: 16px;
-    line-height: 1.3;
+    color: var(--gray-900);
+    margin-bottom: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    line-height: 1.4;
+    letter-spacing: -0.025em;
 }
 
 .customer-item.active .customer-name {
-    color: #1976d2;
+    color: var(--primary-dark);
 }
 
 .customer-info {
-    font-size: 0.9em;
-    color: #6c757d;
-    margin-bottom: 6px;
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-2);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
+    font-weight: 500;
 }
 
 .customer-info i {
-    font-size: 0.8em;
-    color: #007bff;
+    font-size: var(--font-size-xs);
+    color: var(--primary-color);
+    width: 14px;
+    text-align: center;
 }
 
 .customer-meta {
-    font-size: 0.8em;
-    color: #8e9aaf;
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-4);
     flex-wrap: wrap;
+    font-weight: 500;
 }
 
 .customer-meta i {
-    font-size: 0.7em;
+    font-size: var(--font-size-xs);
+    width: 12px;
+    text-align: center;
 }
 
-/* Status indicators */
+/* Status Indicators */
 .status-verified {
-    color: #28a745;
-    font-size: 0.8em;
+    color: var(--success-color);
+    font-size: var(--font-size-xs);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
+    font-weight: 600;
 }
 
 .status-unverified {
-    color: #dc3545;
-    font-size: 0.8em;
+    color: var(--error-color);
+    font-size: var(--font-size-xs);
     display: flex;
     align-items: center;
-    gap: 4px;
-}
-
-/* Search styling */
-#customerSearch {
-    border-radius: 25px;
-    border: 2px solid #e9ecef;
-    padding: 8px 16px 8px 40px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
-}
-
-#customerSearch:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.15);
-    background: white;
-}
-
-#customerSearch::placeholder {
-    color: #adb5bd;
-    font-style: italic;
-}
-
-.unread-badge {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    border-radius: 12px;
-    padding: 4px 8px;
-    font-size: 0.75em;
+    gap: var(--space-1);
     font-weight: 600;
-    box-shadow: 0 2px 4px rgba(220,53,69,0.3);
 }
 
-/* Chat messages container */
-.chat-messages-container {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+/* Unread Badge */
+.unread-badge {
+    background: linear-gradient(135deg, var(--error-color) 0%, #d32f2f 100%);
+    color: var(--white);
+    border-radius: var(--radius-full);
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    min-width: 22px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    animation: pulse 2s infinite;
+    border: 2px solid var(--white);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* ===== Chat Main Area ===== */
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--gray-50);
+    position: relative;
+}
+
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--white);
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Chat Header */
+.chat-header {
+    padding: var(--space-5);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 5;
+}
+
+.chat-user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--gray-600) 0%, var(--gray-700) 100%);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-name {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: var(--space-1);
+}
+
+.user-status {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
+/* Chat Actions */
+.chat-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.action-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--gray-100);
+    border-radius: var(--radius-md);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+}
+
+.action-btn:hover {
+    background: var(--gray-200);
+    color: var(--gray-800);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ===== Messages Container ===== */
+.messages-container {
+    flex: 1;
+    background: var(--gray-50);
     overflow-y: auto;
-    max-height: calc(70vh - 200px);
+    padding: var(--space-6);
     scroll-behavior: smooth;
+    position: relative;
 }
 
-.chat-messages-container::-webkit-scrollbar {
-    width: 6px;
+.messages-container::-webkit-scrollbar {
+    width: 8px;
 }
 
-.chat-messages-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
+.messages-container::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-.chat-messages-container::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
+.messages-container::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: var(--radius-full);
 }
 
-.chat-messages-container::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+.messages-container::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
 }
 
-/* Message styling */
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: var(--gray-500);
+    padding: var(--space-8);
+}
+
+.empty-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+    color: var(--gray-400);
+    font-size: var(--font-size-3xl);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.empty-icon::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.empty-state h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--gray-700);
+    margin-bottom: var(--space-3);
+    letter-spacing: -0.025em;
+}
+
+.empty-state p {
+    font-size: var(--font-size-base);
+    color: var(--gray-500);
+    font-weight: 500;
+    line-height: 1.6;
+    max-width: 300px;
+}
+
+/* ===== Message Items ===== */
 .message-item {
-    margin-bottom: 20px;
-    animation: fadeInUp 0.3s ease;
+    margin-bottom: var(--space-4);
+    animation: messageSlideIn 0.3s ease-out;
 }
 
 .message-item.admin {
@@ -327,298 +866,372 @@
 
 .message-bubble {
     display: inline-block;
-    max-width: 75%;
-    padding: 15px 20px;
-    border-radius: 20px;
+    max-width: 70%;
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-2xl);
     word-wrap: break-word;
     position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-sm);
+    line-height: 1.5;
 }
 
 .message-item.admin .message-bubble {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    color: white;
-    border-bottom-right-radius: 6px;
+    background: #86a4bc;
+    color: var(--white);
+    border-bottom-right-radius: var(--radius-md);
 }
 
 .message-item.customer .message-bubble {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    color: #333;
-    border: 1px solid #e9ecef;
-    border-bottom-left-radius: 6px;
+    background: var(--white);
+    color: var(--gray-900);
+    border: 1px solid var(--gray-200);
+    border-bottom-left-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
 }
 
 .message-meta {
-    font-size: 0.75em;
+    font-size: var(--font-size-xs);
     opacity: 0.8;
-    margin-top: 8px;
+    margin-top: var(--space-2);
     font-weight: 500;
 }
 
 .message-item.admin .message-meta {
     text-align: right;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .message-item.customer .message-meta {
     text-align: left;
-    color: #666;
+    color: var(--gray-500);
 }
 
-/* Typing indicator */
-.typing-indicator {
-    display: flex;
-    align-items: center;
-    padding: 12px 18px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border-radius: 20px;
-    border-bottom-left-radius: 6px;
-    max-width: 90px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.typing-dots {
-    display: flex;
-    gap: 4px;
-}
-
-.typing-dot {
-    width: 8px;
-    height: 8px;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    border-radius: 50%;
-    animation: typing 1.4s infinite ease-in-out;
-}
-
-.typing-dot:nth-child(1) {
-    animation-delay: -0.32s;
-}
-
-.typing-dot:nth-child(2) {
-    animation-delay: -0.16s;
-}
-
-/* Animations */
-@keyframes typing {
-    0%, 80%, 100% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-    40% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeInUp {
+/* Message Animations */
+@keyframes messageSlideIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(20px) scale(0.95);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
-/* Form styling */
-.form-control-lg {
-    border-radius: 25px;
-    border: 2px solid #e9ecef;
-    padding: 12px 20px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.form-control-lg:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-}
-
-.btn-lg {
-    border-radius: 25px;
-    padding: 12px 24px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-lg:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
-}
-
-/* Loading animation */
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-.loading-pulse {
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-/* Empty state styling */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #6c757d;
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.empty-state p {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-}
-
-.empty-state small {
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-/* Scrollbar styling for customer list */
-#adminCustomersList::-webkit-scrollbar {
-    width: 6px;
-}
-
-#adminCustomersList::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-#adminCustomersList::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-#adminCustomersList::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Hover effects for interactive elements */
-.customer-item {
+/* ===== Message Input Section ===== */
+.message-input-section {
+    padding: var(--space-5);
+    background: var(--white);
+    border-top: 1px solid var(--gray-200);
     position: relative;
+    z-index: 5;
 }
 
-.customer-item::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 16px;
-    transform: translateY(-50%);
-    width: 8px;
-    height: 8px;
-    background: #007bff;
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-2);
+    border: 2px solid var(--gray-200);
+    transition: all var(--transition-normal);
 }
 
-.customer-item:hover::after {
-    opacity: 1;
+.input-container:focus-within {
+    border-color: var(--primary-color);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
 }
 
-.customer-item.active::after {
-    background: #2196f3;
-    opacity: 1;
+.message-input-wrapper {
+    flex: 1;
 }
 
-/* Badge styling improvements */
-.unread-badge {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    border-radius: 12px;
-    padding: 4px 8px;
-    font-size: 0.75em;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(220,53,69,0.3);
-    animation: pulse 2s infinite;
+.message-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-base);
+    color: var(--gray-900);
+    outline: none;
+    resize: none;
 }
 
-/* Responsive */
+.message-input:disabled {
+    color: var(--gray-500);
+    cursor: not-allowed;
+}
+
+.message-input::placeholder {
+    color: var(--gray-500);
+}
+
+/* Input Buttons */
+.input-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-md);
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+}
+
+.input-btn:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.input-btn:active {
+    transform: scale(0.95);
+}
+
+.send-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--primary-color);
+    border-radius: var(--radius-full);
+    color: var(--white);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.send-btn:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.send-btn:disabled {
+    background: var(--gray-300);
+    color: var(--gray-500);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.send-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 1024px) {
+    .chat-sidebar {
+        width: 320px;
+    }
+    
+    .admin-profile {
+        padding: var(--space-4);
+    }
+    
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        font-size: var(--font-size-lg);
+    }
+    
+    .admin-name {
+        font-size: var(--font-size-base);
+    }
+}
+
 @media (max-width: 768px) {
-    .row.g-0 {
-        height: 80vh !important;
+    .chat-container {
+        flex-direction: column;
+    }
+    
+    .chat-sidebar {
+        width: 100%;
+        height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .chat-main {
+        height: 60vh;
+    }
+    
+    .chat-window {
+        border-radius: 0;
     }
     
     .message-bubble {
         max-width: 85%;
-        padding: 12px 16px;
+        padding: var(--space-3) var(--space-4);
     }
     
-    .chat-avatar {
-        width: 35px;
-        height: 35px;
-        font-size: 14px;
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-base);
     }
     
     .customer-avatar {
         width: 40px;
         height: 40px;
-        font-size: 16px;
+        font-size: var(--font-size-base);
     }
     
-    .customer-item {
-        padding: 12px;
+    .action-btn {
+        width: 36px;
+        height: 36px;
     }
     
-    .customer-name {
-        font-size: 15px;
-    }
-    
-    .customer-info {
-        font-size: 0.85em;
-    }
-    
-    .customer-meta {
-        font-size: 0.75em;
-        gap: 8px;
+    .send-btn {
+        width: 36px;
+        height: 36px;
     }
 }
 
 @media (max-width: 576px) {
+    .chat-sidebar {
+        height: 35vh;
+    }
+    
+    .chat-main {
+        height: 65vh;
+    }
+    
+    .admin-profile {
+        padding: var(--space-3);
+    }
+    
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-base);
+    }
+    
+    .admin-name {
+        font-size: var(--font-size-sm);
+    }
+    
+    .admin-role {
+        font-size: var(--font-size-xs);
+    }
+    
+    .search-section {
+        padding: var(--space-3);
+    }
+    
+    .search-input {
+        padding: var(--space-2) var(--space-2) var(--space-2) var(--space-8);
+        font-size: var(--font-size-sm);
+    }
+    
+    .section-header {
+        padding: var(--space-3) var(--space-3) var(--space-2);
+    }
+    
+    .section-title {
+        font-size: var(--font-size-base);
+    }
+    
     .customer-item {
-        padding: 10px;
-        margin-bottom: 8px;
+        padding: var(--space-3);
+        margin-bottom: var(--space-1);
     }
     
     .customer-avatar {
         width: 36px;
         height: 36px;
-        font-size: 14px;
-        margin-right: 8px;
+        font-size: var(--font-size-sm);
     }
     
     .customer-name {
-        font-size: 14px;
+        font-size: var(--font-size-sm);
     }
     
     .customer-info {
-        font-size: 0.8em;
+        font-size: var(--font-size-xs);
     }
     
     .customer-meta {
-        font-size: 0.7em;
-        gap: 6px;
+        font-size: var(--font-size-xs);
+        gap: var(--space-2);
     }
     
-    #customerSearch {
-        font-size: 13px;
-        padding: 6px 12px 6px 35px;
+    .chat-header {
+        padding: var(--space-4);
+    }
+    
+    .user-name {
+        font-size: var(--font-size-base);
+    }
+    
+    .user-status {
+        font-size: var(--font-size-xs);
+    }
+    
+    .messages-container {
+        padding: var(--space-4);
+    }
+    
+    .message-input-section {
+        padding: var(--space-4);
+    }
+    
+    .message-input {
+        font-size: var(--font-size-sm);
+        padding: var(--space-2) var(--space-3);
+    }
+    
+    .input-btn {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-xs);
+    }
+    
+    .send-btn {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-xs);
     }
 }
+
+/* ===== Accessibility ===== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus styles for keyboard navigation */
+.customer-item:focus,
+.action-btn:focus,
+.input-btn:focus,
+.send-btn:focus,
+.refresh-btn:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --gray-200: #000000;
+        --gray-300: #000000;
+        --gray-500: #000000;
+        --gray-600: #000000;
+    }
+}
+
+
 </style>
 
 <script>
@@ -730,7 +1343,7 @@ function displayCustomers(customers) {
             customerDiv.className = 'customer-item';
             customerDiv.onclick = () => selectCustomer(customer.id, customer.name, customer.email);
             
-            // Tạo avatar từ tên
+            // Tạo avatar từ tên (fallback nếu không có ảnh)
             const avatarText = customer.name.charAt(0).toUpperCase();
             
             // Tạo ngày đăng ký đẹp hơn
@@ -742,10 +1355,11 @@ function displayCustomers(customers) {
             const statusIcon = isVerified ? 'fas fa-check-circle' : 'fas fa-times-circle';
             const statusText = isVerified ? 'Đã xác thực' : 'Chưa xác thực';
             
+            const hasAvatar = Boolean(customer.avatar_url);
             customerDiv.innerHTML = `
                 <div class="d-flex align-items-start">
                     <div class="customer-avatar">
-                        ${avatarText}
+                        ${hasAvatar ? `<img src="${customer.avatar_url}" alt="${customer.name}" class="customer-avatar-img">` : avatarText}
                     </div>
                     <div class="customer-content">
                         <div class="customer-name">
@@ -888,10 +1502,12 @@ async function loadChatHistory(customerId) {
             lastMessageId = data.data[data.data.length - 1].id;
         } else {
             chatMessages.innerHTML = `
-                <div class="text-center text-muted py-5">
-                    <i class="fas fa-comments fa-3x mb-3 opacity-50"></i>
-                    <p>Chưa có tin nhắn nào</p>
-                    <small>Bắt đầu cuộc trò chuyện với khách hàng</small>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Chưa có tin nhắn nào</h3>
+                    <p>Bắt đầu cuộc trò chuyện với khách hàng</p>
                 </div>
             `;
         }
@@ -900,10 +1516,12 @@ async function loadChatHistory(customerId) {
         console.error('Lỗi load lịch sử chat:', err);
         const chatMessages = document.getElementById('adminChatMessages');
         chatMessages.innerHTML = `
-            <div class="text-center text-muted py-5">
-                <i class="fas fa-exclamation-triangle fa-3x mb-3 opacity-50"></i>
-                <p>Không thể tải lịch sử chat</p>
-                <small>Vui lòng thử lại sau</small>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Không thể tải lịch sử chat</h3>
+                <p>Vui lòng thử lại sau</p>
             </div>
         `;
     }
@@ -914,7 +1532,7 @@ function addMessageToAdminChat(messageData) {
     const chatMessages = document.getElementById('adminChatMessages');
     
     // Xóa thông báo chào mừng nếu có
-    const welcomeMessage = chatMessages.querySelector('.text-center');
+    const welcomeMessage = chatMessages.querySelector('.empty-state');
     if (welcomeMessage) welcomeMessage.remove();
     
     const messageDiv = document.createElement('div');

@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Models\Faq;
 
+
 // Gửi link xác thực
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
@@ -55,7 +56,31 @@ Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('message', 'Link xác thực đã gửi lại!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+// Privacy Policy
+Route::get('/privacy', function () {
+    return response()->view('privacy');
+});
 
+// Terms of Service
+Route::get('/terms', function () {
+    return response()->view('terms');
+});
+
+// Data Deletion (Facebook yêu cầu)
+Route::get('/delete-data', function () {
+    return response()->json([
+        'url' => 'mailto:admin@example.com',
+        'instructions' => 'Liên hệ admin để yêu cầu xóa dữ liệu hoặc truy cập /privacy để biết thêm chi tiết.'
+    ]);
+});
+
+// Google OAuth
+Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
+// Facebook OAuth
+Route::get('/auth/facebook/redirect', [SocialAuthController::class, 'redirectToFacebook'])->name('auth.facebook.redirect');
+Route::get('/auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
 // Routes công khai - không cần đăng nhập
 Route::get('/', function () {
     // Lấy sản phẩm mới nhất để hiển thị trên trang chủ
@@ -380,6 +405,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Quản lý hỏi đáp cho admin
     Route::get('/hoi-dap', [App\Http\Controllers\QuestionAnswerController::class, 'adminIndex'])->name('question-answer.index');
+// Sửa câu hỏi (customer) - chỉ khi được ủy quyền bởi policy
+Route::middleware('auth')->group(function () {
+    Route::patch('/hoi-dap/{question}', [App\Http\Controllers\QuestionAnswerController::class, 'update'])
+        ->name('question-answer.update');
+});
     
     // API routes cho admin hỏi đáp
     Route::get('/api/unanswered-questions', [App\Http\Controllers\QuestionAnswerController::class, 'getUnansweredQuestions'])->name('question-answer.unanswered');

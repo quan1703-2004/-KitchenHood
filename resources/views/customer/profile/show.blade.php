@@ -95,11 +95,7 @@
                             </p>
                         </div>
 
-                        <!-- Địa chỉ -->
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Địa chỉ</label>
-                            <p class="form-control-plaintext text-dark">{{ $user->address ?: 'Chưa cập nhật' }}</p>
-                        </div>
+                        <!-- Địa chỉ đã có trang riêng nên không hiển thị ở đây -->
                     </div>
                 </div>
             </div>
@@ -129,23 +125,7 @@
                     </div>
                 </div>
 
-                <!-- Menu nhanh -->
-                <div class="card shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <h3 class="h5 fw-bold text-dark mb-4">Menu nhanh</h3>
-                        <div class="d-flex flex-column gap-2">
-                            <a href="{{ route('orders.index') }}" class="btn btn-outline-light text-start p-3 rounded-3 border-0 bg-light text-dark">
-                                <i class="fas fa-shopping-bag me-3 text-primary"></i>Đơn hàng của tôi
-                            </a>
-                            <a href="{{ route('addresses.index') }}" class="btn btn-outline-light text-start p-3 rounded-3 border-0 bg-light text-dark">
-                                <i class="fas fa-map-marker-alt me-3 text-primary"></i>Quản lý địa chỉ
-                            </a>
-                            <a href="{{ route('cart.index') }}" class="btn btn-outline-light text-start p-3 rounded-3 border-0 bg-light text-dark">
-                                <i class="fas fa-shopping-cart me-3 text-primary"></i>Giỏ hàng
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <!-- Bỏ Menu nhanh theo yêu cầu -->
 
                 <!-- Đơn hàng gần đây -->
                 @if($orderStats['recent_orders']->count() > 0)

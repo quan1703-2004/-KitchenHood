@@ -100,7 +100,7 @@ class OrderController extends Controller
             $cart = Auth::user()->cart;
             
             if (!$cart) {
-                $cart = Auth::user()->cart()->create();
+                $cart = Auth::user()->carts()->create();
             }
 
             foreach ($order->orderItems as $item) {

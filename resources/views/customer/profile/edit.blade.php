@@ -122,16 +122,7 @@
                                 @enderror
                             </div>
 
-                            <!-- Địa chỉ -->
-                            <div class="col-12">
-                                <label for="address" class="form-label fw-semibold">Địa chỉ</label>
-                                <textarea id="address" name="address" rows="3" 
-                                          class="form-control form-control-lg @error('address') is-invalid @enderror" 
-                                          placeholder="Nhập địa chỉ của bạn...">{{ old('address', $user->address) }}</textarea>
-                                @error('address')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                            <!-- Bỏ trường Địa chỉ vì đã có trang quản lý địa chỉ riêng -->
                         </div>
                     </div>
                 </div>
@@ -283,9 +274,20 @@ function handleDrop(e) {
     }
 }
 
-// Click to upload
-dropArea.addEventListener('click', () => {
-    fileInput.click();
+// Click to upload: chỉ mở dialog khi click trực tiếp lên vùng drop, không phải các phần tử con
+dropArea.addEventListener('click', (e) => {
+    // Nếu click vào chính vùng drop (không phải label hoặc icon bên trong) thì mới mở file dialog
+    if (e.target === dropArea) {
+        fileInput.click();
+    }
 });
+
+// Ngăn sự kiện click ở nút/label "Chọn ảnh" nổi bọt lên dropArea gây mở dialog lần 2
+const chooseLabel = document.querySelector('label[for="avatar"]');
+if (chooseLabel) {
+    chooseLabel.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
 </script>
 @endsection

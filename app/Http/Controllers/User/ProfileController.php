@@ -52,7 +52,6 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date|before:today',
             'gender' => 'nullable|in:male,female,other',
-            'address' => 'nullable|string|max:500',
         ]);
 
         $updateData = [
@@ -61,7 +60,6 @@ class ProfileController extends Controller
             'phone' => $request->phone,
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,
-            'address' => $request->address,
         ];
 
         // Xử lý upload avatar

@@ -23,6 +23,9 @@ class Question extends Model
         'is_answered' => 'boolean',
     ];
 
+    // Đảm bảo accessors xuất hiện trong JSON cho phía admin
+    protected $appends = ['category_name'];
+
     // Danh sách các danh mục có sẵn
     public static function getCategories()
     {

@@ -35,16 +35,26 @@ return [
         ],
     ],
 
+    // Google OAuth
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_REDIRECT'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', 'http://127.0.0.1:8000/auth/google/callback'),
     ],
 
+    // Facebook OAuth
     'facebook' => [
         'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
-        'redirect' => env('FACEBOOK_REDIRECT_URI'),
+        'redirect' => env('FACEBOOK_REDIRECT_URI', 'http://127.0.0.1:8000/auth/facebook/callback'),
     ],
 
+    // GHN API Configuration
+    'ghn' => [
+        'api_url' => env('GHN_API_URL', 'https://dev-online-gateway.ghn.vn'),
+        'token' => env('GHN_TOKEN'),
+        'shop_id' => env('GHN_SHOP_ID'),
+        'from_district_id' => env('GHN_FROM_DISTRICT_ID'),
+        'from_ward_code' => env('GHN_FROM_WARD_CODE'),
+    ],
 ];

@@ -130,7 +130,14 @@
                             <h3 class="mb-4">Đánh giá sản phẩm ({{ $product->reviews->count() }})</h3>
 
                             @forelse ($product->reviews as $review)
-                                <div class="media mb-4">
+                                <div class="media mb-4 d-flex gap-3">
+                                    <div class="review-avatar">
+                                        @if($review->user?->avatar)
+                                            <img src="{{ $review->user->avatar_url }}" alt="{{ $review->user->name }}" class="review-avatar-img">
+                                        @else
+                                            <span class="review-avatar-initial">{{ mb_strtoupper(mb_substr($review->user->name, 0, 1, 'UTF-8'), 'UTF-8') }}</span>
+                                        @endif
+                                    </div>
                                     <div class="media-body">
                                         <h5 class="mt-0">{{ $review->user->name }}</h5>
                                         <div class="text-warning mb-2">
@@ -467,6 +474,28 @@ function showImageModal(imageSrc) {
         height: 60px !important;
     }
 }
+
+/* Avatar trong danh sách đánh giá */
+.review-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #9e9e9e;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.review-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.review-avatar-initial { font-size: 1rem; }
 
 @media (max-width: 576px) {
     .main-image {

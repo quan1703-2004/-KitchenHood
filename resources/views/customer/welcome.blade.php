@@ -316,9 +316,205 @@
     </div>
 </section>
 
-<!-- Câu chuyện thành công / Testimonials -->
+
+
+
+<!-- Testimonials (Câu chuyện thành công từ khách hàng) -->
+<section id="testimonials" class="py-5 position-relative">
+    <!-- Nền ellipse trang trí: dùng file public/elipse.svg, chỉ mang tính decor -->
+    <div class="position-absolute top-50 start-50 translate-middle w-100 overflow-hidden" aria-hidden="true" style="z-index:0; pointer-events:none;">
+        <img src="{{ asset('elipse.svg') }}" alt="" class="d-block mx-auto" style="max-width: 900px; opacity:.65; filter: saturate(1.1);">
+    </div>
+
+    <div class="container position-relative" style="z-index:1;">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold text-dark mb-2">Câu chuyện thành công từ khách hàng</h2>
+            <p class="text-muted mb-0">Trải nghiệm sau khi lắp đặt máy hút mùi tại gia đình và nhà hàng.</p>
+        </div>
+
+        @php
+            // Dữ liệu mẫu tiếng Việt liên quan máy hút mùi (5 thẻ)
+            $testimonials = [
+                ['name' => 'Bùi Xuân Lộc','role' => 'Chủ quán ăn gia đình','avatar' => 'https://www.shutterstock.com/image-vector/man-character-face-avatar-glasses-260nw-562077406.jpg?q=80&w=200&auto=format&fit=crop','content' => 'Sau khi lắp máy hút mùi Inverter, mùi dầu mỡ gần như biến mất, nhà bếp thông thoáng hơn hẳn.'],
+                ['name' => 'Đào Văn Tâm','role' => 'Chủ căn hộ Vinhomes','avatar' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHUndSzxcF1UbSXX3bVILVaUbSIhoc_GEA8g&s?q=80&w=200&auto=format&fit=crop','content' => 'Công suất mạnh, lọc than hoạt tính hiệu quả. Đội ngũ lắp đặt nhanh và hướng dẫn tận tình.'],
+                ['name' => 'Nguyễn Tiến Toán','role' => 'Bếp trưởng nhà hàng nhỏ','avatar' => 'https://png.pngtree.com/png-vector/20191101/ourmid/pngtree-cartoon-color-simple-male-avatar-png-image_1934459.jpg?q=80&w=200&auto=format&fit=crop','content' => 'Máy chạy êm ngay cả ở mức cao. Lưới lọc tháo lắp nhanh, việc vệ sinh mỗi tuần rất nhẹ nhàng.'],
+                ['name' => 'Vũ Minh Quân','role' => 'Nội trợ','avatar' => 'https://png.pngtree.com/png-vector/20220817/ourmid/pngtree-man-avatar-with-circle-frame-vector-ilustration-png-image_6110328.png?q=80&w=200&auto=format&fit=crop','content' => 'Thiết kế kính cong đẹp, đèn LED sáng. Không còn mùi ám phòng khách sau khi chiên rán.'],
+                ['name' => 'Đỗ Hải Nam','role' => 'Chủ homestay','avatar' => 'https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png?q=80&w=200&auto=format&fit=crop','content' => 'Tiết kiệm điện, có hẹn giờ tắt rất tiện. Khách lưu trú khen khu bếp luôn sạch mùi.'],
+            ];
+        @endphp
+
+        <div id="testimonialSlider" class="testimonial-slider">
+            <div class="testimonial-track">
+                @foreach($testimonials as $i => $t)
+                <div class="testimonial-item" data-index="{{ $i }}">
+                    <div class="bg-white shadow-sm testimonial-card h-100 p-4 position-relative border-0">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="{{ $t['avatar'] }}" class="rounded-circle me-3" alt="{{ $t['name'] }}" style="width:64px; height:64px; object-fit:cover;">
+                            <div>
+                                <div class="fw-bold text-dark">{{ $t['name'] }}</div>
+                                <small class="text-muted">{{ $t['role'] }}</small>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-4">{{ $t['content'] }}</p>
+                        <hr class="my-3"/>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="small text-muted">Đánh giá</span>
+                            <div class="text-warning"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            <!-- Indicators -->
+            <div class="testimonial-indicators">
+                @foreach($testimonials as $i => $t)
+                    <span class="indicator-dot @if($i===0) active @endif" data-slide="{{ $i }}"></span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Testimonial Slider với hiệu ứng đẩy */
+        .testimonial-slider {
+            position: relative;
+            overflow: hidden;
+            padding: 0 15px;
+        }
+        
+        .testimonial-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(-66.666%);
+        }
+        
+        .testimonial-item {
+            flex: 0 0 33.333%;
+            padding: 0 15px;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .testimonial-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 30px;
+        }
+        
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .indicator-dot.active {
+            background: #0ea5e9;
+            width: 28px;
+        }
+        
+        .indicator-dot:hover {
+            background: #0ea5e9;
+        }
+        
+        /* Nâng cấp card nhìn giống mockup, tránh dùng màu tím */
+        #testimonials .testimonial-card{ border-radius: 18px; box-shadow: 0 12px 30px rgba(2,6,23,.08); transition: transform .25s ease, box-shadow .25s ease; }
+        #testimonials .testimonial-card:hover{ transform: translateY(-4px); box-shadow: 0 20px 40px rgba(2,6,23,.12); }
+        @media (max-width: 991.98px){
+            #testimonials .display-4{ font-size: 2rem; }
+            .testimonial-item { flex: 0 0 50%; }
+            .testimonial-track { transform: translateX(-25%); }
+        }
+        @media (max-width: 767.98px){
+            .testimonial-item { flex: 0 0 100%; }
+            .testimonial-track { transform: translateX(0%); }
+        }
+    </style>
+    <script>
+    // Testimonial Slider với hiệu ứng đẩy và vòng lặp vô hạn
+    document.addEventListener('DOMContentLoaded', function(){
+        const slider = document.getElementById('testimonialSlider');
+        const track = slider.querySelector('.testimonial-track');
+        const items = slider.querySelectorAll('.testimonial-item');
+        const indicators = slider.querySelectorAll('.indicator-dot');
+        
+        let currentIndex = 0;
+        const totalItems = items.length;
+        
+        // Tạo vòng lặp vô hạn bằng cách nhân bản items
+        function createInfiniteLoop() {
+            // Thêm items ở đầu và cuối để tạo vòng lặp
+            const firstItem = items[0].cloneNode(true);
+            const secondItem = items[1].cloneNode(true);
+            const lastItem = items[totalItems - 1].cloneNode(true);
+            const secondLastItem = items[totalItems - 2].cloneNode(true);
+            
+            // Thêm 2 items cuối vào đầu
+            track.insertBefore(secondLastItem, track.firstChild);
+            track.insertBefore(lastItem, track.firstChild);
+            
+            // Thêm 2 items đầu vào cuối
+            track.appendChild(firstItem);
+            track.appendChild(secondItem);
+            
+            // Cập nhật lại danh sách items
+            const allItems = track.querySelectorAll('.testimonial-item');
+            return allItems;
+        }
+        
+        const allItems = createInfiniteLoop();
+        
+        function updateSlider() {
+            // Tính toán vị trí với offset để bù cho 2 items đầu được thêm vào
+            const translateX = -33.333 * (currentIndex + 2);
+            track.style.transform = `translateX(${translateX}%)`;
+            
+            // Cập nhật indicators
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentIndex);
+            });
+        }
+        
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % totalItems;
+            updateSlider();
+            
+            // Reset về đầu khi đến cuối để tạo vòng lặp mượt
+            if (currentIndex === 0) {
+                setTimeout(() => {
+                    track.style.transition = 'none';
+                    track.style.transform = 'translateX(-66.666%)';
+                    setTimeout(() => {
+                        track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    }, 50);
+                }, 600);
+            }
+        }
+        
+        // Tự động chuyển slide mỗi 7 giây
+        setInterval(nextSlide, 7000);
+        
+        // Click vào indicator để chuyển slide
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', function() {
+                currentIndex = index;
+                updateSlider();
+            });
+        });
+        
+        // Khởi tạo slider
+        updateSlider();
+    });
+    </script>
+</section>
+
+<!-- Logo thương hiệu -->
 <section class="py-5 bg-white">
     <div class="container">
+  
         <!-- Logo thương hiệu: chạy từ phải sang trái lặp vô hạn -->
         @php
             // Logo demo: dùng hình chữ với nền xám để hiển thị ngay, có thể thay bằng file thật trong public/images/brands
@@ -373,23 +569,6 @@
 </section>
 
 
-
-<!-- JS: cho phép bấm vào thẻ bên để chuyển slide mượt -->
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-    var carouselEl = document.querySelector('#testimonialCarousel');
-    if (!carouselEl) return;
-    var carousel = new bootstrap.Carousel(carouselEl, { interval: 6000, ride: false });
-
-    // Ủy quyền sự kiện click: khi bấm vào thẻ bên trái/phải sẽ trượt tương ứng
-    carouselEl.addEventListener('click', function(e){
-        var btnPrev = e.target.closest('.js-goto-prev');
-        var btnNext = e.target.closest('.js-goto-next');
-        if (btnPrev){ carousel.prev(); }
-        if (btnNext){ carousel.next(); }
-    });
-});
-</script>
 <!-- Stats Section -->
 <section class="py-5 bg-white">
     <div class="container">
@@ -467,6 +646,71 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </section>
 
+<!-- Why Choose Us Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <!-- Phần hình minh họa bên trái -->
+            <div class="col-lg-6 d-flex align-items-center justify-content-center">
+                <!-- Thay thế minh họa bằng hình ảnh -->
+                <img 
+                    src="{{ asset('images/Choose_Us.png') }}"
+                    style="max-width: 525px;"
+                >
+            </div>
+            
+            <!-- Phần nội dung bên phải -->
+            <div class="col-lg-6">
+                <div class="why-choose-content">
+                    <!-- Icon và tiêu đề -->
+                    <div class="content-header">
+                       
+                        <h2 class="content-title">Tại sao nên chọn chúng tôi?</h2>
+                    </div>
+                    
+                    <!-- Mô tả chính -->
+                    <p class="content-description">
+                        Chúng tôi kết hợp sự sáng tạo, chiến lược và bảo mật để mang đến những giải pháp số toàn diện giúp thương hiệu phát triển nhanh chóng và thông minh hơn.
+                    </p>
+                    
+                    <!-- Các điểm nổi bật -->
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4 class="feature-title">Chất lượng:</h4>
+                                <p class="feature-description">Chúng tôi mang đến những giải pháp có tác động cao với sự chú ý đến từng chi tiết và độ chính xác trong thiết kế.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4 class="feature-title">Giao tiếp:</h4>
+                                <p class="feature-description">Chúng tôi luôn cập nhật thông tin rõ ràng và hợp tác phản hồi nhanh chóng để bạn luôn được thông báo.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4 class="feature-title">Độ tin cậy:</h4>
+                                <p class="feature-description">Hãy tin tưởng vào chúng tôi để đáp ứng thời hạn và vượt qua mong đợi mỗi lần.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- FAQ Section -->
 
 <!-- FAQ Section (đưa về layout giống mockup) -->
@@ -479,7 +723,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 <i class="fas fa-slash"></i>
                 FAQ
             </span>
-            <h2 class="mt-3 mb-2 fw-bold text-dark">Frequently Asked <span class="text-primary">questions</span></h2>
+            <h2 class="mt-3 mb-2 fw-bold text-dark">Câu hỏi <span class="text-primary">thường gặp</span></h2>
             <p class="text-muted mb-0">Duyệt nhanh các câu hỏi thường gặp để tìm câu trả lời bạn cần.</p>
         </div>
 
@@ -487,7 +731,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <!-- Bên trái: hình minh hoạ -->
             <div class="col-lg-5 d-none d-lg-block">
                 <div class="text-center pe-lg-4">
-                    <img src="{{ asset('images/FAQ.jpg') }}" alt="FAQ Illustration" class="img-fluid" style="max-height:420px; object-fit:contain;">
+                    <img src="{{ asset('images/faq.png') }}" alt="FAQ Illustration" class="img-fluid" style="max-height:420px; object-fit:contain;">
                 </div>
             </div>
 
@@ -533,190 +777,6 @@ document.addEventListener('DOMContentLoaded', function(){
     </style>
 </section>
 @endif
-<!-- Mục Hỏi Đáp -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="text-center mb-5">
-                    <div class="badge bg-info text-white px-3 py-2 rounded-pill mb-3 fw-bold">
-                        <i class="fas fa-question-circle me-1"></i>HỎI ĐÁP
-                    </div>
-                    <h2 class="section-title display-5 fw-bold text-dark">Đặt Câu Hỏi</h2>
-                    <p class="lead text-muted">Bạn có thắc mắc gì về sản phẩm? Hãy đặt câu hỏi và chúng tôi sẽ trả lời sớm nhất!</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <!-- Form đặt câu hỏi -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="card-title fw-bold text-primary mb-3">
-                            <i class="fas fa-pen me-2"></i>Đặt Câu Hỏi Mới
-                        </h5>
-                        <form id="questionForm">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="questionTitle" class="form-label fw-semibold">
-                                    <i class="fas fa-heading me-1"></i>Tiêu đề câu hỏi 
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="questionTitle" 
-                                       name="title" 
-                                       placeholder="Nhập tiêu đề câu hỏi ngắn gọn..." 
-                                       required
-                                       minlength="5"
-                                       maxlength="255">
-                                <div class="form-text">Tối thiểu 5 ký tự, tối đa 255 ký tự</div>
-                                <div class="invalid-feedback"></div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="questionCategory" class="form-label fw-semibold">
-                                    <i class="fas fa-tags me-1"></i>Danh mục câu hỏi 
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <select class="form-select" 
-                                        id="questionCategory" 
-                                        name="category" 
-                                        required>
-                                    <option value="">-- Chọn danh mục --</option>
-                                    <option value="general">Tổng quát</option>
-                                    <option value="product">Sản phẩm</option>
-                                    <option value="category">Danh mục</option>
-                                    <option value="warranty">Bảo hành</option>
-                                    <option value="shipping">Vận chuyển</option>
-                                    <option value="payment">Thanh toán</option>
-                                    <option value="return">Đổi trả</option>
-                                    <option value="technical">Kỹ thuật</option>
-                                    <option value="other">Khác</option>
-                                </select>
-                                <div class="form-text">Chọn danh mục phù hợp với câu hỏi của bạn</div>
-                                <div class="invalid-feedback"></div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="questionContent" class="form-label fw-semibold">
-                                    <i class="fas fa-align-left me-1"></i>Nội dung câu hỏi 
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <textarea class="form-control" 
-                                          id="questionContent" 
-                                          name="content" 
-                                          rows="4" 
-                                          placeholder="Mô tả chi tiết câu hỏi của bạn..." 
-                                          required
-                                          minlength="10"
-                                          maxlength="2000"></textarea>
-                                <div class="form-text">Tối thiểu 10 ký tự, tối đa 2000 ký tự</div>
-                                <div class="invalid-feedback"></div>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-paper-plane me-2"></i>Gửi Câu Hỏi
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Hiển thị một số câu hỏi mới nhất -->
-                @php
-                    $recentQuestions = \App\Models\Question::with(['user', 'answers.user'])
-                        ->orderBy('created_at', 'desc')
-                        ->take(2)
-                        ->get();
-                @endphp
-                @if($recentQuestions->count() > 0)
-                <div class="mt-4">
-                    <h6 class="fw-bold text-dark mb-3">
-                        <i class="fas fa-clock me-2"></i>Câu Hỏi Gần Đây
-                    </h6>
-                    @foreach($recentQuestions as $question)
-                    <div class="card border-0 shadow-sm mb-3">
-                        <div class="card-body p-3">
-                            <div class="d-flex align-items-start">
-                                <div class="flex-shrink-0">
-                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
-                                        <i class="fas fa-question fa-sm"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <h6 class="fw-bold text-dark mb-0 me-2">{{ Str::limit($question->title, 50) }}</h6>
-                                        <span class="badge bg-secondary">{{ $question->category_name }}</span>
-                                    </div>
-                                    <p class="text-muted mb-2 small">{{ Str::limit($question->content, 80) }}</p>
-                                    <div class="d-flex align-items-center text-muted small">
-                                        <i class="fas fa-user me-1"></i>
-                                        <span class="me-3">{{ $question->user->name }}</span>
-                                        <i class="fas fa-clock me-1"></i>
-                                        <span class="me-3">{{ $question->created_at->format('d/m/Y H:i') }}</span>
-                                        @if($question->is_answered)
-                                            <span class="badge bg-success">
-                                                <i class="fas fa-check me-1"></i>Đã trả lời
-                                            </span>
-                                        @else
-                                            <span class="badge bg-warning">
-                                                <i class="fas fa-clock me-1"></i>Chưa trả lời
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Hiển thị câu trả lời nếu có -->
-                            @if($question->answers->count() > 0)
-                                <div class="answer-section mt-3">
-                                    @foreach($question->answers as $answer)
-                                        <div class="answer-item">
-                                            <div class="d-flex align-items-start">
-                                                <div class="flex-shrink-0">
-                                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
-                                                        <i class="fas fa-reply fa-xs"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <div class="answer-content">
-                                                        <p class="text-dark mb-1 small">{{ Str::limit($answer->content, 100) }}</p>
-                                                        <div class="answer-meta">
-                                                            <small class="text-muted">
-                                                                <i class="fas fa-user-tie me-1"></i>
-                                                                {{ $answer->user->name }} (Admin) - 
-                                                                <i class="fas fa-clock me-1"></i>
-                                                                {{ $answer->created_at->format('d/m/Y H:i') }}
-                                                            </small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @if(!$loop->last)
-                                            <hr class="answer-divider my-2">
-                                        @endif
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-
-                <!-- Link đến trang hỏi đáp đầy đủ -->
-                <div class="text-center">
-                    <a href="{{ route('question-answer.index') }}" class="btn btn-outline-primary btn-lg px-5">
-                        <i class="fas fa-comments me-2"></i>Xem Tất Cả Câu Hỏi
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 <!-- Thêm CSS cho giao diện sản phẩm -->
 <style>
     .product-card {
@@ -1053,6 +1113,368 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
     
+    /* Why Choose Us Section Styles */
+    .why-choose-illustration {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem 0;
+    }
+    
+    .tablet-container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .tablet-device {
+        position: relative;
+        width: 280px;
+        height: 200px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        transform: rotate(-5deg);
+        transition: transform 0.3s ease;
+    }
+    
+    .tablet-device:hover {
+        transform: rotate(-3deg) scale(1.02);
+    }
+    
+    .tablet-screen {
+        width: 100%;
+        height: 100%;
+        background: #f8f9fa;
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .app-sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80px;
+        height: 100%;
+        background: #2c3e50;
+        padding: 15px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .sidebar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 4px;
+        border-radius: 8px;
+        color: #bdc3c7;
+        font-size: 10px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-item.active {
+        background: #3498db;
+        color: white;
+    }
+    
+    .sidebar-item i {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+    
+    .sidebar-item span {
+        font-size: 8px;
+        line-height: 1.2;
+    }
+    
+    .app-content {
+        margin-left: 80px;
+        padding: 15px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .content-header h3 {
+        font-size: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+    
+    .chat-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .chat-bubble {
+        background: #e3f2fd;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-size: 9px;
+        color: #2c3e50;
+    }
+    
+    .chat-attachment {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        font-size: 8px;
+        color: #7f8c8d;
+    }
+    
+    .status-section {
+        display: flex;
+        gap: 15px;
+        font-size: 8px;
+        color: #7f8c8d;
+    }
+    
+    .status-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .status-label {
+        font-weight: 600;
+    }
+    
+    .status-value {
+        color: #3498db;
+        font-weight: 500;
+    }
+    
+    .team-section {
+        margin-top: 8px;
+    }
+    
+    .team-member {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .member-avatar {
+        width: 20px;
+        height: 20px;
+        background: #3498db;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 8px;
+    }
+    
+    .member-info {
+        font-size: 8px;
+    }
+    
+    .member-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .member-role {
+        color: #7f8c8d;
+        font-size: 7px;
+    }
+    
+    .message-input {
+        margin-top: auto;
+    }
+    
+    .message-input input {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid #ddd;
+        border-radius: 15px;
+        font-size: 8px;
+        background: white;
+    }
+    
+    .keyboard {
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 8px;
+        background: #34495e;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stylus {
+        position: absolute;
+        top: 20px;
+        right: -20px;
+        width: 40px;
+        height: 3px;
+        background: #95a5a6;
+        border-radius: 2px;
+        transform: rotate(45deg);
+    }
+    
+    .bg-decoration {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: 300px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 50px;
+        opacity: 0.6;
+        z-index: -1;
+    }
+    
+    /* Content Styles */
+    .why-choose-content {
+        padding: 2rem 0;
+    }
+    
+    .content-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .header-icon {
+        width: 50px;
+        height: 50px;
+        background: #2c3e50;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+    }
+    
+    .content-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+        line-height: 1.2;
+    }
+    
+    .content-description {
+        font-size: 1.1rem;
+        color: #7f8c8d;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .features-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .feature-icon {
+        width: 24px;
+        height: 24px;
+        background: #27ae60;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    
+    .feature-content {
+        flex: 1;
+    }
+    
+    .feature-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .feature-description {
+        font-size: 1rem;
+        color: #7f8c8d;
+        line-height: 1.5;
+        margin: 0;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+        .tablet-device {
+            width: 240px;
+            height: 170px;
+        }
+        
+        .content-title {
+            font-size: 2rem;
+        }
+        
+        .content-description {
+            font-size: 1rem;
+        }
+    }
+    
+    @media (max-width: 767.98px) {
+        .why-choose-illustration {
+            margin-bottom: 2rem;
+        }
+        
+        .tablet-device {
+            width: 200px;
+            height: 140px;
+            transform: rotate(0deg);
+        }
+        
+        .content-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 10px;
+        }
+        
+        .content-title {
+            font-size: 1.8rem;
+        }
+        
+        .features-list {
+            gap: 1rem;
+        }
+        
+        .feature-item {
+            gap: 10px;
+        }
+        
+        .feature-title {
+            font-size: 1.1rem;
+        }
+        
+        .feature-description {
+            font-size: 0.95rem;
+        }
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .display-5 {

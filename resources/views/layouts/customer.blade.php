@@ -914,6 +914,8 @@
             }
         }
     </style>
+    
+    @yield('styles')
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Navigation -->
@@ -943,6 +945,11 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('news*') ? 'active' : '' }}" href="{{ route('news.index') }}">
                             <i class="fas fa-newspaper me-1"></i>Tin tức
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('hoi-dap*') ? 'active' : '' }}" href="{{ route('question-answer.index') }}">
+                            <i class="fas fa-comments me-1"></i>Diễn đàn
                         </a>
                     </li>
                     <li class="nav-item">
@@ -1458,5 +1465,7 @@
 
     <!-- Favorite Button JavaScript -->
     <script src="{{ asset('js/favorite-button-simple.js') }}"></script>
+    
+    @yield('scripts')
 </body>
 </html>

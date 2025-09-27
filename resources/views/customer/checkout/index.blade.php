@@ -250,7 +250,7 @@
                         
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="h5 fw-bold text-dark">Tổng cộng:</span>
-                            <span class="h5 fw-bold text-primary">{{ number_format($finalTotal) }} VNĐ</span>
+                            <span class="h5 fw-bold text-primary">{{ number_format($finalAmount) }} VNĐ</span>
                         </div>
                     </div>
                     

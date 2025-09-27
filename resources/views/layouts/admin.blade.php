@@ -58,7 +58,7 @@
         /* Admin Sidebar - modernized */
         .admin-sidebar {
             background: #ffffff;
-            min-height: 100vh;
+            height: 100vh; /* cố định chiều cao bằng viewport để bật cơ chế cuộn */
             padding: 0;
             position: fixed;
             left: 0;
@@ -67,7 +67,13 @@
             z-index: 1000;
             border-right: 1px solid var(--border-color);
             box-shadow: var(--shadow-sm);
+            /* Cho phép cuộn khi nội dung dài hơn viewport và ẩn scrollbar */
+            overflow-y: auto; /* cuộn dọc */
+            -ms-overflow-style: none; /* ẩn scrollbar trên IE/Edge cũ */
+            scrollbar-width: none; /* ẩn scrollbar trên Firefox */
         }
+        /* Ẩn scrollbar trên Chrome/Safari/Edge mới (WebKit) */
+        .admin-sidebar::-webkit-scrollbar { width: 0; height: 0; }
         
         .admin-sidebar .sidebar-header {
             padding: 1.25rem 1.25rem 0.75rem 1.25rem;

@@ -340,16 +340,16 @@ function createQuestionRow(question, isAnswered) {
                             <i class="fas fa-reply me-2"></i>Câu trả lời:
                         </div>
                         ${question.answers.map(answer => `
-                            <div class="answer-item">
-                                <div class="answer-content">
-                                    <p class="mb-2">${answer.content}</p>
-                                    <div class="answer-meta">
-                                        <small class="text-muted">
-                                            <i class="fas fa-user-tie me-1"></i>
-                                            ${answer.user.name} (Admin) - 
-                                            <i class="fas fa-clock me-1"></i>
-                                            ${new Date(answer.created_at).toLocaleDateString('vi-VN')}
-                                        </small>
+                            <div class=\"answer-item\">
+                                <div class=\"d-flex align-items-start gap-2\">
+                                    <div class=\"avatar-sm rounded-circle d-flex align-items-center justify-content-center\" style=\"overflow:hidden;background:#86a4bc;\">
+                                        ${answer.user?.avatar_url ? `<img src=\"${answer.user.avatar_url}\" alt=\"${answer.user.name}\" style=\"width:100%;height:100%;object-fit:cover;\">` : (answer.user?.name || 'A').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div class=\"answer-content flex-grow-1\">
+                                        <p class=\"mb-2\">${answer.content}</p>
+                                        <div class=\"answer-meta\">
+                                            <small class=\"text-muted\">${answer.user.name} (Admin) · ${new Date(answer.created_at).toLocaleDateString('vi-VN')}</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -365,8 +365,8 @@ function createQuestionRow(question, isAnswered) {
             <td>#${question.id}</td>
             <td>
                 <div class="d-flex align-items-center">
-                    <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
-                        ${question.user.name.charAt(0).toUpperCase()}
+                    <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center me-2" style="overflow:hidden;background:#9e9e9e;">
+                        ${question.user.avatar_url ? `<img src="${question.user.avatar_url}" alt="${question.user.name}" style="width:100%;height:100%;object-fit:cover;">` : question.user.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
                         <div class="fw-semibold">${question.user.name}</div>
