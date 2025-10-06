@@ -812,6 +812,10 @@
                 <i class="fas fa-question-circle"></i>
                 <span>Quản lý Hỏi Đáp</span>
             </a>    
+            <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
+                <i class="fas fa-cog"></i>
+                <span>Cài đặt</span>
+            </a>
                 
             <div class="nav-divider"></div>
             <a class="nav-link" href="/">

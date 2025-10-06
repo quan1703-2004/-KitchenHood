@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 06, 2025 at 04:35 PM
+-- Generation Time: Oct 06, 2025 at 05:21 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -449,7 +449,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (49, '2025_10_06_145832_create_question_likes_table', 20),
 (50, '2025_09_10_074803_create_faqs_table', 21),
 (51, '2025_09_12_040359_create_payment_methods_table', 21),
-(52, '2025_10_06_000001_add_order_item_and_admin_reply_to_reviews_table', 21);
+(52, '2025_10_06_000001_add_order_item_and_admin_reply_to_reviews_table', 21),
+(53, '2025_10_06_000000_create_settings_table', 22);
 
 -- --------------------------------------------------------
 
@@ -839,6 +840,29 @@ CREATE TABLE `sessions` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `contact_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_map_embed` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`id`, `contact_email`, `contact_phone`, `contact_address`, `contact_map_embed`, `created_at`, `updated_at`) VALUES
+(1, 'zzztamdzzz@gmail.com', '0987654321', '41A Phú Diễn, Tu Liem, Hà Nội, Việt Nam', '<iframe src=\"https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14892!2d105.76203775562583!3d21.046117684834403!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s\" width=\"100%\" height=\"420\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>', '2025-10-06 09:51:44', '2025-10-06 10:19:35');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -1050,6 +1074,12 @@ ALTER TABLE `sessions`
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -1118,7 +1148,7 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `news`
@@ -1179,6 +1209,12 @@ ALTER TABLE `question_likes`
 --
 ALTER TABLE `reviews`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users`

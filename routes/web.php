@@ -10,6 +10,7 @@ use App\Http\Controllers\AddressController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -107,9 +108,8 @@ Route::get('/news/{slug}', [App\Http\Controllers\NewsController::class, 'show'])
 Route::middleware('auth')->post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
 // Trang Liên hệ
-Route::get('/contact', function () {
-    return view('customer.contact');
-})->name('contact');
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 // Routes đăng nhập/đăng ký
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -416,6 +416,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Quản lý hỏi đáp cho admin
     Route::get('/hoi-dap', [App\Http\Controllers\QuestionAnswerController::class, 'adminIndex'])->name('question-answer.index');
+    
+    // Cài đặt hệ thống (email/phone/address/map)
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 // Sửa câu hỏi (customer) - chỉ khi được ủy quyền bởi policy
 Route::middleware('auth')->group(function () {
     Route::patch('/hoi-dap/{question}', [App\Http\Controllers\QuestionAnswerController::class, 'update'])

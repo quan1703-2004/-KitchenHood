@@ -343,26 +343,38 @@
                     <p>Hãy để lại thông tin, chúng tôi sẽ liên hệ lại trong thời gian sớm nhất</p>
                     
                     <!-- Thông báo kết quả gửi -->
-                    <div id="contactAlert" class="alert alert-success d-none" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>Gửi thành công! Chúng tôi sẽ phản hồi sớm nhất.
-                    </div>
+                    @if(session('success'))
+                        <div class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                        </div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                    <form id="contactForm" novalidate>
+                    <form id="contactForm" method="POST" action="{{ route('contact.send') }}" novalidate>
+                        @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="firstName" class="form-label">Họ và tên *</label>
-                                <input type="text" class="form-control" id="firstName" placeholder="Nhập họ và tên" required>
+                                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Nhập họ và tên" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn" required>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email của bạn" required>
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="service" class="form-label">Chọn dịch vụ *</label>
-                                <select class="form-control" id="service" required>
+                                <select class="form-control" id="service" name="service" required>
                                     <option value="">Chọn dịch vụ</option>
                                     <option value="tư-vấn">Tư vấn sản phẩm</option>
                                     <option value="báo-giá">Báo giá</option>
@@ -373,7 +385,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="budget" class="form-label">Chọn ngân sách</label>
-                                <select class="form-control" id="budget">
+                                <select class="form-control" id="budget" name="budget">
                                     <option value="">Chọn ngân sách</option>
                                     <option value="dưới-5tr">Dưới 5 triệu</option>
                                     <option value="5-10tr">5 - 10 triệu</option>
@@ -386,7 +398,7 @@
                         
                         <div class="mb-4">
                             <label for="message" class="form-label">Tin nhắn *</label>
-                            <textarea class="form-control" id="message" rows="5" placeholder="Mô tả chi tiết yêu cầu của bạn..." required></textarea>
+                            <textarea class="form-control" id="message" name="message" rows="5" placeholder="Mô tả chi tiết yêu cầu của bạn..." required></textarea>
                         </div>
                         
                         <div class="d-grid">
@@ -407,7 +419,7 @@
                         <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
                         <div class="info-content">
                             <h6>Địa chỉ</h6>
-                            <p>Xuân La - Tây Hồ - Hà Nội</p>
+                            <p>{{ $settings->contact_address ?? 'Xuân La - Tây Hồ - Hà Nội' }}</p>
                             <div class="info-actions">
                                 <a class="btn btn-sm btn-soft-primary" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=Xu%C3%A2n%20La%2C%20T%C3%A2y%20H%E1%BB%93%2C%20H%C3%A0%20N%E1%BB%99i">
                                     <i class="fas fa-directions me-1"></i>Chỉ đường
@@ -421,9 +433,9 @@
                         <div class="info-icon"><i class="fas fa-phone"></i></div>
                         <div class="info-content">
                             <h6>Điện thoại</h6>
-                            <p>0987 654 321</p>
+                            <p>{{ $settings->contact_phone ?? '0987 654 321' }}</p>
                             <div class="info-actions">
-                                <a class="btn btn-sm btn-soft-primary" href="tel:0987654321">
+                                <a class="btn btn-sm btn-soft-primary" href="tel:{{ $settings->contact_phone ?? '0987654321' }}">
                                     <i class="fas fa-phone-alt me-1"></i>Gọi ngay
                                 </a>
                             </div>
@@ -435,9 +447,9 @@
                         <div class="info-icon"><i class="fas fa-envelope"></i></div>
                         <div class="info-content">
                             <h6>Email</h6>
-                            <p>tam@kitchenhoodpro.com</p>
-                            <div class="info-actions">
-                                <a class="btn btn-sm btn-soft-primary" href="mailto:tam@kitchenhoodpro.com">
+                            <p>{{ $settings->contact_email ?? 'zzztamdzzz@gmail.com' }}</p>
+                            <div class="info-actions"></div>
+                                <a class="btn btn-sm btn-soft-primary" href="mailto:{{ $settings->contact_email ?? 'zzztamdzzz@gmail.com' }}">
                                     <i class="fas fa-paper-plane me-1"></i>Gửi email
                                 </a>
                             </div>
@@ -471,72 +483,78 @@
             </div>
         </div>
 
-        <!-- Bản đồ Google Maps -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="map-container">
-                    <!-- Nhúng Google Maps: có thể thay địa chỉ bằng toạ độ/Place ID của bạn -->
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d29784.82077814449!2d105.8172884!3d21.0685641!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s!4v1756199478462!5m2!1svi!2s"
-                        width="100%"
-                        height="420"
-                        style="border:0;"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="container">
+            <!-- Bản đồ Google Maps -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="map-container">
+                        <!-- Nhúng Google Maps: có thể thay địa chỉ bằng toạ độ/Place ID của bạn -->
+                        @if(!empty($settings->contact_map_embed))
+                            {!! $settings->contact_map_embed !!}
+                        @else
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d29784.82077814449!2d105.8172884!3d21.0685641!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s!4v1756199478462!5m2!1svi!2s"
+                                width="100%"
+                                height="420"
+                                style="border:0;"
+                                allowfullscreen=""
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        @endif
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Cards dịch vụ -->
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="service-card card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="service-icon bg-primary text-white">
-                            <i class="fas fa-headset"></i>
+            <!-- Cards dịch vụ -->
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="service-card card shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon bg-primary text-white">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-3">Hỗ Trợ 24/7</h5>
+                            <p class="text-muted mb-3">
+                                Đội ngũ tư vấn chuyên nghiệp luôn sẵn sàng hỗ trợ bạn mọi lúc
+                            </p>
+                            <a href="tel:0987654321" class="btn btn-outline-primary">
+                                <i class="fas fa-phone me-2"></i>Gọi Ngay
+                            </a>
                         </div>
-                        <h5 class="fw-bold text-dark mb-3">Hỗ Trợ 24/7</h5>
-                        <p class="text-muted mb-3">
-                            Đội ngũ tư vấn chuyên nghiệp luôn sẵn sàng hỗ trợ bạn mọi lúc
-                        </p>
-                        <a href="tel:0987654321" class="btn btn-outline-primary">
-                            <i class="fas fa-phone me-2"></i>Gọi Ngay
-                        </a>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-                <div class="service-card card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="service-icon bg-success text-white">
-                            <i class="fas fa-tools"></i>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="service-card card shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon bg-success text-white">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-3">Lắp Đặt Miễn Phí</h5>
+                            <p class="text-muted mb-3">
+                                Dịch vụ lắp đặt chuyên nghiệp miễn phí cho mọi đơn hàng
+                            </p>
+                            <a href="{{ route('products.index') }}" class="btn btn-outline-success">
+                                <i class="fas fa-shopping-cart me-2"></i>Mua Ngay
+                            </a>
                         </div>
-                        <h5 class="fw-bold text-dark mb-3">Lắp Đặt Miễn Phí</h5>
-                        <p class="text-muted mb-3">
-                            Dịch vụ lắp đặt chuyên nghiệp miễn phí cho mọi đơn hàng
-                        </p>
-                        <a href="{{ route('products.index') }}" class="btn btn-outline-success">
-                            <i class="fas fa-shopping-cart me-2"></i>Mua Ngay
-                        </a>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-                <div class="service-card card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="service-icon bg-warning text-white">
-                            <i class="fas fa-shield-alt"></i>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="service-card card shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="service-icon bg-warning text-white">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-3">Bảo Hành 5 Năm</h5>
+                            <p class="text-muted mb-3">
+                                Cam kết bảo hành chính hãng 5 năm với dịch vụ hậu mãi tốt nhất
+                            </p>
+                            <a href="{{ route('products.index') }}" class="btn btn-outline-warning">
+                                <i class="fas fa-shield-alt me-2"></i>Tìm Hiểu Thêm
+                            </a>
                         </div>
-                        <h5 class="fw-bold text-dark mb-3">Bảo Hành 5 Năm</h5>
-                        <p class="text-muted mb-3">
-                            Cam kết bảo hành chính hãng 5 năm với dịch vụ hậu mãi tốt nhất
-                        </p>
-                        <a href="{{ route('products.index') }}" class="btn btn-outline-warning">
-                            <i class="fas fa-shield-alt me-2"></i>Tìm Hiểu Thêm
-                        </a>
                     </div>
                 </div>
             </div>
@@ -546,50 +564,15 @@
 
 
 <script>
-    // Validate + hiển thị thông báo đẹp bằng Bootstrap
-    const contactFormElement = document.getElementById('contactForm');
-    const contactAlertElement = document.getElementById('contactAlert');
-
-    contactFormElement.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Thu thập dữ liệu form
-        const formData = {
-            firstName: document.getElementById('firstName').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            service: document.getElementById('service').value.trim(),
-            budget: document.getElementById('budget').value.trim(),
-            message: document.getElementById('message').value.trim()
-        };
-
-        // Kiểm tra bắt buộc (logic đơn giản ở FE, BE nên kiểm tra lại)
-        const isInvalid = !formData.firstName || !formData.email || !formData.service || !formData.message;
-        if (isInvalid) {
-            // Thêm class Bootstrap để báo lỗi trực quan
-            [
-                ['firstName', formData.firstName],
-                ['email', formData.email],
-                ['service', formData.service],
-                ['message', formData.message]
-            ].forEach(([id, value]) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                el.classList.toggle('is-invalid', !value);
-            });
-            return;
-        }
-
-        // Hiển thị alert đẹp và cuộn tới
-        contactAlertElement.classList.remove('d-none');
-        contactAlertElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // Reset form sau khi gửi
-        contactFormElement.reset();
-
-        // Xóa trạng thái lỗi nếu có
-        ['firstName','email','service','message'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('is-invalid');
+    // Gợi ý nhỏ: đánh dấu input lỗi khi submit fail phía server
+    document.addEventListener('DOMContentLoaded', function() {
+        ['firstName','email','service','message'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            if (@json($errors->has('firstName')) && id === 'firstName') el.classList.add('is-invalid');
+            if (@json($errors->has('email')) && id === 'email') el.classList.add('is-invalid');
+            if (@json($errors->has('service')) && id === 'service') el.classList.add('is-invalid');
+            if (@json($errors->has('message')) && id === 'message') el.classList.add('is-invalid');
         });
     });
 </script>
