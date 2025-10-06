@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewPasswordMail;
 
 class AuthController extends Controller
 {
@@ -47,6 +50,12 @@ class AuthController extends Controller
     public function showLogin()
     {
         return view('auth.login');
+    }
+
+    // Hiển thị form quên mật khẩu
+    public function showForgotPassword()
+    {
+        return view('auth.forgot-password');
     }
 
     // Xử lý đăng nhập người dùng
@@ -92,5 +101,67 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         
         return redirect('/');
+    }
+
+    // Xử lý gửi mật khẩu mới qua email (throttle 30 phút)
+    public function forgotPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+
+        // Throttling 30 phút theo email để tránh spam
+        $cacheKey = 'forgot-password:' . $email;
+        if (Cache::has($cacheKey)) {
+            return back()->withErrors([
+                'email' => 'Bạn quên quá nhiều lần, hãy thử lại sau 30 phút',
+            ]);
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            // Không lộ thông tin tồn tại tài khoản
+            return back()->withErrors([
+                'email' => 'Email không tồn tại trong hệ thống.',
+            ]);
+        }
+
+        if (!$user->hasVerifiedEmail()) {
+            return back()->withErrors([
+                'email' => 'Email chưa được xác thực. Vui lòng xác thực email trước.',
+            ]);
+        }
+
+        // Tạo mật khẩu ngẫu nhiên 8 ký tự: chữ và số
+        $newPassword = $this->generateRandomPassword(8);
+
+        // Cập nhật mật khẩu mới (hash) vào DB
+        $user->password = Hash::make($newPassword);
+        $user->save();
+
+        // Gửi email mật khẩu mới
+        Mail::to($email)->queue(new NewPasswordMail($newPassword));
+
+        // Đặt throttle 30 phút
+        Cache::put($cacheKey, true, now()->addMinutes(30));
+
+        // Thông báo
+        Session::flash('status', 'Chúng tôi đã gửi mật khẩu mới về email ' . $email . ' - hãy check cả thư mục spam.');
+        return redirect()->route('password.request');
+    }
+
+    private function generateRandomPassword(int $length = 8): string
+    {
+        // Sinh mật khẩu gồm chữ hoa, chữ thường và số để tăng độ mạnh
+        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+        $maxIndex = strlen($chars) - 1;
+        $result = '';
+        for ($i = 0; $i < $length; $i++) {
+            $result .= $chars[random_int(0, $maxIndex)]; // random_int an toàn hơn mt_rand
+        }
+        return $result;
     }
 }

@@ -108,6 +108,14 @@ class Product extends Model
     }
 
     /**
+     * Quan hệ với order items - sản phẩm có nhiều order items
+     */
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
      * Quan hệ với giao dịch tồn kho
      */
     public function inventoryTransactions()

@@ -12,9 +12,14 @@
             <p class="reports-subtitle">Phân tích hành vi và thống kê khách hàng</p>
         </div>
         <div class="header-actions">
-            <button class="btn btn-success" onclick="exportReport()">
-                <i class="fas fa-download me-2"></i>Xuất Excel
-            </button>
+            <form action="{{ route('admin.reports.export') }}" method="POST" class="d-inline">
+                @csrf
+                <input type="hidden" name="type" value="customers">
+                <input type="hidden" name="sort_by" value="{{ $sortBy }}">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-download me-2"></i>Xuất Excel
+                </button>
+            </form>
         </div>
     </div>
 </div>
@@ -941,13 +946,8 @@ const customerActivityChart = new Chart(customerActivityCtx, {
 });
 
 // Functions
-function exportReport() {
-    // Export report functionality
-    console.log('Exporting customer report');
-}
-
 function exportTable() {
-    // Export table functionality
+    // Export table functionality - sử dụng form xuất chính
     console.log('Exporting customers table');
 }
 </script>

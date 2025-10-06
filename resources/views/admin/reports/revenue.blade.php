@@ -12,9 +12,15 @@
             <p class="reports-subtitle">Phân tích chi tiết doanh thu và xu hướng bán hàng</p>
         </div>
         <div class="header-actions">
-            <button class="btn btn-success" onclick="exportReport()">
-                <i class="fas fa-download me-2"></i>Xuất Excel
-            </button>
+            <form action="{{ route('admin.reports.export') }}" method="POST" class="d-inline">
+                @csrf
+                <input type="hidden" name="type" value="revenue">
+                <input type="hidden" name="start_date" value="{{ $startDate }}">
+                <input type="hidden" name="end_date" value="{{ $endDate }}">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-download me-2"></i>Xuất Excel
+                </button>
+            </form>
         </div>
     </div>
 </div>
@@ -812,18 +818,13 @@ const paymentMethodChart = new Chart(paymentMethodCtx, {
 });
 
 // Functions
-function exportReport() {
-    // Export report functionality
-    console.log('Exporting revenue report');
-}
-
 function toggleChartType(type) {
     // Toggle chart type functionality
     console.log('Toggling chart type:', type);
 }
 
 function exportTable(type) {
-    // Export table functionality
+    // Export table functionality - sử dụng form xuất chính
     console.log('Exporting table:', type);
 }
 </script>

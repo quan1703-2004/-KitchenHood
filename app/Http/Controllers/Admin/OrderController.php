@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Exports\OrdersExport;
 
 class OrderController extends Controller
 {
@@ -79,5 +80,15 @@ class OrderController extends Controller
 
         $statusMessage = $newStatus === 'cancelled' ? 'Đã hủy đơn hàng' : 'Cập nhật trạng thái đơn hàng';
         return redirect()->route('admin.orders.show', $order)->with('success', $statusMessage . ' thành công!');
+    }
+
+    /**
+     * Xuất báo cáo đơn hàng
+     */
+    public function export(Request $request)
+    {
+        $export = new OrdersExport($request->get('start_date'), $request->get('end_date'));
+        $result = $export->export();
+        return response()->download($result['file'], $result['name'])->deleteFileAfterSend(true);
     }
 }

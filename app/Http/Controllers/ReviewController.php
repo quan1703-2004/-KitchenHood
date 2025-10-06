@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\OrderItem;
 
 class ReviewController extends Controller
 {
@@ -38,10 +39,25 @@ class ReviewController extends Controller
             return back()->with('error', 'Bạn chỉ có thể đánh giá sản phẩm đã mua.');
         }
 
-        // Kiểm tra xem người dùng đã đánh giá sản phẩm này chưa
-        $existingReview = $product->reviews()->where('user_id', Auth::id())->first();
-        if ($existingReview) {
-            return back()->with('error', 'Bạn đã đánh giá sản phẩm này rồi.');
+        // Cho phép đánh giá theo từng lần mua: tìm 1 order_item chưa có review
+        // Lấy danh sách order_items đã giao của user cho sản phẩm này
+        $deliveredOrderItems = Auth::user()->orders()
+            ->where('status', 'delivered')
+            ->with(['items' => function ($q) use ($product) {
+                $q->where('product_id', $product->id);
+            }])
+            ->get()
+            ->flatMap(function ($order) {
+                return $order->items; // gom tất cả item phù hợp
+            });
+
+        // Tìm 1 item chưa có review
+        $targetOrderItem = $deliveredOrderItems->first(function ($item) {
+            return !ReviewController::hasReviewForOrderItem($item->id);
+        });
+
+        if (!$targetOrderItem) {
+            return back()->with('error', 'Bạn đã đánh giá đủ số lần mua cho sản phẩm này.');
         }
 
         // Xử lý upload hình ảnh
@@ -55,11 +71,21 @@ class ReviewController extends Controller
 
         $product->reviews()->create([
             'user_id' => Auth::id(),
+            'order_item_id' => $targetOrderItem->id,
             'rating' => $request->rating,
             'comment' => $request->comment,
             'images' => $imagePaths,
         ]);
 
         return back()->with('success', 'Cảm ơn bạn đã gửi đánh giá!');
+    }
+
+    /**
+     * Kiểm tra đã có review cho 1 order_item hay chưa
+     * Ghi chú: tách riêng để dễ kiểm thử, tránh lặp code
+     */
+    public static function hasReviewForOrderItem(int $orderItemId): bool
+    {
+        return \App\Models\Review::where('order_item_id', $orderItemId)->exists();
     }
 }

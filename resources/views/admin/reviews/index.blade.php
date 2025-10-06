@@ -324,6 +324,12 @@
             <p class="reviews-subtitle">Theo dõi và quản lý tất cả đánh giá sản phẩm</p>
         </div>
         <div class="d-flex gap-2">
+            <form action="{{ route('admin.reviews.export') }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-outline-success">
+                    <i class="fas fa-download me-2"></i>Xuất Excel
+                </button>
+            </form>
             <button class="btn btn-outline-primary" onclick="window.print()">
                 <i class="fas fa-print me-2"></i>In Báo Cáo
             </button>
@@ -459,6 +465,12 @@
                                     <i class="fas fa-ellipsis-h"></i>
                                 </a>
                             @endif
+                            @if($review->admin_reply)
+                                <div class="mt-2 p-2 border rounded bg-light">
+                                    <small class="text-muted d-block">Phản hồi admin {{ $review->admin_replied_at ? '(' . $review->admin_replied_at->format('d/m/Y H:i') . ')' : '' }}</small>
+                                    <div>{{ $review->admin_reply }}</div>
+                                </div>
+                            @endif
                         </div>
                     </td>
                     <td class="text-center">
@@ -493,6 +505,13 @@
                                target="_blank">
                                 <i class="fas fa-eye"></i>
                             </a>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-info action-btn"
+                                    title="Trả lời đánh giá"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#replyModal-{{ $review->id }}">
+                                <i class="fas fa-reply"></i>
+                            </button>
                             <button type="button" 
                                     class="btn btn-sm btn-outline-danger action-btn" 
                                     title="Xóa đánh giá"
@@ -502,6 +521,30 @@
                         </div>
                     </td>
                 </tr>
+                <!-- Reply Modal -->
+                <div class="modal fade" id="replyModal-{{ $review->id }}" tabindex="-1" aria-labelledby="replyModalLabel-{{ $review->id }}" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="replyModalLabel-{{ $review->id }}">Trả lời đánh giá của {{ $review->user->name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form method="POST" action="{{ route('admin.reviews.reply', $review) }}">
+                        @csrf
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label class="form-label">Nội dung phản hồi</label>
+                            <textarea name="reply" class="form-control" rows="4" required>{{ old('reply', $review->admin_reply) }}</textarea>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                          <button type="submit" class="btn btn-primary">Gửi phản hồi</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
                 @empty
                 <tr>
                     <td colspan="7" class="text-center">

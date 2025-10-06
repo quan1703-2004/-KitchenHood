@@ -8,6 +8,9 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Review;
+use App\Exports\RevenueExport;
+use App\Exports\ProductsExport;
+use App\Exports\CustomersExport;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -333,35 +336,56 @@ class ReportController extends Controller
         $type = $request->get('type', 'revenue');
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
+        $categoryId = $request->get('category_id');
+        $sortBy = $request->get('sort_by', 'sales');
 
-        switch ($type) {
-            case 'revenue':
-                return $this->exportRevenueReport($startDate, $endDate);
-            case 'products':
-                return $this->exportProductReport();
-            case 'customers':
-                return $this->exportCustomerReport();
-            default:
-                return redirect()->back()->with('error', 'Loại báo cáo không hợp lệ');
+        try {
+            switch ($type) {
+                case 'revenue':
+                    return $this->exportRevenueReport($startDate, $endDate);
+                case 'products':
+                    return $this->exportProductReport($categoryId, $sortBy);
+                case 'customers':
+                    return $this->exportCustomerReport($sortBy);
+                default:
+                    return redirect()->back()->with('error', 'Loại báo cáo không hợp lệ');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất báo cáo: ' . $e->getMessage());
         }
     }
 
+    /**
+     * Xuất báo cáo doanh thu
+     */
     private function exportRevenueReport($startDate, $endDate)
     {
-        // Logic xuất báo cáo doanh thu
-        // Có thể sử dụng Laravel Excel package
-        return redirect()->back()->with('success', 'Xuất báo cáo doanh thu thành công');
+        $export = new RevenueExport($startDate, $endDate);
+        $result = $export->export();
+        
+        return response()->download($result['file'], $result['name'])->deleteFileAfterSend(true);
     }
 
-    private function exportProductReport()
+    /**
+     * Xuất báo cáo sản phẩm
+     */
+    private function exportProductReport($categoryId = null, $sortBy = 'sales')
     {
-        // Logic xuất báo cáo sản phẩm
-        return redirect()->back()->with('success', 'Xuất báo cáo sản phẩm thành công');
+        $export = new ProductsExport($categoryId, $sortBy);
+        $result = $export->export();
+        
+        return response()->download($result['file'], $result['name'])->deleteFileAfterSend(true);
     }
 
-    private function exportCustomerReport()
+    /**
+     * Xuất báo cáo khách hàng
+     */
+    private function exportCustomerReport($sortBy = 'orders')
     {
-        // Logic xuất báo cáo khách hàng
-        return redirect()->back()->with('success', 'Xuất báo cáo khách hàng thành công');
+        $export = new CustomersExport($sortBy);
+        $result = $export->export();
+        
+        return response()->download($result['file'], $result['name'])->deleteFileAfterSend(true);
     }
 }

@@ -34,6 +34,11 @@ class InventoryController extends Controller
     }
 
     /**
+     * Xuất báo cáo tồn kho
+     */
+    
+
+    /**
      * Hiển thị trang nhập hàng cho sản phẩm
      */
     public function show(Product $product)
@@ -113,17 +118,14 @@ class InventoryController extends Controller
      */
     public function export(Request $request)
     {
+        // Sử dụng lớp InventoryExport trả về mảng ['file','name'] để tải xuống
         try {
             $export = new InventoryExport();
-            $filepath = $export->export();
+            $result = $export->export();
             
-            $filename = basename($filepath);
-            
-            return response()->download($filepath, $filename, [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            ])->deleteFileAfterSend();
-            
+            return response()
+                ->download($result['file'], $result['name'])
+                ->deleteFileAfterSend(true);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất báo cáo: ' . $e->getMessage());
         }

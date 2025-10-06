@@ -313,7 +313,7 @@
 
         <!-- Forgot Password -->
         <div class="forgot-password">
-            <a href="#" onclick="alert('Tính năng quên mật khẩu đang được phát triển')">
+            <a href="{{ route('password.request') }}">
                 Quên mật khẩu?
             </a>
         </div>

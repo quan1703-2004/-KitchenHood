@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('faqs', function (Blueprint $table) {
-            $table->id();
-            $table->text('question'); // Nội dung câu hỏi
-            $table->longText('answer'); // Nội dung câu trả lời
-            $table->boolean('is_visible')->default(true); // Bật/tắt hiển thị ngoài trang chủ
-            $table->integer('sort_order')->default(0); // Thứ tự sắp xếp
-            $table->timestamps();
-        });
+        // Nếu bảng đã tồn tại (vd: đã tạo thủ công), bỏ qua tạo mới để tránh lỗi
+        if (!Schema::hasTable('faqs')) {
+            Schema::create('faqs', function (Blueprint $table) {
+                $table->id();
+                $table->text('question'); // Nội dung câu hỏi
+                $table->longText('answer'); // Nội dung câu trả lời
+                $table->boolean('is_visible')->default(true); // Bật/tắt hiển thị ngoài trang chủ
+                $table->integer('sort_order')->default(0); // Thứ tự sắp xếp
+                $table->timestamps();
+            });
+        }
     }
 
     /**

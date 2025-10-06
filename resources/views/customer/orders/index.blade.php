@@ -466,6 +466,106 @@
     transform: scale(1.05);
 }
 
+/* Pagination Styles - Giao diện đẹp */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination .page-item {
+    list-style: none;
+}
+
+.pagination .page-link {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    color: #495057;
+    padding: 10px 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: white;
+    min-width: 45px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.pagination .page-link:hover {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.25);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+    transform: scale(1.1);
+}
+
+.pagination .page-item.disabled .page-link {
+    background: #f8f9fa;
+    border-color: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pagination .page-item.disabled .page-link:hover {
+    background: #f8f9fa;
+    border-color: #e9ecef;
+    color: #adb5bd;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Previous/Next buttons */
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 10px 20px;
+}
+
+.pagination .page-item:first-child .page-link {
+    background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.pagination .page-item:last-child .page-link {
+    background: linear-gradient(90deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.pagination .page-item:first-child .page-link:hover,
+.pagination .page-item:last-child .page-link:hover {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+/* Dots separator */
+.pagination .page-item .page-link[aria-label*="..."] {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    cursor: default;
+    padding: 10px 8px;
+}
+
+.pagination .page-item .page-link[aria-label*="..."]:hover {
+    background: transparent;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Pagination wrapper */
+.d-flex.justify-content-center {
+    padding: 20px 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .order-card .card-header .row > div {
@@ -480,6 +580,40 @@
         left: -17px;
         width: 25px;
         height: 25px;
+    }
+    
+    .pagination .page-link {
+        padding: 8px 12px;
+        min-width: 38px;
+        font-size: 14px;
+    }
+    
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        padding: 8px 14px;
+    }
+    
+    .pagination {
+        gap: 4px;
+    }
+}
+
+@media (max-width: 576px) {
+    .pagination .page-link {
+        padding: 6px 10px;
+        min-width: 35px;
+        font-size: 13px;
+        border-radius: 8px;
+    }
+    
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        padding: 6px 12px;
+    }
+    
+    /* Ẩn một số số trang trên mobile để gọn hơn */
+    .pagination .page-item:not(.active):not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) {
+        display: none;
     }
 }
 </style>

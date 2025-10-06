@@ -262,6 +262,12 @@
             <p class="orders-subtitle">Theo dõi và quản lý tất cả đơn hàng trong hệ thống</p>
         </div>
         <div class="d-flex gap-2">
+            <form action="{{ route('admin.orders.export') }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-outline-success">
+                    <i class="fas fa-download me-2"></i>Xuất Excel
+                </button>
+            </form>
             <button class="btn btn-outline-primary" onclick="window.print()">
                 <i class="fas fa-print me-2"></i>In Báo Cáo
             </button>

@@ -301,9 +301,9 @@ class QuestionAnswerController extends Controller
             $search = $request->get('search', '');
             $page = $request->get('page', 1);
 
-            // Query cơ bản
-            $unansweredQuery = Question::unanswered()->with('user');
-            $answeredQuery = Question::answered()->with(['user', 'answers.user']);
+            // Query cơ bản - Thêm likes để hiển thị trong admin
+            $unansweredQuery = Question::unanswered()->with('user')->withCount('likes');
+            $answeredQuery = Question::answered()->with(['user', 'answers.user'])->withCount('likes');
 
             // Áp dụng bộ lọc danh mục
             if ($category !== 'all') {

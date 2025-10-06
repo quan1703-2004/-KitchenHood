@@ -329,9 +329,12 @@
             <a href="{{ route('admin.inventory.history') }}" class="btn btn-outline-primary">
                 <i class="fas fa-history me-2"></i>Lịch Sử Giao Dịch
             </a>
-            <a href="{{ route('admin.inventory.export') }}" class="btn btn-success">
-                <i class="fas fa-file-excel me-2"></i>Xuất Excel
-            </a>
+            <form action="{{ route('admin.inventory.export') }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-file-excel me-2"></i>Xuất Excel
+                </button>
+            </form>
         </div>
     </div>
 </div>

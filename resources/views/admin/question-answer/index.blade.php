@@ -112,6 +112,7 @@
                         <th>Tiêu đề</th>
                         <th>Danh mục</th>
                         <th>Nội dung</th>
+                        <th>Lượt thích</th>
                         <th>Trạng thái</th>
                         <th>Ngày tạo</th>
                         <th>Hành động</th>
@@ -301,7 +302,7 @@ function updateQuestionsTable(data) {
     if (tbody.children().length === 0) {
         tbody.append(`
             <tr>
-                <td colspan="8" class="text-center py-4">
+                <td colspan="9" class="text-center py-4">
                     <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                     <p class="text-muted">Không có câu hỏi nào</p>
                 </td>
@@ -329,44 +330,33 @@ function createQuestionRow(question, isAnswered) {
             <i class="fas fa-eye me-1"></i>Xem
         </button>`;
     
-    // Tạo HTML cho câu trả lời nếu có
-    let answersHtml = '';
-    if (isAnswered && question.answers && question.answers.length > 0) {
-        answersHtml = `
-            <tr class="answer-row">
-                <td colspan="8">
-                    <div class="answer-section">
-                        <div class="answer-header">
-                            <i class="fas fa-reply me-2"></i>Câu trả lời:
-                        </div>
-                        ${question.answers.map(answer => `
-                            <div class=\"answer-item\">
-                                <div class=\"d-flex align-items-start gap-2\">
-                                    <div class=\"avatar-sm rounded-circle d-flex align-items-center justify-content-center\" style=\"overflow:hidden;background:#86a4bc;\">
-                                        ${answer.user?.avatar_url ? `<img src=\"${answer.user.avatar_url}\" alt=\"${answer.user.name}\" style=\"width:100%;height:100%;object-fit:cover;\">` : (answer.user?.name || 'A').charAt(0).toUpperCase()}
-                                    </div>
-                                    <div class=\"answer-content flex-grow-1\">
-                                        <p class=\"mb-2\">${answer.content}</p>
-                                        <div class=\"answer-meta\">
-                                            <small class=\"text-muted\">${answer.user.name} (Admin) · ${new Date(answer.created_at).toLocaleDateString('vi-VN')}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </td>
-            </tr>
-        `;
+    // Avatar từ database hoặc chữ cái đầu
+    let avatarHtml = '';
+    if (question.user.avatar) {
+        // Có avatar trong database
+        const avatarUrl = question.user.avatar.startsWith('http') 
+            ? question.user.avatar 
+            : `/storage/${question.user.avatar}`;
+        avatarHtml = `<img src="${avatarUrl}" alt="${question.user.name}" style="width:100%;height:100%;object-fit:cover;">`;
+    } else {
+        // Không có avatar, hiển thị chữ cái đầu
+        avatarHtml = `<span style="color:#fff;font-weight:700;">${question.user.name.charAt(0).toUpperCase()}</span>`;
     }
+    
+    // Số lượt thích
+    const likesCount = question.likes_count || 0;
+    const likesHtml = likesCount > 0 
+        ? `<span class="badge badge-likes"><i class="fas fa-heart me-1"></i>${likesCount}</span>`
+        : `<span class="text-muted small">0</span>`;
     
     return `
         <tr>
             <td>#${question.id}</td>
             <td>
                 <div class="d-flex align-items-center">
-                    <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center me-2" style="overflow:hidden;background:#9e9e9e;">
-                        ${question.user.avatar_url ? `<img src="${question.user.avatar_url}" alt="${question.user.name}" style="width:100%;height:100%;object-fit:cover;">` : question.user.name.charAt(0).toUpperCase()}
+                    <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center me-2" 
+                         style="overflow:hidden;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        ${avatarHtml}
                     </div>
                     <div>
                         <div class="fw-semibold">${question.user.name}</div>
@@ -383,6 +373,7 @@ function createQuestionRow(question, isAnswered) {
                     ${question.content}
                 </div>
             </td>
+            <td>${likesHtml}</td>
             <td>${statusBadge}</td>
             <td>
                 <div class="small text-muted">
@@ -398,7 +389,6 @@ function createQuestionRow(question, isAnswered) {
                 </div>
             </td>
         </tr>
-        ${answersHtml}
     `;
 }
 
@@ -439,21 +429,38 @@ function answerQuestion(questionId) {
             }
             
             if (question) {
+                // Avatar từ database
+                let avatarHtml = '';
+                if (question.user.avatar) {
+                    const avatarUrl = question.user.avatar.startsWith('http') 
+                        ? question.user.avatar 
+                        : `/storage/${question.user.avatar}`;
+                    avatarHtml = `<img src="${avatarUrl}" alt="${question.user.name}" class="rounded-circle" style="width:50px;height:50px;object-fit:cover;">`;
+                } else {
+                    avatarHtml = `<div class="rounded-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:#fff;font-size:20px;font-weight:700;">${question.user.name.charAt(0).toUpperCase()}</div>`;
+                }
+                
+                // Số lượt thích
+                const likesCount = question.likes_count || 0;
+                
                 $('#questionInfo').html(`
-                    <div class="row">
-                        <div class="col-md-6">
-                            <strong>Khách hàng:</strong> ${question.user.name}
-                        </div>
-                        <div class="col-md-6">
-                            <strong>Email:</strong> ${question.user.email}
+                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                        ${avatarHtml}
+                        <div class="ms-3">
+                            <div class="fw-bold">${question.user.name}</div>
+                            <div class="text-muted small">${question.user.email}</div>
                         </div>
                     </div>
-                    <div class="row mt-2">
-                        <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-4">
                             <strong>Danh mục:</strong> ${question.category_name}
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <strong>Ngày hỏi:</strong> ${new Date(question.created_at).toLocaleDateString('vi-VN')}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Lượt thích:</strong> 
+                            <span class="badge badge-likes"><i class="fas fa-heart me-1"></i>${likesCount}</span>
                         </div>
                     </div>
                     <div class="mt-3">
@@ -572,6 +579,20 @@ function viewQuestion(questionId) {
             }
             
             if (question) {
+                // Avatar từ database
+                let avatarHtml = '';
+                if (question.user.avatar) {
+                    const avatarUrl = question.user.avatar.startsWith('http') 
+                        ? question.user.avatar 
+                        : `/storage/${question.user.avatar}`;
+                    avatarHtml = `<img src="${avatarUrl}" alt="${question.user.name}" class="rounded-circle" style="width:60px;height:60px;object-fit:cover;">`;
+                } else {
+                    avatarHtml = `<div class="rounded-circle d-flex align-items-center justify-content-center" style="width:60px;height:60px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:#fff;font-size:24px;font-weight:700;">${question.user.name.charAt(0).toUpperCase()}</div>`;
+                }
+                
+                // Số lượt thích
+                const likesCount = question.likes_count || 0;
+                
                 let answersHtml = '';
                 if (question.answers && question.answers.length > 0) {
                     answersHtml = `
@@ -600,20 +621,23 @@ function viewQuestion(questionId) {
                             </h6>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <strong>Khách hàng:</strong> ${question.user.name}
-                                </div>
-                                <div class="col-md-6">
-                                    <strong>Email:</strong> ${question.user.email}
+                            <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                                ${avatarHtml}
+                                <div class="ms-3">
+                                    <div class="fw-bold">${question.user.name}</div>
+                                    <div class="text-muted small">${question.user.email}</div>
                                 </div>
                             </div>
-                            <div class="row mt-2">
-                                <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4">
                                     <strong>Danh mục:</strong> ${question.category_name}
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <strong>Ngày hỏi:</strong> ${new Date(question.created_at).toLocaleDateString('vi-VN')}
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Lượt thích:</strong> 
+                                    <span class="badge badge-likes"><i class="fas fa-heart me-1"></i>${likesCount}</span>
                                 </div>
                             </div>
                             <div class="mt-3">
@@ -676,6 +700,19 @@ function refreshQuestions() {
 
 .badge-success {
     background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    color: #fff;
+}
+
+.badge-likes {
+    background: linear-gradient(135deg, #e91e63 0%, #f06292 100%);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badge-likes i {
     color: #fff;
 }
 
@@ -743,6 +780,19 @@ function refreshQuestions() {
     .answer-content {
         padding: 0.75rem;
     }
+    
+    /* Ẩn cột lượt thích trên mobile để gọn hơn */
+    .admin-table .table th:nth-child(6),
+    .admin-table .table td:nth-child(6) {
+        display: none;
+    }
+}
+
+/* Cột Lượt thích - width cố định */
+.admin-table .table th:nth-child(6),
+.admin-table .table td:nth-child(6) {
+    width: 100px;
+    text-align: center;
 }
 </style>
 @endsection

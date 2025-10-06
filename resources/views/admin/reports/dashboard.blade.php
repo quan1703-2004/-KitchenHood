@@ -100,11 +100,7 @@
                     <i class="fas fa-chart-bar me-2"></i>
                     Doanh thu theo danh mục
                 </h3>
-                <div class="chart-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('categoryRevenue')">
-                        <i class="fas fa-download me-1"></i>Xuất
-                    </button>
-                </div>
+                
             </div>
             <div class="chart-content">
                 <canvas id="categoryRevenueChart" height="300"></canvas>
@@ -118,11 +114,7 @@
                     <i class="fas fa-chart-line me-2"></i>
                     Doanh thu theo ngày (30 ngày gần nhất)
                 </h3>
-                <div class="chart-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenueByDate')">
-                        <i class="fas fa-download me-1"></i>Xuất
-                    </button>
-                </div>
+                
             </div>
             <div class="chart-content">
                 <canvas id="revenueByDateChart" height="300"></canvas>
@@ -136,11 +128,7 @@
                     <i class="fas fa-chart-bar me-2"></i>
                     Doanh thu theo tháng (6 tháng gần nhất)
                 </h3>
-                <div class="chart-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenueByMonth')">
-                        <i class="fas fa-download me-1"></i>Xuất
-                    </button>
-                </div>
+                
             </div>
             <div class="chart-content">
                 <canvas id="revenueByMonthChart" height="300"></canvas>
@@ -154,11 +142,7 @@
                     <i class="fas fa-chart-bar me-2"></i>
                     Doanh thu theo năm (3 năm gần nhất)
                 </h3>
-                <div class="chart-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenueByYear')">
-                        <i class="fas fa-download me-1"></i>Xuất
-                    </button>
-                </div>
+                
             </div>
             <div class="chart-content">
                 <canvas id="revenueByYearChart" height="300"></canvas>
@@ -175,11 +159,7 @@
                     <i class="fas fa-chart-pie me-2"></i>
                     Doanh thu theo phương thức thanh toán
                 </h3>
-                <div class="chart-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart('revenueByPaymentMethod')">
-                        <i class="fas fa-download me-1"></i>Xuất
-                    </button>
-                </div>
+                
             </div>
             <div class="chart-content">
                 <canvas id="revenueByPaymentMethodChart" height="300"></canvas>
@@ -304,15 +284,21 @@
             </div>
         </a>
 
-        <a href="#" class="action-card" onclick="exportAllReports()">
-            <div class="action-icon">
-                <i class="fas fa-download"></i>
-            </div>
-            <div class="action-content">
-                <h4>Xuất tất cả báo cáo</h4>
-                <p>Download báo cáo Excel</p>
-            </div>
-        </a>
+        <form action="{{ route('admin.reports.export') }}" method="POST" class="m-0">
+            @csrf
+            <input type="hidden" name="type" value="revenue">
+            <input type="hidden" name="start_date" value="{{ $startDate }}">
+            <input type="hidden" name="end_date" value="{{ $endDate }}">
+            <button type="submit" class="action-card" style="border: none; width: 100%; cursor: pointer;">
+                <div class="action-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Xuất báo cáo doanh thu</h4>
+                    <p>Download báo cáo Excel</p>
+                </div>
+            </button>
+        </form>
     </div>
 </div>
 
@@ -1265,17 +1251,7 @@ function updateDateRange() {
     }
 }
 
-function exportChart(type) {
-    // Export chart functionality
-    console.log('Exporting chart:', type);
-    // Có thể thêm logic xuất biểu đồ thành hình ảnh hoặc PDF
-}
-
-function exportAllReports() {
-    // Export all reports functionality
-    console.log('Exporting all reports');
-    // Có thể thêm logic xuất tất cả báo cáo
-}
+// Các function export đã được chuyển sang form submit cho từng biểu đồ
 
 function refreshCharts() {
     // Làm mới trang để cập nhật dữ liệu

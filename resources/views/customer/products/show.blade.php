@@ -145,6 +145,18 @@
                                             <span class="badge bg-primary ms-2">{{ $review->rating }}/5</span>
                                         </div>
                                         <p>{{ $review->comment }}</p>
+
+                                        @if($review->admin_reply)
+                                            <div class="mt-3 p-3 border rounded bg-light">
+                                                <small class="text-muted d-block mb-1">
+                                                    Phản hồi từ Admin
+                                                    @if($review->admin_replied_at)
+                                                        ({{ $review->admin_replied_at->format('d/m/Y H:i') }})
+                                                    @endif
+                                                </small>
+                                                <div>{{ $review->admin_reply }}</div>
+                                            </div>
+                                        @endif
                                         
                                         <!-- Hiển thị hình ảnh đánh giá -->
                                         @if($review->images && count($review->images) > 0)
