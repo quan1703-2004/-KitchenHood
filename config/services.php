@@ -57,4 +57,14 @@ return [
         'from_district_id' => env('GHN_FROM_DISTRICT_ID'),
         'from_ward_code' => env('GHN_FROM_WARD_CODE'),
     ],
+
+    // Google AI Studio (Generative Language API for Gemini)
+    'google_ai' => [
+        'api_key' => env('GOOGLE_API_KEY'),
+        'model' => env('GOOGLE_AI_MODEL', 'gemini-2.5-flash-lite'),
+        // Bật/tắt kiểm tra chứng chỉ SSL (DEV có thể đặt false để tránh lỗi cURL 60)
+        'verify_ssl' => env('GOOGLE_AI_VERIFY_SSL', true),
+        // Nếu muốn chỉ định CA bundle cụ thể: đặt đường dẫn tuyệt đối tới cacert.pem
+        'ca_bundle' => env('GOOGLE_AI_CA_BUNDLE'),
+    ],
 ];

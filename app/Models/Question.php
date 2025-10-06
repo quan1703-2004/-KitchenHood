@@ -66,6 +66,30 @@ class Question extends Model
     }
 
     /**
+     * Quan hệ với Likes
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(QuestionLike::class);
+    }
+
+    /**
+     * Kiểm tra user đã like câu hỏi này chưa
+     */
+    public function isLikedBy($userId)
+    {
+        return $this->likes()->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * Đếm số lượt like
+     */
+    public function getLikesCountAttribute()
+    {
+        return $this->likes()->count();
+    }
+
+    /**
      * Scope: Lấy câu hỏi chưa trả lời
      */
     public function scopeUnanswered($query)

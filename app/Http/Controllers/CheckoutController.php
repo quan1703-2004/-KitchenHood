@@ -204,7 +204,7 @@ class CheckoutController extends Controller
             // Xử lý thanh toán theo phương thức
             if ($request->payment_method === 'momo') {
                 session(['momo_pending_order_id' => $order->id]);
-                return redirect()->route('payment.momo.start', ['order' => $order->id]);
+                return redirect()->route('payment.momo', $order->id);
             } else {
                 // Tích hợp với GHN API cho phương thức không phải MoMo
                 // Gọi ở đây để chỉ đẩy sang GHN khi không cần chờ thanh toán ví MoMo

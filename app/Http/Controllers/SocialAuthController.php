@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use GuzzleHttp\Client;
 use Throwable;
 
 class SocialAuthController extends Controller
@@ -17,14 +19,34 @@ class SocialAuthController extends Controller
             ->redirect();
     }
 
-    public function handleGoogleCallback()
+    public function handleGoogleCallback(Request $request)
     {
+        // Chuẩn bị HTTP client cho Socialite, fix lỗi SSL cURL 60 ở môi trường local (Windows/MAMP)
+        $httpOptions = [];
+        if (app()->environment('local')) {
+            // Cảnh báo: chỉ vô hiệu hóa verify trong môi trường local để debug
+            $httpOptions['verify'] = false;
+        }
+
+        $provider = app(\Laravel\Socialite\Contracts\Factory::class)->driver('google');
+        if (!empty($httpOptions)) {
+            $provider->setHttpClient(new Client($httpOptions));
+        }
+
         try {
-            $googleUser = app(\Laravel\Socialite\Contracts\Factory::class)
-                ->driver('google')
-                ->user();
+            $googleUser = $provider->user();
         } catch (Throwable $e) {
-            return redirect()->route('login')->with('warning', 'Đăng nhập Google thất bại. Vui lòng thử lại.');
+            // Một số môi trường (proxy, thiếu session) gây ra lỗi InvalidState
+
+            try {
+                $providerStateless = app(\Laravel\Socialite\Contracts\Factory::class)->driver('google')->stateless();
+                if (!empty($httpOptions)) {
+                    $providerStateless->setHttpClient(new Client($httpOptions));
+                }
+                $googleUser = $providerStateless->user();
+            } catch (Throwable $e2) {
+                return redirect()->route('login')->with('warning', 'Đăng nhập Google thất bại. Vui lòng thử lại.');
+            }
         }
 
         $user = User::where('email', $googleUser->getEmail())->first();
@@ -33,7 +55,8 @@ class SocialAuthController extends Controller
             $user = User::create([
                 'name' => $googleUser->getName() ?: ($googleUser->user['given_name'] ?? 'Người dùng'),
                 'email' => $googleUser->getEmail(),
-                'password' => Str::random(32),
+                // Băm mật khẩu ngẫu nhiên để an toàn hơn dù không dùng tới
+                'password' => bcrypt(Str::random(32)),
                 'role' => 'customer',
             ]);
         } else {
@@ -104,4 +127,4 @@ class SocialAuthController extends Controller
             ? redirect()->route('admin.dashboard')
             : redirect()->intended(route('home'));
     }
-}
+}   

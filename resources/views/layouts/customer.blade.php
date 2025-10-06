@@ -123,7 +123,6 @@
         .dropdown-item:hover {
             background-color: var(--light-blue);
             color: var(--primary-color);
-            transform: translateX(5px);
         }
         
         .dropdown-item.active {
@@ -1160,6 +1159,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    @if(request()->routeIs('home'))
+    <script src="{{ asset('js/chatbot.js') }}" defer></script>
+    @endif
     
     <!-- CSS cho payment icons -->
     <style>

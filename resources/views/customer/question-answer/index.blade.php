@@ -1,76 +1,70 @@
 @extends('layouts.customer')
 
-@section('title', 'Hỏi Đáp')
+@section('title', 'Diễn Đàn Hỏi Đáp')
 
 @section('content')
-<div class="faq-container">
-    <!-- Main Content -->
-    <div class="faq-main">
-        <!-- Ask Question Section -->
-        <div class="ask-question-section">
-            <div class="section-header">
-                <div class="header-icon">
+<div class="forum-container">
+    <div class="forum-layout">
+        <!-- Main Content -->
+        <div class="forum-wrapper">
+            <!-- Header Section -->
+            <div class="forum-header">
+            <div class="header-content">
+                <h1 class="forum-title">
+                    <i class="fas fa-comments"></i>
+                    Diễn Đàn Hỏi Đáp
+                </h1>
+                <button type="button" id="toggleQuestionFormBtn" class="btn-ask-question">
                     <i class="fas fa-plus-circle"></i>
-                </div>
-                <h2 class="section-title">Câu hỏi & trả lời</h2>
-                <div class="ms-auto">
-                    <button type="button" id="toggleQuestionFormBtn" class="toggle-form-btn">
-                        <i class="fas fa-pen"></i>
-                        <span>Đặt câu hỏi mới</span>
-                    </button>
-                </div>
+                    <span>Đặt câu hỏi mới</span>
+                </button>
             </div>
-            
-            <div class="question-form-container is-hidden" id="questionFormWrapper">
+        </div>
+
+        <!-- Question Form -->
+        <div class="question-form-wrapper is-hidden" id="questionFormWrapper">
+            <div class="post-card">
                 <form id="questionForm" class="question-form" novalidate>
                     @csrf
-                    <div class="form-group">
-                        <label for="title" class="form-label">
-                            <i class="fas fa-heading"></i>
+                    <div class="form-row">
+                        <label class="form-label">
                             <span>Tiêu đề câu hỏi</span>
                             <span class="required">*</span>
                         </label>
                         <input type="text" 
-                               class="form-input" 
+                               class="form-control" 
                                id="title" 
                                name="title" 
-                               placeholder="Nhập tiêu đề câu hỏi ngắn gọn..." 
+                               placeholder="Nhập tiêu đề câu hỏi..." 
                                required
                                minlength="5"
                                maxlength="255">
-                        <div class="form-hint">Tối thiểu 5 ký tự, tối đa 255 ký tự</div>
-                        <div class="form-error"></div>
+                        <div class="invalid-feedback"></div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="category" class="form-label">
-                            <i class="fas fa-tags"></i>
-                            <span>Danh mục câu hỏi</span>
+                    <div class="form-row">
+                        <label class="form-label">
+                            <span>Danh mục</span>
                             <span class="required">*</span>
                         </label>
-                        <div class="select-wrapper">
-                            <select class="form-select" 
-                                    id="category" 
-                                    name="category" 
-                                    required>
-                                <option value="">-- Chọn danh mục --</option>
-                                @foreach($categories as $key => $name)
-                                    <option value="{{ $key }}">{{ $name }}</option>
-                                @endforeach
-                            </select>
-                            <i class="fas fa-chevron-down select-arrow"></i>
-                        </div>
-                        <div class="form-hint">Chọn danh mục phù hợp với câu hỏi của bạn</div>
-                        <div class="form-error"></div>
+                        <select class="form-control" 
+                                id="category" 
+                                name="category" 
+                                required>
+                            <option value="">-- Chọn danh mục --</option>
+                            @foreach($categories as $key => $name)
+                                <option value="{{ $key }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="invalid-feedback"></div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="content" class="form-label">
-                            <i class="fas fa-align-left"></i>
+                    <div class="form-row">
+                        <label class="form-label">
                             <span>Nội dung câu hỏi</span>
                             <span class="required">*</span>
                         </label>
-                        <textarea class="form-textarea" 
+                        <textarea class="form-control" 
                                   id="content" 
                                   name="content" 
                                   rows="5" 
@@ -78,163 +72,247 @@
                                   required
                                   minlength="10"
                                   maxlength="2000"></textarea>
-                        <div class="form-hint">Tối thiểu 10 ký tự, tối đa 2000 ký tự</div>
-                        <div class="form-error"></div>
+                        <div class="invalid-feedback"></div>
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="submit-btn">
+                        <button type="submit" class="btn-submit">
                             <i class="fas fa-paper-plane"></i>
                             <span>Gửi Câu Hỏi</span>
+                        </button>
+                        <button type="button" class="btn-cancel" id="cancelFormBtn">
+                            <i class="fas fa-times"></i>
+                            <span>Hủy</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Questions Section -->
-        <div class="questions-section">
-            <div class="section-header">
-                <div class="header-icon">
-                    <i class="fas fa-list"></i>
-                </div>
-                <h2 class="section-title">Câu Hỏi & Trả Lời</h2>
+        <!-- Search & Filter Bar -->
+        <div class="filter-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Tìm kiếm câu hỏi...">
             </div>
-            
-            <!-- Search and Filter -->
-            <div class="search-filter-section">
-                <div class="search-container">
-                    <div class="search-input-wrapper">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm câu hỏi...">
-                    </div>
-                </div>
-                <div class="filter-container">
-                    <div class="filter-select-wrapper">
-                        <select id="categoryFilter" class="filter-select">
-                            <option value="">Tất cả danh mục</option>
-                            @foreach($categories as $key => $name)
-                                <option value="{{ $key }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
-                        <i class="fas fa-chevron-down filter-arrow"></i>
-                    </div>
-                </div>
+            <div class="filter-box">
+                <select id="categoryFilter">
+                    <option value="">Tất cả danh mục</option>
+                    @foreach($categories as $key => $name)
+                        <option value="{{ $key }}">{{ $name }}</option>
+                    @endforeach
+                </select>
             </div>
-            
-            <!-- Questions List -->
-            <div class="questions-list">
-                @if($questions->count() > 0)
-                    @foreach($questions as $question)
-                        <div class="question-item" data-category="{{ $question->category }}">
-                            <div class="question-header" onclick="toggleQuestion({{ $question->id }})">
-                                <div class="question-icon">
-                                    <i class="fas fa-question"></i>
+        </div>
+
+        <!-- Questions List -->
+        <div class="questions-feed">
+            @if($questions->count() > 0)
+                @foreach($questions as $question)
+                    <div class="post-card" data-category="{{ $question->category }}" data-question-id="{{ $question->id }}">
+                        <!-- Post Header -->
+                        <div class="post-header">
+                            <div class="author-info">
+                                <div class="author-avatar">
+                                    @if($question->user?->avatar)
+                                        <img src="{{ $question->user->avatar_url }}" alt="{{ $question->user->name }}">
+                                    @else
+                                        <div class="avatar-placeholder">{{ mb_strtoupper(mb_substr($question->user->name, 0, 1, 'UTF-8'), 'UTF-8') }}</div>
+                                    @endif
                                 </div>
-                                <div class="question-content">
-                                    <h3 class="question-title">{{ $question->title }}</h3>
-                                    <div class="question-meta">
-                                        <span class="category-badge">{{ $question->category_name }}</span>
-                                        <span class="user-info">
-                                            <span class="qa-avatar">
-                                                @if($question->user?->avatar)
-                                                    <img src="{{ $question->user->avatar_url }}" alt="{{ $question->user->name }}" class="qa-avatar-img">
-                                                @else
-                                                    <span class="qa-avatar-initial">{{ mb_strtoupper(mb_substr($question->user->name, 0, 1, 'UTF-8'), 'UTF-8') }}</span>
-                                                @endif
-                                            </span>
-                                            {{ $question->user->name }}
-                                        </span>
-                                        <span class="date-info">
-                                            <i class="fas fa-clock"></i>
-                                            {{ $question->created_at->format('d/m/Y H:i') }}
-                                        </span>
-                                        @can('update', $question)
-                                            <button type="button" class="edit-question-btn" data-id="{{ $question->id }}">
-                                                <i class="fas fa-edit"></i> Sửa
-                                            </button>
-                                        @endcan
-                                        @if($question->is_answered)
-                                            <span class="status-badge answered">
-                                                <i class="fas fa-check"></i>
-                                                Đã trả lời
-                                            </span>
+                                <div class="author-details">
+                                    <div class="author-name-row">
+                                        <span class="author-name">{{ $question->user->name }}</span>
+                                        @if($question->user->role === 'admin')
+                                            <span class="user-badge admin-badge">ADMIN</span>
                                         @else
-                                            <span class="status-badge pending">
-                                                <i class="fas fa-clock"></i>
-                                                Chưa trả lời
-                                            </span>
+                                            <span class="user-badge member-badge">Thành viên</span>
                                         @endif
+                                        <span class="category-tag">{{ $question->category_name }}</span>
+                                    </div>
+                                    <div class="post-time">
+                                        <i class="far fa-clock"></i>
+                                        {{ $question->created_at->format('d/m/Y H:i') }}
                                     </div>
                                 </div>
-                                <div class="question-toggle">
-                                    <i class="fas fa-chevron-down toggle-icon"></i>
-                                </div>
                             </div>
-                            
-                            <div class="question-body" id="question-{{ $question->id }}">
-                                <div class="question-description">
-                                    <p>{{ $question->content }}</p>
+                            @can('update', $question)
+                                <div class="post-actions">
+                                    <button class="btn-edit-question" data-id="{{ $question->id }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                 </div>
-                                
-                                @if($question->answers->count() > 0)
-                                    <div class="answers-section">
-                                        <div class="answers-header">
-                                            <i class="fas fa-reply"></i>
-                                            <span>Câu trả lời</span>
-                                        </div>
-                                        @foreach($question->answers as $answer)
-                                            <div class="answer-item">
-                                                <div class="d-flex align-items-start gap-3">
-                                                    <span class="qa-avatar qa-avatar-admin">
-                                                        @if($answer->user?->avatar)
-                                                            <img src="{{ $answer->user->avatar_url }}" alt="{{ $answer->user->name }}" class="qa-avatar-img">
-                                                        @else
-                                                            <span class="qa-avatar-initial">{{ mb_strtoupper(mb_substr($answer->user->name, 0, 1, 'UTF-8'), 'UTF-8') }}</span>
-                                                        @endif
+                            @endcan
+                        </div>
+
+                        <!-- Post Content -->
+                        <div class="post-content">
+                            <h3 class="post-title">{{ $question->title }}</h3>
+                            <div class="post-body" id="body-{{ $question->id }}">
+                                <p>{{ $question->content }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Post Stats -->
+                        <div class="post-stats">
+                            <!-- Nút Like -->
+                            <button class="btn-like @if(Auth::check() && $question->isLikedBy(Auth::id())) liked @endif" 
+                                    data-question-id="{{ $question->id }}"
+                                    onclick="toggleLike({{ $question->id }})">
+                                <i class="fas fa-heart"></i>
+                                <span class="like-count">{{ $question->likes_count }}</span>
+                            </button>
+                            <span class="stat-divider">•</span>
+                            @if($question->is_answered)
+                                <span class="stat-item stat-answered">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Đã trả lời ({{ $question->answers->count() }})</span>
+                                </span>
+                            @else
+                                <span class="stat-item stat-pending">
+                                    <i class="far fa-clock"></i>
+                                    <span>Chờ trả lời</span>
+                                </span>
+                            @endif
+                            <span class="stat-divider">•</span>
+                            <button class="btn-toggle-answers" onclick="toggleAnswers({{ $question->id }})">
+                                <i class="fas fa-comment-dots"></i>
+                                <span>{{ $question->answers->count() }} bình luận</span>
+                            </button>
+                        </div>
+
+                        <!-- Answers Section -->
+                        <div class="answers-wrapper is-collapsed" id="answers-{{ $question->id }}">
+                            @if($question->answers->count() > 0)
+                                <div class="answers-list">
+                                    @foreach($question->answers as $answer)
+                                        <div class="answer-card">
+                                            <div class="answer-avatar">
+                                                @if($answer->user?->avatar)
+                                                    <img src="{{ $answer->user->avatar_url }}" alt="{{ $answer->user->name }}">
+                                                @else
+                                                    <div class="avatar-placeholder admin">{{ mb_strtoupper(mb_substr($answer->user->name, 0, 1, 'UTF-8'), 'UTF-8') }}</div>
+                                                @endif
+                                            </div>
+                                            <div class="answer-content">
+                                                <div class="answer-header">
+                                                    <span class="answer-author">{{ $answer->user->name }}</span>
+                                                    <span class="user-badge admin-badge">ADMIN</span>
+                                                    <span class="answer-time">
+                                                        <i class="far fa-clock"></i>
+                                                        {{ $answer->created_at->format('d/m/Y H:i') }}
                                                     </span>
-                                                    <div class="answer-content flex-grow-1">
-                                                        <p>{{ $answer->content }}</p>
-                                                        <div class="answer-meta">
-                                                            <span class="answer-author">
-                                                                {{ $answer->user->name }} (Admin)
-                                                            </span>
-                                                            <span class="answer-date">
-                                                                <i class="fas fa-clock"></i>
-                                                                {{ $answer->created_at->format('d/m/Y H:i') }}
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                                </div>
+                                                <div class="answer-text">
+                                                    <p>{{ $answer->content }}</p>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <div class="no-answer">
-                                        <i class="fas fa-hourglass-half"></i>
-                                        <p>Chưa có câu trả lời</p>
-                                    </div>
-                                @endif
-                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="no-answers">
+                                    <i class="far fa-comment-dots"></i>
+                                    <p>Chưa có câu trả lời nào. Hãy chờ admin phản hồi!</p>
+                                </div>
+                            @endif
                         </div>
-                    @endforeach
-                    
-                    <!-- Pagination -->
-                    <div class="pagination-container">
-                        {{ $questions->links() }}
+                    </div>
+                @endforeach
+                
+                <!-- Pagination -->
+                <div class="pagination-wrapper">
+                    {{ $questions->links() }}
+                </div>
+            @else
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <h3>Chưa có câu hỏi nào</h3>
+                    <p>Hãy là người đầu tiên đặt câu hỏi trong diễn đàn!</p>
+                    <button type="button" class="btn-ask-question" onclick="$('#toggleQuestionFormBtn').click()">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Đặt câu hỏi ngay</span>
+                    </button>
+                </div>
+            @endif
+        </div>
+    </div>
+    
+    <!-- Sidebar Xếp Hạng -->
+    <aside class="forum-sidebar">
+        <div class="sidebar-card">
+            <div class="sidebar-header">
+                <i class="fas fa-trophy"></i>
+                <h3>Top Bài Viết</h3>
+            </div>
+            <div class="sidebar-body">
+                @if($topQuestions->count() > 0)
+                    <div class="top-questions-list">
+                        @foreach($topQuestions as $index => $topQuestion)
+                            <div class="top-question-item">
+                                <div class="rank-badge rank-{{ $index + 1 }}">
+                                    @if($index == 0)
+                                        <i class="fas fa-trophy"></i>
+                                    @elseif($index == 1)
+                                        <i class="fas fa-medal"></i>
+                                    @elseif($index == 2)
+                                        <i class="fas fa-award"></i>
+                                    @else
+                                        {{ $index + 1 }}
+                                    @endif
+                                </div>
+                                <div class="top-question-info">
+                                    <a href="#question-{{ $topQuestion->id }}" class="top-question-title">
+                                        {{ Str::limit($topQuestion->title, 50) }}
+                                    </a>
+                                    <div class="top-question-meta">
+                                        <span class="top-author">
+                                            <i class="fas fa-user"></i>
+                                            {{ $topQuestion->user->name }}
+                                        </span>
+                                        <span class="top-likes">
+                                            <i class="fas fa-heart"></i>
+                                            {{ $topQuestion->likes_count }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 @else
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
-                        <h3>Chưa có câu hỏi nào</h3>
-                        <p>Hãy là người đầu tiên đặt câu hỏi!</p>
+                    <div class="no-top-questions">
+                        <i class="fas fa-inbox"></i>
+                        <p>Chưa có bài viết nào được like</p>
                     </div>
                 @endif
             </div>
         </div>
-    </div>
+        
+        <!-- Thống kê -->
+        <div class="sidebar-card">
+            <div class="sidebar-header">
+                <i class="fas fa-chart-bar"></i>
+                <h3>Thống Kê</h3>
+            </div>
+            <div class="sidebar-body">
+                <div class="stat-row">
+                    <span class="stat-label">Tổng câu hỏi:</span>
+                    <span class="stat-value">{{ $questions->total() }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Đã trả lời:</span>
+                    <span class="stat-value text-success">{{ $questions->where('is_answered', true)->count() }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Chờ trả lời:</span>
+                    <span class="stat-value text-warning">{{ $questions->where('is_answered', false)->count() }}</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
 </div>
 
 <!-- Loading Modal -->
@@ -295,714 +373,906 @@
 
 @section('styles')
 <style>
-/* ===== SCOPED CSS CHỈ CHO FAQ CONTAINER ===== */
-.faq-container {
-    padding: 2rem 1rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    min-height: 80vh;
-    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+/* ===== FORUM CONTAINER - GIAO DIỆN DIỄN ĐÀN CHUYÊN NGHIỆP ===== */
+.forum-container {
+    background: #f0f2f5;
+    min-height: 100vh;
+    padding: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
 
-.faq-container .faq-main {
-    max-width: 1000px;
+.forum-layout {
+    max-width: 1200px;
     margin: 0 auto;
-}
-
-/* ===== Section Headers ===== */
-.faq-container .section-header {
+    padding: 0 15px;
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e9ecef;
+    gap: 20px;
+    align-items: flex-start;
 }
 
-/* Nút toggle form hỏi đáp */
-.faq-container .toggle-form-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 150ms ease-in-out, box-shadow 150ms ease-in-out;
-    box-shadow: 0 6px 12px rgba(52,152,219,0.2);
-}
-
-.faq-container .toggle-form-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 10px 16px rgba(52,152,219,0.25);
-}
-
-.faq-container .toggle-form-btn:active {
-    transform: translateY(0);
-}
-
-/* Ẩn/hiện form mượt mà */
-.faq-container .question-form-container {
-    transition: all 250ms ease-in-out;
-}
-.faq-container .question-form-container.is-hidden {
-    display: none;
-}
-
-.faq-container .header-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.25rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.faq-container .section-title {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: #2c3e50;
-    letter-spacing: -0.025em;
-}
-
-/* ===== Ask Question Section ===== */
-.faq-container .ask-question-section {
-    margin-bottom: 4rem;
-}
-
-.faq-container .question-form-container {
-    background: white;
-    border-radius: 1.5rem;
-    padding: 2rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border: 1px solid #e9ecef;
-}
-
-.faq-container .question-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.faq-container .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.faq-container .form-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #495057;
-}
-
-.faq-container .form-label i {
-    color: #3498db;
-    font-size: 0.875rem;
-}
-
-.faq-container .required {
-    color: #dc3545;
-    font-weight: 700;
-}
-
-.faq-container .form-input, 
-.faq-container .form-textarea {
-    padding: 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 1rem;
-    font-size: 1rem;
-    font-weight: 500;
-    background: #f8f9fa;
-    transition: all 250ms ease-in-out;
-    outline: none;
-}
-
-.faq-container .form-input:focus, 
-.faq-container .form-textarea:focus {
-    border-color: #3498db;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
-    transform: translateY(-1px);
-}
-
-.faq-container .form-input.valid, 
-.faq-container .form-textarea.valid {
-    border-color: #28a745;
-    background: rgba(40, 167, 69, 0.05);
-}
-
-.faq-container .form-input.error, 
-.faq-container .form-textarea.error {
-    border-color: #dc3545;
-    background: rgba(220, 53, 69, 0.05);
-}
-
-.faq-container .select-wrapper {
-    position: relative;
-}
-
-.faq-container .form-select {
-    appearance: none;
-    padding: 1rem 3rem 1rem 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 1rem;
-    font-size: 1rem;
-    font-weight: 500;
-    background: #f8f9fa;
-    transition: all 250ms ease-in-out;
-    outline: none;
-    cursor: pointer;
-    width: 100%;
-}
-
-.faq-container .form-select:focus {
-    border-color: #3498db;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
-}
-
-.faq-container .select-arrow {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    pointer-events: none;
-    transition: all 150ms ease-in-out;
-}
-
-.faq-container .select-wrapper:hover .select-arrow {
-    color: #3498db;
-}
-
-.faq-container .form-hint {
-    font-size: 0.875rem;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-.faq-container .form-error {
-    font-size: 0.875rem;
-    color: #dc3545;
-    font-weight: 600;
-    display: none;
-}
-
-.faq-container .form-error.show {
-    display: block;
-}
-
-.faq-container .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1rem;
-}
-
-.faq-container .submit-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: white;
-    border: none;
-    border-radius: 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 250ms ease-in-out;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.faq-container .submit-btn:hover {
-    background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-}
-
-/* ===== Questions Section ===== */
-.faq-container .questions-section {
-    margin-bottom: 4rem;
-}
-
-/* ===== Search and Filter ===== */
-.faq-container .search-filter-section {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-
-.faq-container .search-container, 
-.faq-container .filter-container {
-    flex: 1;
-    min-width: 250px;
-}
-
-.faq-container .search-input-wrapper {
-    position: relative;
-}
-
-.faq-container .search-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    font-size: 0.875rem;
-    z-index: 2;
-}
-
-.faq-container .search-input {
-    width: 100%;
-    padding: 1rem 1rem 1rem 2.5rem;
-    border: 2px solid #e9ecef;
-    border-radius: 1rem;
-    font-size: 1rem;
-    font-weight: 500;
-    background: white;
-    transition: all 250ms ease-in-out;
-    outline: none;
-}
-
-.faq-container .search-input:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
-    transform: translateY(-1px);
-}
-
-.faq-container .filter-select-wrapper {
-    position: relative;
-}
-
-.faq-container .filter-select {
-    appearance: none;
-    width: 100%;
-    padding: 1rem 3rem 1rem 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 1rem;
-    font-size: 1rem;
-    font-weight: 500;
-    background: white;
-    transition: all 250ms ease-in-out;
-    outline: none;
-    cursor: pointer;
-}
-
-.faq-container .filter-select:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
-}
-
-.faq-container .filter-arrow {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    pointer-events: none;
-    transition: all 150ms ease-in-out;
-}
-
-.faq-container .filter-select-wrapper:hover .filter-arrow {
-    color: #3498db;
-}
-
-/* ===== Questions List ===== */
-.faq-container .questions-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.faq-container .question-item {
-    background: white;
-    border-radius: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e9ecef;
-    overflow: hidden;
-    transition: all 250ms ease-in-out;
-}
-
-.faq-container .question-item:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-.faq-container .question-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    cursor: pointer;
-    transition: all 250ms ease-in-out;
-    background: white;
-}
-
-.faq-container .question-header:hover {
-    background: #f8f9fa;
-}
-
-.faq-container .question-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.125rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    flex-shrink: 0;
-}
-
-.faq-container .question-content {
+.forum-wrapper {
     flex: 1;
     min-width: 0;
 }
 
-.faq-container .question-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-    letter-spacing: -0.025em;
+/* ===== HEADER ===== */
+.forum-header {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.faq-container .question-meta {
+.header-content {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
     flex-wrap: wrap;
+    gap: 16px;
 }
 
-.faq-container .category-badge {
-    background: linear-gradient(135deg, #ffc107 0%, #e6a800 100%);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.faq-container .user-info, 
-.faq-container .date-info {
+.forum-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1c1e21;
+    margin: 0;
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-    color: #6c757d;
-    font-weight: 500;
+    gap: 12px;
 }
 
-/* Avatar nhỏ cho Q&A */
-.qa-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: #9e9e9e;
+.forum-title i {
+    color: #1877f2;
+    font-size: 28px;
+}
+
+.btn-ask-question {
+    background: #1877f2;
     color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    overflow: hidden;
-    margin-right: 6px;
+    gap: 8px;
+    transition: background 0.2s;
 }
 
-.qa-avatar-img {
+.btn-ask-question:hover {
+    background: #166fe5;
+}
+
+/* ===== FORM ===== */
+.question-form-wrapper {
+    margin-bottom: 16px;
+    transition: all 0.3s;
+}
+
+.question-form-wrapper.is-hidden {
+    display: none;
+}
+
+.post-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.question-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #050505;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.form-label .required {
+    color: #f02849;
+}
+
+.form-control {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    padding: 10px 12px;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    font-size: 15px;
+    background: #f0f2f5;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.form-control:focus {
+    background: #fff;
+    border-color: #1877f2;
+}
+
+.form-control.is-invalid {
+    border-color: #f02849;
+    background: #fff5f5;
+}
+
+.invalid-feedback {
+    color: #f02849;
+    font-size: 13px;
+    display: none;
+}
+
+.form-control.is-invalid + .invalid-feedback {
     display: block;
 }
 
-.qa-avatar-initial { font-size: 0.85rem; }
-
-.qa-avatar-admin { background: #86a4bc; }
-
-.faq-container .user-info i, 
-.faq-container .date-info i {
-    color: #3498db;
-    font-size: 0.75rem;
-}
-
-.faq-container .status-badge {
+.form-actions {
     display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 600;
+    gap: 12px;
+    justify-content: flex-end;
 }
 
-.faq-container .status-badge.answered {
-    background: rgba(40, 167, 69, 0.1);
-    color: #28a745;
-}
-
-.faq-container .status-badge.pending {
-    background: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
-}
-
-.faq-container .question-toggle {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f8f9fa;
-    border-radius: 50%;
-    transition: all 150ms ease-in-out;
-}
-
-.faq-container .question-toggle:hover {
-    background: #3498db;
-    color: white;
-}
-
-.faq-container .toggle-icon {
-    transition: transform 250ms ease-in-out;
-}
-
-/* Nút sửa câu hỏi */
-.faq-container .edit-question-btn {
-    border: 1px solid #e9ecef;
-    background: #ffffff;
-    color: #2c3e50;
-    border-radius: 8px;
-    padding: 0.35rem 0.6rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    transition: all 150ms ease-in-out;
-}
-
-.faq-container .edit-question-btn:hover {
-    background: #3498db;
+.btn-submit {
+    background: #1877f2;
     color: #fff;
-    border-color: #3498db;
-}
-
-.faq-container .question-item.expanded .toggle-icon {
-    transform: rotate(180deg);
-}
-
-.faq-container .question-body {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 350ms ease-in-out;
-    background: #f8f9fa;
-}
-
-.faq-container .question-item.expanded .question-body {
-    max-height: 1000px;
-}
-
-.faq-container .question-description {
-    padding: 1.5rem;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.faq-container .question-description p {
-    font-size: 1rem;
-    color: #495057;
-    line-height: 1.7;
-    font-weight: 500;
-}
-
-/* ===== Answers Section ===== */
-.faq-container .answers-section {
-    padding: 1.5rem;
-}
-
-.faq-container .answers-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 15px;
     font-weight: 600;
-    color: #3498db;
-}
-
-.faq-container .answer-item {
-    background: white;
-    border-radius: 1rem;
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid #e9ecef;
-}
-
-.faq-container .answer-item:last-child {
-    margin-bottom: 0;
-}
-
-.faq-container .answer-content p {
-    font-size: 1rem;
-    color: #343a40;
-    line-height: 1.7;
-    margin-bottom: 0.75rem;
-    font-weight: 500;
-}
-
-.faq-container .answer-meta {
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-submit:hover {
+    background: #166fe5;
+}
+
+.btn-cancel {
+    background: #e4e6eb;
+    color: #050505;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #d8dadf;
+}
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
-.faq-container .answer-author, 
-.faq-container .answer-date {
+.search-box {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #65676b;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 12px 10px 38px;
+    border: 1px solid #dddfe2;
+    border-radius: 20px;
+    background: #f0f2f5;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    background: #fff;
+    border-color: #1877f2;
+}
+
+.filter-box {
+    min-width: 200px;
+}
+
+.filter-box select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    background: #f0f2f5;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.filter-box select:focus {
+    background: #fff;
+    border-color: #1877f2;
+}
+
+/* ===== POST CARD - GIAO DIỆN GIỐNG FACEBOOK ===== */
+.questions-feed .post-card {
+    margin-bottom: 16px;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.author-info {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+}
+
+.author-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-    color: #6c757d;
-    font-weight: 500;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
 }
 
-.faq-container .answer-author i, 
-.faq-container .answer-date i {
-    color: #28a745;
-    font-size: 0.75rem;
+.avatar-placeholder.admin {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-.faq-container .no-answer {
-    padding: 1.5rem;
-    text-align: center;
-    color: #6c757d;
+.author-details {
+    flex: 1;
 }
 
-.faq-container .no-answer i {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: #ffc107;
+.author-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
 }
 
-.faq-container .no-answer p {
-    font-size: 1rem;
-    font-weight: 500;
+.author-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #050505;
 }
 
-/* ===== Empty State ===== */
-.faq-container .empty-state {
-    text-align: center;
-    padding: 5rem;
-    color: #6c757d;
+.user-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.faq-container .empty-icon {
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+.admin-badge {
+    color: #fff;
+}
+
+.member-badge {
+    background: #e7f3ff;
+    color: #1877f2;
+}
+
+.category-tag {
+    background: #ffeaa7;
+    color: #2d3436;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.post-time {
+    font-size: 13px;
+    color: #65676b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.post-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit-question {
+    background: #f0f2f5;
+    border: none;
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #65676b;
+    transition: all 0.2s;
+}
+
+.btn-edit-question:hover {
+    background: #e4e6eb;
+    color: #050505;
+}
+
+/* ===== POST CONTENT ===== */
+.post-content {
+    margin-bottom: 16px;
+}
+
+.post-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #050505;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+}
+
+.post-body {
+    color: #050505;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.post-body p {
+    margin: 0;
+}
+
+/* ===== POST STATS ===== */
+.post-stats {
+    border-top: 1px solid #e4e6eb;
+    padding-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.stat-answered {
+    color: #31b545;
+}
+
+.stat-pending {
+    color: #e67e22;
+}
+
+.stat-divider {
+    color: #65676b;
+    font-size: 12px;
+}
+
+.btn-toggle-answers {
+    background: none;
+    border: none;
+    color: #65676b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.btn-toggle-answers:hover {
+    color: #050505;
+}
+
+.btn-like {
+    background: none;
+    border: none;
+    color: #65676b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-like:hover {
+    background: #f0f2f5;
+}
+
+.btn-like.liked {
+    color: #e91e63;
+}
+
+.btn-like.liked i {
+    animation: likeAnimation 0.3s ease;
+}
+
+@keyframes likeAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.btn-like .like-count {
+    font-weight: 700;
+}
+
+/* ===== SIDEBAR ===== */
+.forum-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+}
+
+.sidebar-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f2f5;
+}
+
+.sidebar-header i {
+    color: #1877f2;
+    font-size: 18px;
+}
+
+.sidebar-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1c1e21;
+    margin: 0;
+}
+
+.sidebar-body {
+    color: #65676b;
+}
+
+/* Top Questions */
+.top-questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.top-question-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.rank-badge {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1.5rem;
-    color: #adb5bd;
-    font-size: 2.25rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.faq-container .empty-state h3 {
-    font-size: 1.5rem;
     font-weight: 700;
-    color: #495057;
-    margin-bottom: 0.75rem;
+    font-size: 14px;
+    flex-shrink: 0;
 }
 
-.faq-container .empty-state p {
-    font-size: 1rem;
-    color: #6c757d;
-    font-weight: 500;
+.rank-badge.rank-1 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
 }
 
-/* ===== Pagination ===== */
-.faq-container .pagination-container {
+.rank-badge.rank-2 {
+    background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(192, 192, 192, 0.4);
+}
+
+.rank-badge.rank-3 {
+    background: linear-gradient(135deg, #cd7f32 0%, #e69a56 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4);
+}
+
+.rank-badge:not(.rank-1):not(.rank-2):not(.rank-3) {
+    background: #f0f2f5;
+    color: #65676b;
+}
+
+.top-question-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.top-question-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #050505;
+    margin-bottom: 4px;
+    text-decoration: none;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.top-question-title:hover {
+    color: #1877f2;
+}
+
+.top-question-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #65676b;
+}
+
+.top-author,
+.top-likes {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.top-likes {
+    color: #e91e63;
+    font-weight: 600;
+}
+
+.no-top-questions {
+    text-align: center;
+    padding: 24px 12px;
+    color: #65676b;
+}
+
+.no-top-questions i {
+    font-size: 36px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.no-top-questions p {
+    margin: 0;
+    font-size: 13px;
+}
+
+/* Stats */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+.stat-row:not(:last-child) {
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.stat-label {
+    color: #65676b;
+}
+
+.stat-value {
+    font-weight: 700;
+    color: #050505;
+}
+
+.stat-value.text-success {
+    color: #31b545;
+}
+
+.stat-value.text-warning {
+    color: #e67e22;
+}
+
+/* ===== ANSWERS SECTION ===== */
+.answers-wrapper {
+    border-top: 1px solid #e4e6eb;
+    margin-top: 16px;
+    padding-top: 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.answers-wrapper.is-expanded {
+    max-height: 2000px;
+}
+
+.answers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.answer-card {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    background: #f7f8fa;
+    border-radius: 8px;
+}
+
+.answer-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.answer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.answer-content {
+    flex: 1;
+}
+
+.answer-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.answer-author {
+    font-size: 14px;
+    font-weight: 600;
+    color: #050505;
+}
+
+.answer-time {
+    font-size: 12px;
+    color: #65676b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.answer-text {
+    color: #050505;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.answer-text p {
+    margin: 0;
+}
+
+.no-answers {
+    text-align: center;
+    padding: 24px;
+    color: #65676b;
+}
+
+.no-answers i {
+    font-size: 36px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.no-answers p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    background: #fff;
+    border-radius: 8px;
+    padding: 60px 20px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.empty-icon {
+    width: 100px;
+    height: 100px;
+    background: #f0f2f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.empty-icon i {
+    font-size: 48px;
+    color: #bcc0c4;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1c1e21;
+    margin: 0 0 8px 0;
+}
+
+.empty-state p {
+    font-size: 15px;
+    color: #65676b;
+    margin: 0 0 20px 0;
+}
+
+/* ===== PAGINATION ===== */
+.pagination-wrapper {
     display: flex;
     justify-content: center;
-    margin-top: 2rem;
+    margin-top: 20px;
 }
 
-/* ===== Responsive Design ===== */
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .forum-layout {
+        flex-direction: column;
+    }
+    
+    .forum-sidebar {
+        width: 100%;
+        order: -1;
+    }
+    
+    .sidebar-card {
+        display: inline-block;
+        width: calc(50% - 8px);
+        margin-right: 16px;
+        vertical-align: top;
+    }
+    
+    .sidebar-card:last-child {
+        margin-right: 0;
+    }
+}
+
 @media (max-width: 768px) {
-    .faq-container {
-        padding: 1rem 0.5rem;
+    .forum-container {
+        padding: 12px 0;
     }
     
-    .faq-container .section-header {
+    .forum-layout {
+        padding: 0 8px;
+    }
+    
+    .header-content {
         flex-direction: column;
-        text-align: center;
-        gap: 0.5rem;
+        align-items: stretch;
     }
     
-    .faq-container .section-title {
-        font-size: 1.5rem;
+    .forum-title {
+        font-size: 20px;
     }
     
-    .faq-container .question-form-container {
-        padding: 1.5rem;
+    .btn-ask-question {
+        justify-content: center;
+        width: 100%;
     }
     
-    .faq-container .search-filter-section {
+    .filter-bar {
         flex-direction: column;
     }
     
-    .faq-container .question-header {
-        padding: 1rem;
+    .search-box,
+    .filter-box {
+        width: 100%;
+        min-width: 100%;
     }
     
-    .faq-container .question-meta {
+    .post-card {
+        padding: 16px;
+    }
+    
+    .author-name-row {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
     }
     
-    .faq-container .question-description,
-    .faq-container .answers-section {
-        padding: 1rem;
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .sidebar-card {
+        width: 100%;
+        margin-right: 0;
+        display: block;
     }
 }
 
 @media (max-width: 576px) {
-    .faq-container .question-icon {
+    .author-avatar {
         width: 40px;
         height: 40px;
-        font-size: 1rem;
     }
     
-    .faq-container .question-title {
-        font-size: 1rem;
+    .post-title {
+        font-size: 16px;
     }
     
-    .faq-container .form-actions {
-        justify-content: stretch;
-    }
-    
-    .faq-container .submit-btn {
-        width: 100%;
-        justify-content: center;
+    .post-body {
+        font-size: 14px;
     }
 }
 </style>
@@ -1010,23 +1280,70 @@
 
 @section('scripts')
 <script>
-// Accordion functionality
-function toggleQuestion(questionId) {
-    const questionItem = document.querySelector(`[onclick="toggleQuestion(${questionId})"]`).closest('.question-item');
-    const questionBody = document.getElementById(`question-${questionId}`);
+// Toggle like/unlike câu hỏi
+function toggleLike(questionId) {
+    // Kiểm tra đăng nhập
+    @guest
+        alert('Bạn cần đăng nhập để like câu hỏi!');
+        window.location.href = '{{ route("login") }}';
+        return;
+    @endguest
     
-    if (questionItem.classList.contains('expanded')) {
-        // Collapse
-        questionItem.classList.remove('expanded');
-        questionBody.style.maxHeight = '0';
-    } else {
-        // Expand
-        questionItem.classList.add('expanded');
-        questionBody.style.maxHeight = questionBody.scrollHeight + 'px';
+    const token = $('meta[name="csrf-token"]').attr('content');
+    const $btn = $(`.btn-like[data-question-id="${questionId}"]`);
+    
+    // Disable button khi đang xử lý
+    $btn.prop('disabled', true);
+    
+    $.ajax({
+        url: `/hoi-dap/${questionId}/like`,
+        method: 'POST',
+        data: {
+            _token: token
+        },
+        success: function(response) {
+            if (response.success) {
+                // Cập nhật UI
+                $btn.find('.like-count').text(response.likes_count);
+                
+                if (response.liked) {
+                    $btn.addClass('liked');
+                } else {
+                    $btn.removeClass('liked');
+                }
+            }
+        },
+        error: function(xhr) {
+            if (xhr.status === 401) {
+                alert('Bạn cần đăng nhập để like câu hỏi!');
+                window.location.href = '{{ route("login") }}';
+            } else {
+                alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
+        },
+        complete: function() {
+            // Enable lại button
+            $btn.prop('disabled', false);
+        }
+    });
+}
+
+// Toggle answers section
+function toggleAnswers(questionId) {
+    const answersWrapper = document.getElementById(`answers-${questionId}`);
+    
+    if (answersWrapper) {
+        if (answersWrapper.classList.contains('is-collapsed')) {
+            answersWrapper.classList.remove('is-collapsed');
+            answersWrapper.classList.add('is-expanded');
+        } else {
+            answersWrapper.classList.add('is-collapsed');
+            answersWrapper.classList.remove('is-expanded');
+        }
     }
 }
 
-// Search functionality
+// Search và filter functionality
 function initSearch() {
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
@@ -1043,13 +1360,14 @@ function initSearch() {
 function filterQuestions() {
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     const selectedCategory = document.getElementById('categoryFilter')?.value || '';
-    const questionItems = document.querySelectorAll('.question-item');
+    const questionItems = document.querySelectorAll('.questions-feed .post-card[data-question-id]');
     
     questionItems.forEach(item => {
-        const title = item.querySelector('.question-title')?.textContent.toLowerCase() || '';
+        const title = item.querySelector('.post-title')?.textContent.toLowerCase() || '';
+        const body = item.querySelector('.post-body')?.textContent.toLowerCase() || '';
         const category = item.dataset.category || '';
         
-        const matchesSearch = title.includes(searchTerm);
+        const matchesSearch = title.includes(searchTerm) || body.includes(searchTerm);
         const matchesCategory = !selectedCategory || category === selectedCategory;
         
         if (matchesSearch && matchesCategory) {
@@ -1074,92 +1392,60 @@ function debounce(func, wait) {
 }
 
 $(document).ready(function() {
-    // Mở modal sửa câu hỏi (inline replace form)
-    $(document).on('click', '.edit-question-btn', function() {
-        const id = $(this).data('id');
-        const $item = $(this).closest('.question-item');
-        const currentTitle = $item.find('.question-title').text().trim();
-        const currentCategory = $item.data('category');
-        const currentContent = $item.find('.question-description p').text().trim();
-
-        // Hiển thị form inline thay cho form tạo mới
-        $('#toggleQuestionFormBtn').trigger('click');
-        $('#title').val(currentTitle);
-        $('#category').val(currentCategory).trigger('change');
-        $('#content').val(currentContent);
-
-        // Gắn cờ đang edit
-        $('#questionForm').attr('data-edit-id', id);
-        $('.submit-btn span').text('Cập nhật Câu Hỏi');
-    });
-
-    // Khi submit: nếu có data-edit-id thì gọi API update
-    $('#questionForm').on('submit', function(e) {
-        const editId = $(this).attr('data-edit-id');
-        if (!editId) return; // không can thiệp khi tạo mới
-
-        e.preventDefault();
-        if (!validateForm()) return;
-
-        const token = $('meta[name="csrf-token"]').attr('content');
-        const payload = {
-            title: $('#title').val().trim(),
-            category: $('#category').val(),
-            content: $('#content').val().trim(),
-            _token: token,
-            _method: 'PATCH'
-        };
-
-        $.ajax({
-            url: '/hoi-dap/' + editId,
-            method: 'POST',
-            data: payload,
-            dataType: 'json',
-            success: function(res) {
-                if (res.success) {
-                    // Cập nhật UI nhanh
-                    const $item = $('.question-item').filter(function(){ return $(this).find('.edit-question-btn').data('id') == editId; });
-                    $item.find('.question-title').text(res.question.title);
-                    $item.find('.question-description p').text(res.question.content);
-                    // Đặt lại form về trạng thái tạo mới
-                    $('#questionForm').removeAttr('data-edit-id')[0].reset();
-                    $('.submit-btn span').text('Gửi Câu Hỏi');
-                    $('#toggleQuestionFormBtn').trigger('click');
-                }
-            },
-            error: function(xhr) {
-                if (xhr.status === 403) {
-                    showErrorModal('Bạn không được phép sửa câu hỏi này.');
-                } else if (xhr.status === 422) {
-                    showValidationErrors(xhr.responseJSON.errors);
-                } else {
-                    showErrorModal('Không thể cập nhật câu hỏi. Vui lòng thử lại.');
-                }
-            }
-        });
-    });
     // Initialize search functionality
     initSearch();
     
     // Toggle form hỏi đáp
     const $formWrapper = $('#questionFormWrapper');
     const $toggleBtn = $('#toggleQuestionFormBtn');
+    
     if ($toggleBtn.length && $formWrapper.length) {
         $toggleBtn.on('click', function() {
             const isHidden = $formWrapper.hasClass('is-hidden');
             if (isHidden) {
                 $formWrapper.removeClass('is-hidden');
-                $toggleBtn.find('span').text('Ẩn form đặt câu hỏi');
-                $toggleBtn.find('i').removeClass('fa-pen').addClass('fa-times');
-                // Focus vào tiêu đề khi mở form để UX tốt
                 setTimeout(() => { $('#title').trigger('focus'); }, 50);
             } else {
                 $formWrapper.addClass('is-hidden');
-                $toggleBtn.find('span').text('Đặt câu hỏi mới');
-                $toggleBtn.find('i').removeClass('fa-times').addClass('fa-pen');
+                // Reset form khi đóng
+                resetForm();
             }
         });
     }
+    
+    // Nút Cancel trong form
+    $('#cancelFormBtn').on('click', function() {
+        $formWrapper.addClass('is-hidden');
+        resetForm();
+    });
+    
+    // Xử lý nút sửa câu hỏi
+    $(document).on('click', '.btn-edit-question', function() {
+        const id = $(this).data('id');
+        const $card = $(this).closest('.post-card');
+        const currentTitle = $card.find('.post-title').text().trim();
+        const currentCategory = $card.data('category');
+        const currentContent = $card.find('.post-body p').text().trim();
+
+        // Hiển thị form
+        if ($formWrapper.hasClass('is-hidden')) {
+            $toggleBtn.trigger('click');
+        }
+        
+        // Điền dữ liệu vào form
+        $('#title').val(currentTitle);
+        $('#category').val(currentCategory);
+        $('#content').val(currentContent);
+
+        // Gắn cờ đang edit
+        $('#questionForm').attr('data-edit-id', id);
+        $('.btn-submit span').text('Cập nhật Câu Hỏi');
+        
+        // Scroll đến form
+        $('html, body').animate({
+            scrollTop: $formWrapper.offset().top - 100
+        }, 500);
+    });
     
     // Xử lý form gửi câu hỏi
     $('#questionForm').on('submit', function(e) {
@@ -1169,6 +1455,9 @@ $(document).ready(function() {
         if (!validateForm()) {
             return;
         }
+        
+        const editId = $(this).attr('data-edit-id');
+        const isEdit = !!editId;
         
         // Hiển thị loading
         $('#loadingModal').modal('show');
@@ -1187,9 +1476,17 @@ $(document).ready(function() {
             _token: token
         };
         
+        // Thêm method PATCH nếu đang edit
+        if (isEdit) {
+            formData._method = 'PATCH';
+        }
+        
+        // Xác định URL
+        const url = isEdit ? '/hoi-dap/' + editId : '{{ route("question-answer.store") }}';
+        
         // Gửi request
         $.ajax({
-            url: '{{ route("question-answer.store") }}',
+            url: url,
             method: 'POST',
             data: formData,
             dataType: 'json',
@@ -1201,9 +1498,7 @@ $(document).ready(function() {
                     $('#successModal').modal('show');
                     
                     // Reset form
-                    $('#questionForm')[0].reset();
-                    $('.form-input, .form-textarea, .form-select').removeClass('valid error');
-                    $('.form-error').removeClass('show').text('');
+                    resetForm();
                     
                     // Reload trang sau khi đóng modal
                     $('#successModal').on('hidden.bs.modal', function() {
@@ -1223,16 +1518,31 @@ $(document).ready(function() {
                 } else if (xhr.status === 401) {
                     // Chưa đăng nhập
                     showErrorModal('Bạn cần đăng nhập để đặt câu hỏi.');
+                } else if (xhr.status === 403) {
+                    showErrorModal('Bạn không có quyền thực hiện thao tác này.');
                 } else {
-                    showErrorModal('Có lỗi xảy ra khi gửi câu hỏi. Vui lòng thử lại.');
+                    showErrorModal('Có lỗi xảy ra. Vui lòng thử lại.');
                 }
             }
         });
     });
     
+    // Reset form về trạng thái ban đầu
+    function resetForm() {
+        $('#questionForm')[0].reset();
+        $('#questionForm').removeAttr('data-edit-id');
+        $('.form-control').removeClass('is-invalid');
+        $('.invalid-feedback').text('').hide();
+        $('.btn-submit span').text('Gửi Câu Hỏi');
+    }
+    
     // Hàm validate form
     function validateForm() {
         let isValid = true;
+        
+        // Clear previous errors
+        $('.form-control').removeClass('is-invalid');
+        $('.invalid-feedback').text('').hide();
         
         // Validate title
         const title = $('#title').val().trim();
@@ -1245,8 +1555,6 @@ $(document).ready(function() {
         } else if (title.length > 255) {
             showFieldError('title', 'Tiêu đề không được vượt quá 255 ký tự.');
             isValid = false;
-        } else {
-            showFieldSuccess('title');
         }
         
         // Validate category
@@ -1254,8 +1562,6 @@ $(document).ready(function() {
         if (!category) {
             showFieldError('category', 'Vui lòng chọn danh mục câu hỏi.');
             isValid = false;
-        } else {
-            showFieldSuccess('category');
         }
         
         // Validate content
@@ -1269,8 +1575,6 @@ $(document).ready(function() {
         } else if (content.length > 2000) {
             showFieldError('content', 'Nội dung không được vượt quá 2000 ký tự.');
             isValid = false;
-        } else {
-            showFieldSuccess('content');
         }
         
         return isValid;
@@ -1278,20 +1582,11 @@ $(document).ready(function() {
     
     // Hàm hiển thị lỗi cho field
     function showFieldError(fieldName, message) {
-        const input = $(`#${fieldName}`);
-        const feedback = input.siblings('.form-error');
+        const $input = $(`#${fieldName}`);
+        const $feedback = $input.siblings('.invalid-feedback');
         
-        input.removeClass('valid').addClass('error');
-        feedback.addClass('show').text(message);
-    }
-    
-    // Hàm hiển thị thành công cho field
-    function showFieldSuccess(fieldName) {
-        const input = $(`#${fieldName}`);
-        const feedback = input.siblings('.form-error');
-        
-        input.removeClass('error').addClass('valid');
-        feedback.removeClass('show').text('');
+        $input.addClass('is-invalid');
+        $feedback.text(message).show();
     }
     
     // Hàm hiển thị modal lỗi
@@ -1300,66 +1595,22 @@ $(document).ready(function() {
         $('#errorModal').modal('show');
     }
     
-    // Hàm hiển thị lỗi validation
+    // Hàm hiển thị lỗi validation từ server
     function showValidationErrors(errors) {
-        // Xóa class invalid cũ
-        $('.form-input, .form-textarea, .form-select').removeClass('error valid');
-        $('.form-error').removeClass('show').text('');
+        $('.form-control').removeClass('is-invalid');
+        $('.invalid-feedback').text('').hide();
         
-        // Hiển thị lỗi mới
         Object.keys(errors).forEach(function(field) {
-            const input = $(`#${field}`);
-            const feedback = input.siblings('.form-error');
-            
-            input.addClass('error');
-            feedback.addClass('show').text(errors[field][0]);
+            showFieldError(field, errors[field][0]);
         });
         
-        // Hiển thị modal lỗi
         showErrorModal('Vui lòng kiểm tra lại thông tin đã nhập.');
     }
     
-    // Real-time validation
-    $('#title').on('input', function() {
-        const value = $(this).val().trim();
-        if (value.length >= 5 && value.length <= 255) {
-            showFieldSuccess('title');
-        } else if (value.length > 0) {
-            if (value.length < 5) {
-                showFieldError('title', 'Tiêu đề phải có ít nhất 5 ký tự.');
-            } else if (value.length > 255) {
-                showFieldError('title', 'Tiêu đề không được vượt quá 255 ký tự.');
-            }
-        } else {
-            $(this).removeClass('valid error');
-            $(this).siblings('.form-error').removeClass('show').text('');
-        }
-    });
-    
-    $('#category').on('change', function() {
-        const value = $(this).val();
-        if (value) {
-            showFieldSuccess('category');
-        } else {
-            $(this).removeClass('valid error');
-            $(this).siblings('.form-error').removeClass('show').text('');
-        }
-    });
-    
-    $('#content').on('input', function() {
-        const value = $(this).val().trim();
-        if (value.length >= 10 && value.length <= 2000) {
-            showFieldSuccess('content');
-        } else if (value.length > 0) {
-            if (value.length < 10) {
-                showFieldError('content', 'Nội dung phải có ít nhất 10 ký tự.');
-            } else if (value.length > 2000) {
-                showFieldError('content', 'Nội dung không được vượt quá 2000 ký tự.');
-            }
-        } else {
-            $(this).removeClass('valid error');
-            $(this).siblings('.form-error').removeClass('show').text('');
-        }
+    // Real-time validation khi người dùng nhập
+    $('#title, #category, #content').on('input change', function() {
+        $(this).removeClass('is-invalid');
+        $(this).siblings('.invalid-feedback').text('').hide();
     });
 });
 </script>

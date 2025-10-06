@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Question;
 use App\Models\Answer;
+use App\Models\QuestionLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,15 +18,24 @@ class QuestionAnswerController extends Controller
     public function index()
     {
         try {
-            // Lấy tất cả câu hỏi với answers, sắp xếp theo thời gian mới nhất
-            $questions = Question::with(['user', 'answers.user'])
+            // Lấy tất cả câu hỏi với answers, likes và user, sắp xếp theo thời gian mới nhất
+            $questions = Question::with(['user', 'answers.user', 'likes'])
+                ->withCount('likes')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
 
             // Lấy danh sách danh mục
             $categories = Question::getCategories();
+            
+            // Lấy top 10 câu hỏi có nhiều like nhất
+            $topQuestions = Question::with(['user'])
+                ->withCount('likes')
+                ->having('likes_count', '>', 0)
+                ->orderBy('likes_count', 'desc')
+                ->take(10)
+                ->get();
 
-            return view('customer.question-answer.index', compact('questions', 'categories'));
+            return view('customer.question-answer.index', compact('questions', 'categories', 'topQuestions'));
         } catch (\Exception $e) {
             Log::error('Lỗi khi hiển thị trang hỏi đáp: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi tải trang hỏi đáp.');
@@ -487,6 +497,61 @@ class QuestionAnswerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Có lỗi xảy ra khi xóa câu trả lời.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Like hoặc Unlike câu hỏi
+     */
+    public function toggleLike(Question $question)
+    {
+        try {
+            // Kiểm tra user đã đăng nhập chưa
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn cần đăng nhập để like câu hỏi.'
+                ], 401);
+            }
+
+            $userId = Auth::id();
+            
+            // Kiểm tra user đã like chưa
+            $existingLike = QuestionLike::where('user_id', $userId)
+                ->where('question_id', $question->id)
+                ->first();
+
+            if ($existingLike) {
+                // Đã like rồi thì unlike
+                $existingLike->delete();
+                $liked = false;
+                $message = 'Đã bỏ like câu hỏi.';
+            } else {
+                // Chưa like thì tạo like mới
+                QuestionLike::create([
+                    'user_id' => $userId,
+                    'question_id' => $question->id
+                ]);
+                $liked = true;
+                $message = 'Đã like câu hỏi.';
+            }
+
+            // Đếm lại số lượt like
+            $likesCount = $question->likes()->count();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'liked' => $liked,
+                'likes_count' => $likesCount
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi toggle like câu hỏi: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra. Vui lòng thử lại.'
             ], 500);
         }
     }

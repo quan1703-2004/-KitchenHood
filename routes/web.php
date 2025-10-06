@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\ChatbotController;
 use App\Models\Faq;
 
 
@@ -98,6 +99,8 @@ Route::get('/', function () {
 
 // Routes cho tin tức
 Route::get('/news', [App\Http\Controllers\NewsController::class, 'index'])->name('news.index');
+// API Chatbot (khách hàng)
+Route::post('/api/chatbot/message', [ChatbotController::class, 'message'])->name('api.chatbot.message');
 Route::get('/news/{slug}', [App\Http\Controllers\NewsController::class, 'show'])->name('news.show');
 
 // Routes cho đánh giá
@@ -257,6 +260,7 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 Route::middleware(['auth'])->group(function () {
     Route::get('/hoi-dap', [App\Http\Controllers\QuestionAnswerController::class, 'index'])->name('question-answer.index');
     Route::post('/hoi-dap', [App\Http\Controllers\QuestionAnswerController::class, 'store'])->name('question-answer.store');
+    Route::post('/hoi-dap/{question}/like', [App\Http\Controllers\QuestionAnswerController::class, 'toggleLike'])->name('question-answer.like');
 });
 
 // Route để lấy CSRF token

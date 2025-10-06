@@ -126,7 +126,6 @@
                                     id="payment_method" 
                                     name="payment_method" 
                                     required>
-                                <option value="">Chọn phương thức thanh toán</option>
                                 <option value="cod" {{ old('payment_method') == 'cod' ? 'selected' : '' }}>
                                     Thanh toán khi nhận hàng (COD)
                                 </option>

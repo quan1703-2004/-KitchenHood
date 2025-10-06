@@ -64,6 +64,8 @@ class FavoriteController extends Controller
             'product_id' => $productId
         ]);
 
+        
+
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
