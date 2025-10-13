@@ -87,7 +87,7 @@
                     
                     @if($product->image2)
                         <div class="mb-3 text-center">
-                            <img src="{{ asset('storage/' . $product->image2) }}" 
+                            <img src="{{ $product->image2_url }}" 
                                  alt="Hình ảnh phụ 1" 
                                  class="img-thumbnail" 
                                  style="max-width: 200px; border-radius: 12px;">
@@ -115,7 +115,7 @@
                     
                     @if($product->image3)
                         <div class="mb-3 text-center">
-                            <img src="{{ asset('storage/' . $product->image3) }}" 
+                            <img src="{{ $product->image3_url }}" 
                                  alt="Hình ảnh phụ 2" 
                                  class="img-thumbnail" 
                                  style="max-width: 200px; border-radius: 12px;">

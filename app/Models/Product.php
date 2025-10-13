@@ -50,6 +50,28 @@ class Product extends Model
     }
 
     /**
+     * Lấy đường dẫn hình ảnh phụ 1
+     */
+    public function getImage2UrlAttribute()
+    {
+        if ($this->image2) {
+            return asset('storage/' . $this->image2);
+        }
+        return null;
+    }
+
+    /**
+     * Lấy đường dẫn hình ảnh phụ 2
+     */
+    public function getImage3UrlAttribute()
+    {
+        if ($this->image3) {
+            return asset('storage/' . $this->image3);
+        }
+        return null;
+    }
+
+    /**
      * Quan hệ chi tiết sản phẩm (1-1)
      */
     public function detail()
