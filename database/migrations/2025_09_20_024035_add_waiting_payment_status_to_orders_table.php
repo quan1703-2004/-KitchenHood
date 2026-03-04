@@ -12,8 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Thêm trạng thái 'waiting_payment' vào enum status
-        DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'waiting_payment', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending'");
+        // Thêm trạng thái 'waiting_payment' vào enum status (chỉ cho MySQL/MariaDB)
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'waiting_payment', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending'");
+        }
     }
 
     /**
@@ -21,7 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Khôi phục enum cũ
-        DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending'");
+        // Khôi phục enum cũ (chỉ cho MySQL/MariaDB)
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending'");
+        }
     }
 };
