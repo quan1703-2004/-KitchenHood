@@ -12,8 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Cập nhật enum cho payment_method để thêm 'momo' và 'qr_code'
-        DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method ENUM('cod', 'bank_transfer', 'momo', 'qr_code') NOT NULL");
+        // Chỉ chạy lệnh ALTER ENUM cho MySQL/MariaDB
+        if (DB::getDriverName() === 'mysql') {
+            // Cập nhật enum cho payment_method để thêm 'momo' và 'qr_code'
+            DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method ENUM('cod', 'bank_transfer', 'momo', 'qr_code') NOT NULL");
+        }
     }
 
     /**
@@ -21,7 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Khôi phục enum cũ
-        DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method ENUM('cod', 'bank_transfer', 'momo') NOT NULL");
+        // Chỉ chạy lệnh ALTER ENUM cho MySQL/MariaDB
+        if (DB::getDriverName() === 'mysql') {
+            // Khôi phục enum cũ
+            DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method ENUM('cod', 'bank_transfer', 'momo') NOT NULL");
+        }
     }
 };

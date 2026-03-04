@@ -15,8 +15,9 @@ FROM php:8.2-cli
 RUN apt-get update && apt-get install -y \
     git unzip libpng-dev libjpeg-dev libfreetype6-dev \
     libonig-dev libzip-dev libxml2-dev libicu-dev \
+    libpq-dev \
  && docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install pdo_mysql mbstring zip gd intl \
+ && docker-php-ext-install pdo_mysql pdo_pgsql pgsql mbstring zip gd intl \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
@@ -34,4 +35,5 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 
 EXPOSE 10000
 
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan migrate:fresh --seed --force && \
+    php artisan serve --host=0.0.0.0 --port=10000
